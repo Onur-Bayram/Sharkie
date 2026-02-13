@@ -26,15 +26,15 @@ constructor(canvas) {
             this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
 
     this.backgroundObjects.forEach((background) => {
-        if (background.img.complete) {
+        if (background.img && background.img.src) {
             this.ctx.drawImage(background.img, background.x, background.y, background.width, background.height);
         }
     });
-    if (this.character.img.complete) {
+    if (this.character.img && this.character.img.src) {
         this.ctx.drawImage(this.character.img, this.character.x, this.character.y, this.character.width, this.character.height);
     }
     this.enemies.forEach((enemy) => {
-        if (enemy.img.complete) {
+        if (enemy.img && enemy.img.src) {
             this.ctx.drawImage(enemy.img, enemy.x, enemy.y, enemy.width, enemy.height);
         }
     }); 

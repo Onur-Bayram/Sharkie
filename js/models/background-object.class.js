@@ -5,7 +5,7 @@ class BackgroundObject extends MovableObject {
         this.x = x;
         this.y = y;
         this.width = 720;
-        this.height = 300;
+        this.height = 480;
 
 
     }
