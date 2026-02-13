@@ -9,8 +9,8 @@ class World {
 
 backgroundObjects = [
     new BackgroundObject('3. Background/Layers/1. Light/1.png', 0, 0),
-    new BackgroundObject('3. Background/Layers/2. Floor/1.png', 0, 0),
-    new BackgroundObject('3. Background/Layers/5. Water/1.png', 0, 0),
+    new BackgroundObject('3. Background/Layers/2. Floor/L.png', 0, 0),
+    new BackgroundObject('3. Background/Layers/5. Water/L.png', 0, 0),
 ];  
 canvas; 
 ctx; 
