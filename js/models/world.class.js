@@ -7,7 +7,15 @@ class World {
     new Pufferfish(),
 ];
 
+clouds = [
+    new Cloud(),
 
+];  
+backgrounds = [
+    new BackgroundObject('3. Background/Layers/1. Light/1.png', 0, 0),
+    new BackgroundObject('3. Background/Layers/2. Floor/1.png', 0, 0),
+    new BackgroundObject('3. Background/Layers/5. Water/1.png', 0, 0),
+];  
 canvas; 
 ctx; 
 
@@ -25,6 +33,17 @@ constructor(canvas) {
     this.enemies.forEach((enemy) => {
         this.ctx.drawImage(enemy.img, enemy.x, enemy.y, enemy.width, enemy.height);
     }); 
+
+      this.clouds.forEach((cloud) => {
+        this.ctx.drawImage(cloud.img, cloud.x, cloud.y, cloud.width, cloud.height);
+    }); 
+      this.clouds.forEach((enemy) => {
+        this.ctx.drawImage(Cloud.img, enemy.x, Cloud.y, Cloud.width, Cloud.height);
+    }); 
+       this.clouds.forEach((enemy) => {
+        this.ctx.drawImage(Cloud.img, enemy.x, Cloud.y, Cloud.width, Cloud.height);
+    }); 
+
         let self = this; 
         requestAnimationFrame(function() {
             self.draw();
