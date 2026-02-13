@@ -9,8 +9,8 @@ class World {
 
 backgroundObjects = [
     new BackgroundObject('3. Background/Layers/5. Water/L.png', 0, 0),
-    new BackgroundObject('3. Background/Layers/4.Fondo 2/L.png', 0, 0),
     new BackgroundObject('3. Background/Layers/3.Fondo 1/L.png', 0, 0),
+    new BackgroundObject('3. Background/Layers/4.Fondo 2/L.png', 0, 0),
     new BackgroundObject('3. Background/Layers/2. Floor/L.png', 0, 0),
     new BackgroundObject('3. Background/Layers/1. Light/COMPLETO.png', 0, 0),
 ];  

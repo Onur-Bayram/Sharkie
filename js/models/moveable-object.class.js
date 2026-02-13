@@ -6,6 +6,7 @@ height = 150;
 width = 100;
 imageCache = {};
 currentImage = 0;
+speed = 0.15;
 
 
 loadImage(path) {
@@ -21,16 +22,21 @@ loadImages(arr) {
     });
 }
 
-
 moveRight() {
-    console.log('Moving right');
- }
+    this.x += this.speed;
+}
 
-    moveLeft(){
-        console.log('Moving left');
+moveLeft() {
+    this.x -= this.speed;
+}
 
+moveUp() {
+    this.y -= this.speed;
+}
 
-    }
+moveDown() {
+    this.y += this.speed;
+}
 
  }
 

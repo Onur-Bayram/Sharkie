@@ -27,7 +27,9 @@ class Character extends MovableObject{
         this.loadImages(this.IMAGES_IDLE);
         this.width = 200;
         this.height = 140;
+        this.speed = 5;
         this.animate();
+        this.handleKeyboard();
     }
 
     animate() {
@@ -36,6 +38,37 @@ class Character extends MovableObject{
             this.img = this.imageCache[path];
             this.currentImage++;
         }, 100);
+    }
+
+    handleKeyboard() {
+        setInterval(() => {
+            if (window.keyboard && window.keyboard.RIGHT) {
+                this.moveRight();
+            }
+            if (window.keyboard && window.keyboard.LEFT) {
+                this.moveLeft();
+            }
+            if (window.keyboard && window.keyboard.UP) {
+                this.moveUp();
+            }
+            if (window.keyboard && window.keyboard.DOWN) {
+                this.moveDown();
+            }
+            
+            // Begrenzung - Hai darf nicht aus dem Bild schwimmen
+            if (this.x < 0) {
+                this.x = 0;
+            }
+            if (this.x > 760) { // 960 - 200 (Canvas-Breite minus Hai-Breite)
+                this.x = 760;
+            }
+            if (this.y < 0) {
+                this.y = 0;
+            }
+            if (this.y > 400) { // 540 - 140 (Canvas-Höhe minus Hai-Höhe)
+                this.y = 400;
+            }
+        }, 1000 / 60);
     }
 
     jump() {
