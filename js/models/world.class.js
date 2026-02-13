@@ -21,10 +21,18 @@ ctx;
 constructor(canvas) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
+    this.lightLayer = this.backgroundObjects[this.backgroundObjects.length - 1];
+    this.lightBaseX = this.lightLayer.x;
     this.draw();
 }
 
 draw() {
+    const now = performance.now();
+
+    if (this.lightLayer) {
+        this.lightLayer.x = this.lightBaseX + Math.sin(now * 0.0008) * 25;
+    }
+
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.backgroundObjects.forEach((background) => {
