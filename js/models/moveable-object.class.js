@@ -9,7 +9,7 @@ width = 100;
 
 loadImage(path) {
     this.img = new Image();
-    this.img.src = path;
+    this.img.src = encodeURI(path);
 }
 
 
