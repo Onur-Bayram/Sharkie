@@ -7,7 +7,7 @@ class World {
     new Pufferfish(),
 ];
 
-backgrounds = [
+backgroundObjects = [
     new BackgroundObject('3. Background/Layers/1. Light/1.png', 0, 0),
     new BackgroundObject('3. Background/Layers/2. Floor/1.png', 0, 0),
     new BackgroundObject('3. Background/Layers/5. Water/1.png', 0, 0),
@@ -25,7 +25,7 @@ constructor(canvas) {
     draw() {
             this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
 
-    this.backgrounds.forEach((background) => {
+    this.backgroundObjects.forEach((background) => {
         if (background.img.complete) {
             this.ctx.drawImage(background.img, background.x, background.y, background.width, background.height);
         }
