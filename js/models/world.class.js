@@ -41,7 +41,15 @@ draw() {
         }
     });
     if (this.character.img && this.character.img.complete && this.character.img.naturalHeight !== 0) {
-        this.ctx.drawImage(this.character.img, this.character.x, this.character.y, this.character.width, this.character.height);
+        if (this.character.otherDirection) {
+            this.ctx.save();
+            this.ctx.translate(this.character.x + this.character.width, this.character.y);
+            this.ctx.scale(-1, 1);
+            this.ctx.drawImage(this.character.img, 0, 0, this.character.width, this.character.height);
+            this.ctx.restore();
+        } else {
+            this.ctx.drawImage(this.character.img, this.character.x, this.character.y, this.character.width, this.character.height);
+        }
     }
     this.enemies.forEach((enemy) => {
         if (enemy.img && enemy.img.complete && enemy.img.naturalHeight !== 0) {

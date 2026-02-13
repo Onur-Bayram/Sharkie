@@ -1,5 +1,7 @@
 class Character extends MovableObject{
 
+    otherDirection = false;
+
     IMAGES_IDLE = [
         '1.Sharkie/1.IDLE/1.png',
         '1.Sharkie/1.IDLE/2.png',
@@ -44,9 +46,11 @@ class Character extends MovableObject{
         setInterval(() => {
             if (window.keyboard && window.keyboard.RIGHT) {
                 this.moveRight();
+                this.otherDirection = false;
             }
             if (window.keyboard && window.keyboard.LEFT) {
                 this.moveLeft();
+                this.otherDirection = true;
             }
             if (window.keyboard && window.keyboard.UP) {
                 this.moveUp();
