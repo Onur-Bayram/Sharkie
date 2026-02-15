@@ -2,7 +2,7 @@ class Pufferfish extends MovableObject{
 
     IMAGES_SWIM = [];
 
-    constructor(){
+    constructor(x = null, y = null){
         super();
         
     
@@ -20,8 +20,8 @@ class Pufferfish extends MovableObject{
         this.loadImage(this.IMAGES_SWIM[0]);
         this.loadImages(this.IMAGES_SWIM);
         
-        this.x = 200 + Math.random() * 300;
-        this.y = 150 + Math.random() * 200;
+        this.x = x !== null ? x : 200 + Math.random() * 300;
+        this.y = y !== null ? y : 150 + Math.random() * 200;
         this.width = 80;
         this.height = 60;
         
