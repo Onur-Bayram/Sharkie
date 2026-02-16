@@ -92,7 +92,7 @@ handleThrow() {
 
 checkCollisions() {
     this.enemies.forEach((enemy) => {
-        if (this.character.isColliding(enemy)) {
+        if (!enemy.isDead && this.character.isColliding(enemy)) {
             const currentTime = Date.now();
             if (!this.character.isHurt || (currentTime - this.character.lastHitTime > 600)) {
                 this.character.hit();
@@ -100,7 +100,17 @@ checkCollisions() {
             }
         }
     });
+    this.cleanupDeadEnemies();
     this.checkBubbleCollisions();
+}
+
+cleanupDeadEnemies() {
+    for (let i = this.enemies.length - 1; i >= 0; i--) {
+        const enemy = this.enemies[i];
+        if (enemy.isDead && enemy.deadAnimationFinished) {
+            this.enemies.splice(i, 1);
+        }
+    }
 }
 
 checkBubbleCollisions() {
@@ -111,11 +121,17 @@ checkBubbleCollisions() {
         // Check collision with enemies (with small offset for bubbles)
         for (let j = this.enemies.length - 1; j >= 0; j--) {
             const enemy = this.enemies[j];
-            if (!enemy.isDead && this.isCollidingBubble(bubble, enemy)) {
+            if (enemy.isDead) {
+                if (enemy.deadAnimationFinished) {
+                    this.enemies.splice(j, 1);
+                }
+                continue;
+            }
+
+            if (this.isCollidingBubble(bubble, enemy)) {
                 enemy.hp -= 50;
                 if (enemy.hp <= 0) {
-                    enemy.isDead = true;
-                    this.enemies.splice(j, 1);
+                    enemy.die();
                 }
                 bubbleHit = true;
                 break;
