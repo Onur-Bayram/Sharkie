@@ -3,6 +3,7 @@ class World {
  cameraX = 0;
  character = new Character();
  enemies = [];
+ jellyfishes = [];
  finalBoss = null;
  statusBar = new StatusBar();
  poisonBar = new PoisonBar();
@@ -56,6 +57,7 @@ constructor(canvas) {
     this.backgroundObjects = [...this.backgroundObjectsLight, ...this.backgroundObjectsDark];
     this.lightLayers = this.backgroundObjectsLight.filter((bg, index) => index % 5 === 4);
     this.enemies = this.createEnemies();
+    this.jellyfishes = this.createJellyfishes();
     this.finalBoss = new FinalBoss(this.mapWidth - 500, 80);
     this.handleThrow();
     this.draw();
@@ -76,6 +78,23 @@ createEnemies() {
     }
 
     return enemies;
+}
+
+createJellyfishes() {
+    const jellyfishes = [];
+    const count = 12;
+    const minX = 200;
+    const maxX = 4500;
+    const minY = 80;
+    const maxY = Math.max(minY, this.canvas.height - 120);
+
+    for (let i = 0; i < count; i++) {
+        const x = minX + Math.random() * (maxX - minX);
+        const y = minY + Math.random() * (maxY - minY);
+        jellyfishes.push(new Jellyfish(x, y));
+    }
+
+    return jellyfishes;
 }
 
 handleThrow() {
@@ -100,6 +119,15 @@ checkCollisions() {
             }
         }
     });
+    this.jellyfishes.forEach((jellyfish) => {
+        if (!jellyfish.isDead && this.character.isColliding(jellyfish)) {
+            const currentTime = Date.now();
+            if (!this.character.isHurt || (currentTime - this.character.lastHitTime > 600)) {
+                this.character.hit();
+                this.statusBar.setPercentage(this.character.energy);
+            }
+        }
+    });
     this.cleanupDeadEnemies();
     this.checkBubbleCollisions();
 }
@@ -109,6 +137,12 @@ cleanupDeadEnemies() {
         const enemy = this.enemies[i];
         if (enemy.isDead && enemy.deadAnimationFinished) {
             this.enemies.splice(i, 1);
+        }
+    }
+    for (let i = this.jellyfishes.length - 1; i >= 0; i--) {
+        const jellyfish = this.jellyfishes[i];
+        if (jellyfish.isDead && jellyfish.deadAnimationFinished) {
+            this.jellyfishes.splice(i, 1);
         }
     }
 }
@@ -135,6 +169,28 @@ checkBubbleCollisions() {
                 }
                 bubbleHit = true;
                 break;
+            }
+        }
+
+        // Check collision with jellyfishes
+        if (!bubbleHit) {
+            for (let j = this.jellyfishes.length - 1; j >= 0; j--) {
+                const jellyfish = this.jellyfishes[j];
+                if (jellyfish.isDead) {
+                    if (jellyfish.deadAnimationFinished) {
+                        this.jellyfishes.splice(j, 1);
+                    }
+                    continue;
+                }
+
+                if (this.isCollidingBubble(bubble, jellyfish)) {
+                    jellyfish.hp -= 50;
+                    if (jellyfish.hp <= 0) {
+                        jellyfish.die();
+                    }
+                    bubbleHit = true;
+                    break;
+                }
             }
         }
 
@@ -212,6 +268,13 @@ draw() {
     this.enemies.forEach((enemy) => {
         if (enemy.img && enemy.img.complete && enemy.img.naturalHeight !== 0) {
             this.ctx.drawImage(enemy.img, enemy.x, enemy.y, enemy.width, enemy.height);
+        }
+    });
+
+    // Jellyfishes
+    this.jellyfishes.forEach((jellyfish) => {
+        if (jellyfish.img && jellyfish.img.complete && jellyfish.img.naturalHeight !== 0) {
+            this.ctx.drawImage(jellyfish.img, jellyfish.x, jellyfish.y, jellyfish.width, jellyfish.height);
         }
     });
     
