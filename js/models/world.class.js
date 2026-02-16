@@ -4,6 +4,8 @@ class World {
  character = new Character();
  enemies = [];
  finalBoss = null;
+ statusBar = new StatusBar();
+ statusBar = new StatusBar();
 
 backgroundObjectsLight = [
     new BackgroundObject('3. Background/Layers/5. Water/L.png', 0, 0),
@@ -77,8 +79,10 @@ createEnemies() {
 checkCollisions() {
     this.enemies.forEach((enemy) => {
         if (this.character.isColliding(enemy)) {
-            if (!this.character.isHurt) {
+            const currentTime = Date.now();
+            if (!this.character.isHurt || (currentTime - this.character.lastHitTime > 600)) {
                 this.character.hit();
+                this.statusBar.setPercentage(this.character.energy);
             }
         }
     });
@@ -143,6 +147,11 @@ draw() {
     
     // Stelle den Kontext wieder her
     this.ctx.restore(); 
+
+    // Draw status bar (fixed position, not affected by camera)
+    if (this.statusBar && this.statusBar.img && this.statusBar.img.complete && this.statusBar.img.naturalHeight !== 0) {
+        this.ctx.drawImage(this.statusBar.img, this.statusBar.x, this.statusBar.y, this.statusBar.width, this.statusBar.height);
+    } 
 
     let self = this;
     requestAnimationFrame(function() {

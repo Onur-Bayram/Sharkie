@@ -3,6 +3,8 @@ class Character extends MovableObject{
     otherDirection = false;
     isHurt = false;
     lastHitTime = 0;
+    energy = 100;
+    maxEnergy = 100;
 
     IMAGES_IDLE = [
         '1.Sharkie/1.IDLE/1.png',
@@ -61,6 +63,11 @@ class Character extends MovableObject{
         this.isHurt = true;
         this.lastHitTime = Date.now();
         this.currentImage = 0;
+        this.energy -= 10;
+        if (this.energy < 0) {
+            this.energy = 0;
+        }
+        console.log('Energy:', this.energy);
         
         setTimeout(() => {
             this.isHurt = false;
