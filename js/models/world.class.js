@@ -5,7 +5,8 @@ class World {
  enemies = [];
  finalBoss = null;
  statusBar = new StatusBar();
- statusBar = new StatusBar();
+ poisonBar = new PoisonBar();
+ throwableObjects = [];
 
 backgroundObjectsLight = [
     new BackgroundObject('3. Background/Layers/5. Water/L.png', 0, 0),
@@ -56,6 +57,7 @@ constructor(canvas) {
     this.lightLayers = this.backgroundObjectsLight.filter((bg, index) => index % 5 === 4);
     this.enemies = this.createEnemies();
     this.finalBoss = new FinalBoss(this.mapWidth - 500, 80);
+    this.handleThrow();
     this.draw();
 }
 
@@ -76,6 +78,18 @@ createEnemies() {
     return enemies;
 }
 
+handleThrow() {
+    setInterval(() => {
+        if (window.keyboard && window.keyboard.D) {
+            const bubble = this.character.throw();
+            if (bubble) {
+                this.throwableObjects.push(bubble);
+                this.poisonBar.setPercentage(this.character.poison);
+            }
+        }
+    }, 100);
+}
+
 checkCollisions() {
     this.enemies.forEach((enemy) => {
         if (this.character.isColliding(enemy)) {
@@ -86,6 +100,51 @@ checkCollisions() {
             }
         }
     });
+    this.checkBubbleCollisions();
+}
+
+checkBubbleCollisions() {
+    for (let i = this.throwableObjects.length - 1; i >= 0; i--) {
+        const bubble = this.throwableObjects[i];
+        let bubbleHit = false;
+
+        // Check collision with enemies (with small offset for bubbles)
+        for (let j = this.enemies.length - 1; j >= 0; j--) {
+            const enemy = this.enemies[j];
+            if (!enemy.isDead && this.isCollidingBubble(bubble, enemy)) {
+                enemy.hp -= 50;
+                if (enemy.hp <= 0) {
+                    enemy.isDead = true;
+                    this.enemies.splice(j, 1);
+                }
+                bubbleHit = true;
+                break;
+            }
+        }
+
+        // Check collision with boss
+        if (!bubbleHit && this.finalBoss && !this.finalBoss.isDead && this.isCollidingBubble(bubble, this.finalBoss)) {
+            this.finalBoss.hp -= 50;
+            if (this.finalBoss.hp <= 0) {
+                this.finalBoss.isDead = true;
+                console.log('Boss defeated!');
+            }
+            bubbleHit = true;
+        }
+
+        // Remove bubble if it hit something or flew off-screen
+        if (bubbleHit || bubble.x < -100 || bubble.x > this.mapWidth + 100) {
+            this.throwableObjects.splice(i, 1);
+        }
+    }
+}
+
+isCollidingBubble(bubble, obj) {
+    const offset = 10; // Smaller offset for bubbles
+    return bubble.x + offset < obj.x + obj.width - offset &&
+           bubble.x + bubble.width - offset > obj.x + offset &&
+           bubble.y + offset < obj.y + obj.height - offset &&
+           bubble.y + bubble.height - offset > obj.y + offset;
 }
 
 draw() {
@@ -144,6 +203,13 @@ draw() {
     if (this.finalBoss && this.finalBoss.img && this.finalBoss.img.complete && this.finalBoss.img.naturalHeight !== 0) {
         this.ctx.drawImage(this.finalBoss.img, this.finalBoss.x, this.finalBoss.y, this.finalBoss.width, this.finalBoss.height);
     }
+
+    // Throwable objects (bubbles)
+    this.throwableObjects.forEach((bubble) => {
+        if (bubble.img && bubble.img.complete && bubble.img.naturalHeight !== 0) {
+            this.ctx.drawImage(bubble.img, bubble.x, bubble.y, bubble.width, bubble.height);
+        }
+    });
     
     // Stelle den Kontext wieder her
     this.ctx.restore(); 
@@ -151,6 +217,11 @@ draw() {
     // Draw status bar (fixed position, not affected by camera)
     if (this.statusBar && this.statusBar.img && this.statusBar.img.complete && this.statusBar.img.naturalHeight !== 0) {
         this.ctx.drawImage(this.statusBar.img, this.statusBar.x, this.statusBar.y, this.statusBar.width, this.statusBar.height);
+    }
+
+    // Draw poison bar (fixed position, below status bar)
+    if (this.poisonBar && this.poisonBar.img && this.poisonBar.img.complete && this.poisonBar.img.naturalHeight !== 0) {
+        this.ctx.drawImage(this.poisonBar.img, this.poisonBar.x, this.poisonBar.y, this.poisonBar.width, this.poisonBar.height);
     } 
 
     let self = this;

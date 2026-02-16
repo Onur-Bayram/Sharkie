@@ -1,6 +1,8 @@
 class Pufferfish extends MovableObject{
 
     IMAGES_SWIM = [];
+    hp = 30;
+    isDead = false;
 
     constructor(x = null, y = null){
         super();

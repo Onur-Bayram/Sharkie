@@ -30,6 +30,8 @@ class FinalBoss extends MovableObject {
     ];
 
     introduced = false;
+    hp = 200;
+    isDead = false;
 
     constructor(x, y) {
         super();

@@ -5,6 +5,9 @@ class Character extends MovableObject{
     lastHitTime = 0;
     energy = 100;
     maxEnergy = 100;
+    poison = 100;
+    maxPoison = 100;
+    lastThrowTime = 0;
 
     IMAGES_IDLE = [
         '1.Sharkie/1.IDLE/1.png',
@@ -114,6 +117,25 @@ class Character extends MovableObject{
 
     jump() {
 
+    }
+
+    canThrow() {
+        const currentTime = Date.now();
+        return this.poison >= 20 && (currentTime - this.lastThrowTime > 500);
+    }
+
+    throw() {
+        if (this.canThrow()) {
+            this.lastThrowTime = Date.now();
+            this.poison -= 20;
+            if (this.poison < 0) {
+                this.poison = 0;
+            }
+            const direction = this.otherDirection ? -1 : 1;
+            const offsetX = this.otherDirection ? 0 : this.width;
+            return new ThrowableObject(this.x + offsetX, this.y + 50, direction);
+        }
+        return null;
     }
 
 
