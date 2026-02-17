@@ -143,7 +143,7 @@ class Character extends MovableObject{
 
     canThrowPoisonBubble() {
         const currentTime = Date.now();
-        return this.poison >= 40 && (currentTime - this.lastThrowTime > 1200) && !this.isAttacking;
+        return this.poison >= 30 && (currentTime - this.lastThrowTime > 1200) && !this.isAttacking;
     }
 
     throwNormalBubble() {
@@ -178,7 +178,7 @@ class Character extends MovableObject{
     throwPoisonBubble() {
         if (this.canThrowPoisonBubble()) {
             this.lastThrowTime = Date.now();
-            this.poison -= 40;
+            this.poison -= 30;
             if (this.poison < 0) {
                 this.poison = 0;
             }

@@ -173,23 +173,23 @@ checkCollisions() {
 }
 
 checkPoisonCollection() {
-    // Statische Bodenflaschen (+20 Poison)
+    // Statische Bodenflaschen (+30 Poison)
     for (let i = this.poisonBottles.length - 1; i >= 0; i--) {
         const bottle = this.poisonBottles[i];
         if (!bottle.collected && this.character.isColliding(bottle)) {
             bottle.collected = true;
-            this.character.poison = Math.min(this.character.poison + 20, 100);
+            this.character.poison = Math.min(this.character.poison + 30, 100);
             this.poisonBar.setPercentage(this.character.poison);
             this.poisonBottles.splice(i, 1);
         }
     }
 
-    // Animierte fallende Flaschen (+40 Poison)
+    // Animierte fallende Flaschen (+50 Poison)
     for (let i = this.animatedPoisonBottles.length - 1; i >= 0; i--) {
         const bottle = this.animatedPoisonBottles[i];
         if (!bottle.collected && this.character.isColliding(bottle)) {
             bottle.collected = true;
-            this.character.poison = Math.min(this.character.poison + 40, 100);
+            this.character.poison = Math.min(this.character.poison + 50, 100);
             this.poisonBar.setPercentage(this.character.poison);
             this.animatedPoisonBottles.splice(i, 1);
         }
