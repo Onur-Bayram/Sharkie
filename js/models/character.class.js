@@ -3,6 +3,7 @@ class Character extends MovableObject{
     otherDirection = false;
     isHurt = false;
     isAttacking = false;
+    isFinSlapping = false;
     lastHitTime = 0;
     energy = 100;
     maxEnergy = 100;
@@ -47,6 +48,17 @@ class Character extends MovableObject{
         '1.Sharkie/5.Hurt/2.Electric shock/2.png',
         '1.Sharkie/5.Hurt/2.Electric shock/3.png'
     ];
+
+    IMAGES_FIN_SLAP = [
+        '1.Sharkie/4.Attack/Fin slap/1.png',
+        '1.Sharkie/4.Attack/Fin slap/2.png',
+        '1.Sharkie/4.Attack/Fin slap/3.png',
+        '1.Sharkie/4.Attack/Fin slap/4.png',
+        '1.Sharkie/4.Attack/Fin slap/5.png',
+        '1.Sharkie/4.Attack/Fin slap/6.png',
+        '1.Sharkie/4.Attack/Fin slap/7.png',
+        '1.Sharkie/4.Attack/Fin slap/8.png'
+    ];
     
     constructor() {
         super();
@@ -54,6 +66,7 @@ class Character extends MovableObject{
         this.loadImages(this.IMAGES_IDLE);
         this.loadImages(this.IMAGES_ATTACK);
         this.loadImages(this.IMAGES_HURT);
+        this.loadImages(this.IMAGES_FIN_SLAP);
         this.width = 200;
         this.height = 140;
         this.speed = 5;
@@ -65,6 +78,10 @@ class Character extends MovableObject{
         setInterval(() => {
             if (this.isHurt) {
                 let path = this.IMAGES_HURT[this.currentImage % this.IMAGES_HURT.length];
+                this.img = this.imageCache[path];
+                this.currentImage++;
+            } else if (this.isFinSlapping) {
+                let path = this.IMAGES_FIN_SLAP[this.currentImage % this.IMAGES_FIN_SLAP.length];
                 this.img = this.imageCache[path];
                 this.currentImage++;
             } else if (this.isAttacking) {
@@ -87,7 +104,7 @@ class Character extends MovableObject{
         if (this.energy < 0) {
             this.energy = 0;
         }
-        console.log('Energy:', this.energy);
+        console.log('Energie:', this.energy);
         
         setTimeout(() => {
             this.isHurt = false;
@@ -204,6 +221,40 @@ class Character extends MovableObject{
             }, 800);
             
             return bubbleAnimation;
+        }
+        return null;
+    }
+
+    canThrowFinSlap() {
+        const currentTime = Date.now();
+        return currentTime - this.lastThrowTime > 1200 && !this.isAttacking && !this.isFinSlapping;
+    }
+
+    throwFinSlap() {
+        if (this.canThrowFinSlap()) {
+            this.lastThrowTime = Date.now();
+            this.isFinSlapping = true;
+            this.currentImage = 0;
+            
+            const direction = this.otherDirection ? -1 : 1;
+            const offsetX = this.otherDirection ? 0 : this.width;
+            
+            // Erstelle Fin Slap Attacke nach 400ms (mittelpunkt der animation)
+            let finSlap = null;
+            setTimeout(() => {
+                finSlap = new FinSlap(this.x + offsetX, this.y + 50, direction);
+                if (this.world) {
+                    this.world.finSlaps.push(finSlap);
+                }
+            }, 400);
+            
+            // Beende die Fin Slap Animation nach 800ms
+            setTimeout(() => {
+                this.isFinSlapping = false;
+                this.currentImage = 0;
+            }, 800);
+            
+            return finSlap;
         }
         return null;
     }

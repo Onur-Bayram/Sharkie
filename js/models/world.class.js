@@ -10,6 +10,7 @@ class World {
  statusBar = new StatusBar();
  poisonBar = new PoisonBar();
  bubbleAnimations = [];
+ finSlaps = [];
 
 backgroundObjectsLight = [
     new BackgroundObject('3. Background/Layers/5. Water/L.png', 0, 0),
@@ -141,6 +142,9 @@ handleThrow() {
             this.character.throwPoisonBubble();
             this.poisonBar.setPercentage(this.character.poison);
         }
+        if (window.keyboard && window.keyboard.SPACE) {
+            this.character.throwFinSlap();
+        }
     }, 100);
 }
 
@@ -170,6 +174,7 @@ checkCollisions() {
     this.cleanupDeadEnemies();
     this.checkPoisonCollection();
     this.checkBubbleCollisions();
+    this.checkFinSlapCollisions();
 }
 
 checkPoisonCollection() {
@@ -304,8 +309,81 @@ checkBubbleCollisions() {
     }
 }
 
+checkFinSlapCollisions() {
+    // Fin Slap - treffen ALLE Gegner
+    for (let i = this.finSlaps.length - 1; i >= 0; i--) {
+        const finSlap = this.finSlaps[i];
+        let finSlapHit = false;
+
+        //  Kollision mit Pufferfish
+        for (let j = this.enemies.length - 1; j >= 0; j--) {
+            const enemy = this.enemies[j];
+            if (enemy.isDead) {
+                if (enemy.deadAnimationFinished) {
+                    this.enemies.splice(j, 1);
+                }
+                continue;
+            }
+
+            if (this.isCollidingFinSlap(finSlap, enemy)) {
+                enemy.hp -= finSlap.damage;
+                if (enemy.hp <= 0) {
+                    enemy.die();
+                }
+                finSlapHit = true;
+                break;
+            }
+        }
+
+        // Prüfe Kollision mit Quallen
+        if (!finSlapHit) {
+            for (let j = this.jellyfishes.length - 1; j >= 0; j--) {
+                const jellyfish = this.jellyfishes[j];
+                if (jellyfish.isDead) {
+                    if (jellyfish.deadAnimationFinished) {
+                        this.jellyfishes.splice(j, 1);
+                    }
+                    continue;
+                }
+
+                if (this.isCollidingFinSlap(finSlap, jellyfish)) {
+                    jellyfish.hp -= finSlap.damage;
+                    if (jellyfish.hp <= 0) {
+                        jellyfish.die();
+                    }
+                    finSlapHit = true;
+                    break;
+                }
+            }
+        }
+
+        // Prüfe Kollision mit Boss
+        if (!finSlapHit && this.finalBoss && !this.finalBoss.isDead && this.isCollidingFinSlap(finSlap, this.finalBoss)) {
+            this.finalBoss.hp -= finSlap.damage;
+            if (this.finalBoss.hp <= 0) {
+                this.finalBoss.isDead = true;
+                console.log('Boss besiegt!');
+            }
+            finSlapHit = true;
+        }
+
+        // Entferne Fin Slap wenn die Animation vorbei ist
+        if (!finSlap.isAlive()) {
+            this.finSlaps.splice(i, 1);
+        }
+    }
+}
+
+isCollidingFinSlap(finSlap, obj) {
+    const offset = 20; 
+    return finSlap.x + offset < obj.x + obj.width - offset &&
+           finSlap.x + finSlap.width - offset > obj.x + offset &&
+           finSlap.y + offset < obj.y + obj.height - offset &&
+           finSlap.y + finSlap.height - offset > obj.y + offset;
+}
+
 isCollidingBubble(bubble, obj) {
-    const offset = 10; // Kleinerer Offset für Bubbles
+    const offset = 10; 
     return bubble.x + offset < obj.x + obj.width - offset &&
            bubble.x + bubble.width - offset > obj.x + offset &&
            bubble.y + offset < obj.y + obj.height - offset &&
@@ -398,6 +476,11 @@ draw() {
         bubble.draw(this.ctx, this.cameraX);
     });
     
+    // Zeichne Fin Slap Attacken
+    this.finSlaps.forEach((finSlap) => {
+        finSlap.draw(this.ctx, this.cameraX);
+        finSlap.animate();
+    });
 
     // Zeichne Statusleiste (fixe Position, nicht von Kamera beeinflusst)
     if (this.statusBar && this.statusBar.img && this.statusBar.img.complete && this.statusBar.img.naturalHeight !== 0) {
