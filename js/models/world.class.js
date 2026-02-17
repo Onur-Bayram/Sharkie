@@ -9,7 +9,7 @@ class World {
  finalBoss = null;
  statusBar = new StatusBar();
  poisonBar = new PoisonBar();
- throwableObjects = [];
+ bubbleAnimations = [];
 
 backgroundObjectsLight = [
     new BackgroundObject('3. Background/Layers/5. Water/L.png', 0, 0),
@@ -134,12 +134,12 @@ createAnimatedPoisonBottles() {
 
 handleThrow() {
     setInterval(() => {
+        if (window.keyboard && window.keyboard.F) {
+            this.character.throwNormalBubble();
+        }
         if (window.keyboard && window.keyboard.D) {
-            const bubble = this.character.throw();
-            if (bubble) {
-                this.throwableObjects.push(bubble);
-                this.poisonBar.setPercentage(this.character.poison);
-            }
+            this.character.throwPoisonBubble();
+            this.poisonBar.setPercentage(this.character.poison);
         }
     }, 100);
 }
@@ -163,7 +163,7 @@ checkCollisions() {
             }
         }
     });
-    // Prüfe ob animierte Giftflaschen in Sichtweite sind
+    // nimierte Giftflaschen in Sichtweite sind
     this.animatedPoisonBottles.forEach((bottle) => {
         bottle.checkVisibility(this.character.x);
     });
@@ -212,32 +212,71 @@ cleanupDeadEnemies() {
 }
 
 checkBubbleCollisions() {
-    for (let i = this.throwableObjects.length - 1; i >= 0; i--) {
-        const bubble = this.throwableObjects[i];
+    // Blase Animationen (sowohl F als auch D)
+    for (let i = this.bubbleAnimations.length - 1; i >= 0; i--) {
+        const bubble = this.bubbleAnimations[i];
         let bubbleHit = false;
 
-        // Prüfe Kollision mit Feinden (mit kleinem Offset für Bubbles)
-        for (let j = this.enemies.length - 1; j >= 0; j--) {
-            const enemy = this.enemies[j];
-            if (enemy.isDead) {
-                if (enemy.deadAnimationFinished) {
-                    this.enemies.splice(j, 1);
+        if (bubble.isPoison) {
+            // GRÜNE Blase (D) - macht Schaden auf ALLE Gegner
+            const damage = 100;
+
+            // Kollision mit Feinden (Pufferfish)
+            for (let j = this.enemies.length - 1; j >= 0; j--) {
+                const enemy = this.enemies[j];
+                if (enemy.isDead) {
+                    if (enemy.deadAnimationFinished) {
+                        this.enemies.splice(j, 1);
+                    }
+                    continue;
                 }
-                continue;
+
+                if (this.isCollidingBubble(bubble, enemy)) {
+                    enemy.hp -= damage;
+                    if (enemy.hp <= 0) {
+                        enemy.die();
+                    }
+                    bubbleHit = true;
+                    break;
+                }
             }
 
-            if (this.isCollidingBubble(bubble, enemy)) {
-                enemy.hp -= 50;
-                if (enemy.hp <= 0) {
-                    enemy.die();
+            // Prüfe Kollision mit Quallen
+            if (!bubbleHit) {
+                for (let j = this.jellyfishes.length - 1; j >= 0; j--) {
+                    const jellyfish = this.jellyfishes[j];
+                    if (jellyfish.isDead) {
+                        if (jellyfish.deadAnimationFinished) {
+                            this.jellyfishes.splice(j, 1);
+                        }
+                        continue;
+                    }
+
+                    if (this.isCollidingBubble(bubble, jellyfish)) {
+                        jellyfish.hp -= damage;
+                        if (jellyfish.hp <= 0) {
+                            jellyfish.die();
+                        }
+                        bubbleHit = true;
+                        break;
+                    }
+                }
+            }
+
+            // Prüfe Kollision mit Boss
+            if (!bubbleHit && this.finalBoss && !this.finalBoss.isDead && this.isCollidingBubble(bubble, this.finalBoss)) {
+                this.finalBoss.hp -= damage;
+                if (this.finalBoss.hp <= 0) {
+                    this.finalBoss.isDead = true;
+                    console.log('Boss defeated!');
                 }
                 bubbleHit = true;
-                break;
             }
-        }
+        } else {
+            // WEISSE Blase (F) - macht Schaden NUR auf Quallen (Jellyfishes)
+            const damage = 50;
 
-        // Prüfe Kollision mit Quallen
-        if (!bubbleHit) {
+            // Prüfe Kollision NUR mit Quallen
             for (let j = this.jellyfishes.length - 1; j >= 0; j--) {
                 const jellyfish = this.jellyfishes[j];
                 if (jellyfish.isDead) {
@@ -248,7 +287,7 @@ checkBubbleCollisions() {
                 }
 
                 if (this.isCollidingBubble(bubble, jellyfish)) {
-                    jellyfish.hp -= 50;
+                    jellyfish.hp -= damage;
                     if (jellyfish.hp <= 0) {
                         jellyfish.die();
                     }
@@ -258,19 +297,9 @@ checkBubbleCollisions() {
             }
         }
 
-        // Prüfe Kollision mit Boss
-        if (!bubbleHit && this.finalBoss && !this.finalBoss.isDead && this.isCollidingBubble(bubble, this.finalBoss)) {
-            this.finalBoss.hp -= 50;
-            if (this.finalBoss.hp <= 0) {
-                this.finalBoss.isDead = true;
-                console.log('Boss defeated!');
-            }
-            bubbleHit = true;
-        }
-
         // Entferne Bubble wenn sie etwas getroffen hat oder außerhalb des Bildschirms ist
         if (bubbleHit || bubble.x < -100 || bubble.x > this.mapWidth + 100) {
-            this.throwableObjects.splice(i, 1);
+            this.bubbleAnimations.splice(i, 1);
         }
     }
 }
@@ -360,16 +389,15 @@ draw() {
     if (this.finalBoss && this.finalBoss.img && this.finalBoss.img.complete && this.finalBoss.img.naturalHeight !== 0) {
         this.ctx.drawImage(this.finalBoss.img, this.finalBoss.x, this.finalBoss.y, this.finalBoss.width, this.finalBoss.height);
     }
-
-    // Werfbare Objekte (Bubbles)
-    this.throwableObjects.forEach((bubble) => {
-        if (bubble.img && bubble.img.complete && bubble.img.naturalHeight !== 0) {
-            this.ctx.drawImage(bubble.img, bubble.x, bubble.y, bubble.width, bubble.height);
-        }
-    });
     
     // Stelle den Kontext wieder her
-    this.ctx.restore(); 
+    this.ctx.restore();
+
+    // Zeichne Bubble Animationen 
+    this.bubbleAnimations.forEach((bubble) => {
+        bubble.draw(this.ctx, this.cameraX);
+    });
+    
 
     // Zeichne Statusleiste (fixe Position, nicht von Kamera beeinflusst)
     if (this.statusBar && this.statusBar.img && this.statusBar.img.complete && this.statusBar.img.naturalHeight !== 0) {

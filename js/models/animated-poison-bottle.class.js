@@ -41,7 +41,7 @@ class AnimatedPoisonBottle extends MovableObject {
 
     fall() {
         setInterval(() => {
-            // Prüfe ob der Hai in der Nähe ist und die Flasche sichtbar ist, bevor sie fällt
+            // nur fallen lassen, wenn sichtbar, unter maxY und nicht gesammelt
             if (this.isVisible && this.y < this.maxY && !this.collected) {
                 this.y += this.fallSpeed;
             }

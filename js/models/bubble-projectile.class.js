@@ -1,14 +1,14 @@
-class ThrowableObject extends MovableObject {
+class BubbleProjectile extends MovableObject {
     
     IMAGES_BUBBLE = [
-        '4. Marcadores/Posión/Animada/1.png',
-        '4. Marcadores/Posión/Animada/2.png',
-        '4. Marcadores/Posión/Animada/3.png',
-        '4. Marcadores/Posión/Animada/4.png',
-        '4. Marcadores/Posión/Animada/5.png',
-        '4. Marcadores/Posión/Animada/6.png',
-        '4. Marcadores/Posión/Animada/7.png',
-        '4. Marcadores/Posión/Animada/8.png'
+        '1.Sharkie/4.Attack/Bubble trap/For Whale/1.png',
+        '1.Sharkie/4.Attack/Bubble trap/For Whale/2.png',
+        '1.Sharkie/4.Attack/Bubble trap/For Whale/3.png',
+        '1.Sharkie/4.Attack/Bubble trap/For Whale/4.png',
+        '1.Sharkie/4.Attack/Bubble trap/For Whale/5.png',
+        '1.Sharkie/4.Attack/Bubble trap/For Whale/6.png',
+        '1.Sharkie/4.Attack/Bubble trap/For Whale/7.png',
+        '1.Sharkie/4.Attack/Bubble trap/For Whale/8.png'
     ];
 
     constructor(x, y, direction) {

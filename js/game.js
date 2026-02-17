@@ -6,7 +6,8 @@ let keyboard = {
     RIGHT: false,
     UP: false,
     DOWN: false,
-    D: false
+    D: false,
+    F: false
 };
 
 window.keyboard = keyboard;
@@ -25,6 +26,7 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowUp') keyboard.UP = true;
     if (e.key === 'ArrowDown') keyboard.DOWN = true;
     if (e.key === 'd' || e.key === 'D') keyboard.D = true;
+    if (e.key === 'f' || e.key === 'F') keyboard.F = true;
 });
 
 document.addEventListener('keyup', (e) => {
@@ -33,5 +35,6 @@ document.addEventListener('keyup', (e) => {
     if (e.key === 'ArrowUp') keyboard.UP = false;
     if (e.key === 'ArrowDown') keyboard.DOWN = false;
     if (e.key === 'd' || e.key === 'D') keyboard.D = false;
+    if (e.key === 'f' || e.key === 'F') keyboard.F = false;
 });
 

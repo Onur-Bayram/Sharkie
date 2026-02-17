@@ -2,6 +2,7 @@ class Character extends MovableObject{
 
     otherDirection = false;
     isHurt = false;
+    isAttacking = false;
     lastHitTime = 0;
     energy = 100;
     maxEnergy = 100;
@@ -30,6 +31,17 @@ class Character extends MovableObject{
         '1.Sharkie/1.IDLE/18.png'
     ];
 
+    IMAGES_ATTACK = [
+        '1.Sharkie/4.Attack/Bubble trap/op1 (with bubble formation)/1.png',
+        '1.Sharkie/4.Attack/Bubble trap/op1 (with bubble formation)/2.png',
+        '1.Sharkie/4.Attack/Bubble trap/op1 (with bubble formation)/3.png',
+        '1.Sharkie/4.Attack/Bubble trap/op1 (with bubble formation)/4.png',
+        '1.Sharkie/4.Attack/Bubble trap/op1 (with bubble formation)/5.png',
+        '1.Sharkie/4.Attack/Bubble trap/op1 (with bubble formation)/6.png',
+        '1.Sharkie/4.Attack/Bubble trap/op1 (with bubble formation)/7.png',
+        '1.Sharkie/4.Attack/Bubble trap/op1 (with bubble formation)/8.png'
+    ];
+
     IMAGES_HURT = [
         '1.Sharkie/5.Hurt/2.Electric shock/1.png',
         '1.Sharkie/5.Hurt/2.Electric shock/2.png',
@@ -40,6 +52,7 @@ class Character extends MovableObject{
         super();
         this.loadImage('1.Sharkie/1.IDLE/1.png');
         this.loadImages(this.IMAGES_IDLE);
+        this.loadImages(this.IMAGES_ATTACK);
         this.loadImages(this.IMAGES_HURT);
         this.width = 200;
         this.height = 140;
@@ -52,6 +65,10 @@ class Character extends MovableObject{
         setInterval(() => {
             if (this.isHurt) {
                 let path = this.IMAGES_HURT[this.currentImage % this.IMAGES_HURT.length];
+                this.img = this.imageCache[path];
+                this.currentImage++;
+            } else if (this.isAttacking) {
+                let path = this.IMAGES_ATTACK[this.currentImage % this.IMAGES_ATTACK.length];
                 this.img = this.imageCache[path];
                 this.currentImage++;
             } else {
@@ -119,21 +136,74 @@ class Character extends MovableObject{
 
     }
 
-    canThrow() {
+    canThrowNormalBubble() {
         const currentTime = Date.now();
-        return this.poison >= 20 && (currentTime - this.lastThrowTime > 500);
+        return currentTime - this.lastThrowTime > 1200 && !this.isAttacking;
     }
 
-    throw() {
-        if (this.canThrow()) {
+    canThrowPoisonBubble() {
+        const currentTime = Date.now();
+        return this.poison >= 40 && (currentTime - this.lastThrowTime > 1200) && !this.isAttacking;
+    }
+
+    throwNormalBubble() {
+        if (this.canThrowNormalBubble()) {
             this.lastThrowTime = Date.now();
-            this.poison -= 20;
+            this.isAttacking = true;
+            this.currentImage = 0;
+            
+            const direction = this.otherDirection ? -1 : 1;
+            const offsetX = this.otherDirection ? 0 : this.width;
+            
+            // Schieße die Blase nach 800ms ab (nach der Animation)
+            let bubbleAnimation = null;
+            setTimeout(() => {
+                bubbleAnimation = new BubbleAnimation(this.x + offsetX, this.y + 50, direction, false);
+                if (this.world) {
+                    this.world.bubbleAnimations.push(bubbleAnimation);
+                }
+            }, 800);
+            
+            // Beende die Attack Animation nach 800ms
+            setTimeout(() => {
+                this.isAttacking = false;
+                this.currentImage = 0;
+            }, 800);
+            
+            return bubbleAnimation;
+        }
+        return null;
+    }
+
+    throwPoisonBubble() {
+        if (this.canThrowPoisonBubble()) {
+            this.lastThrowTime = Date.now();
+            this.poison -= 40;
             if (this.poison < 0) {
                 this.poison = 0;
             }
+            this.isAttacking = true;
+            this.currentImage = 0;
+            
             const direction = this.otherDirection ? -1 : 1;
             const offsetX = this.otherDirection ? 0 : this.width;
-            return new ThrowableObject(this.x + offsetX, this.y + 50, direction);
+            
+            // Schieße die Blase nach 800ms ab (nach der Animation)
+            let bubbleAnimation = null;
+            setTimeout(() => {
+                bubbleAnimation = new BubbleAnimation(this.x + offsetX, this.y + 50, direction, true);
+                if (this.world) {
+                    this.world.bubbleAnimations.push(bubbleAnimation);
+                }
+            }, 800);
+            
+            // Beende die Attack Animation nach 800ms
+            setTimeout(() => {
+                this.isAttacking = false;
+                this.currentImage = 0;
+            }, 800);
+            
+            return bubbleAnimation;
         }
         return null;
     }
