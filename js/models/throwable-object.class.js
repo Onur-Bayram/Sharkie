@@ -20,7 +20,7 @@ class ThrowableObject extends MovableObject {
         this.width = 60;
         this.height = 60;
         this.speed = 7;
-        this.direction = direction; // 1 = right, -1 = left
+        this.direction = direction; // 1 = rechts, -1 = links
         this.animate();
         this.throw();
     }

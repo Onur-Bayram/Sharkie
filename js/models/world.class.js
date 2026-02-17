@@ -4,6 +4,7 @@ class World {
  character = new Character();
  enemies = [];
  jellyfishes = [];
+ poisonBottles = [];
  finalBoss = null;
  statusBar = new StatusBar();
  poisonBar = new PoisonBar();
@@ -58,6 +59,7 @@ constructor(canvas) {
     this.lightLayers = this.backgroundObjectsLight.filter((bg, index) => index % 5 === 4);
     this.enemies = this.createEnemies();
     this.jellyfishes = this.createJellyfishes();
+    this.poisonBottles = this.createPoisonBottles();
     this.finalBoss = new FinalBoss(this.mapWidth - 500, 80);
     this.handleThrow();
     this.draw();
@@ -97,6 +99,23 @@ createJellyfishes() {
     return jellyfishes;
 }
 
+createPoisonBottles() {
+    const bottles = [];
+    const count = 15;
+    const minX = 200;
+    const maxX = 4500;
+    const minY = 80;
+    const maxY = Math.max(minY, this.canvas.height - 120);
+
+    for (let i = 0; i < count; i++) {
+        const x = minX + Math.random() * (maxX - minX);
+        const y = minY + Math.random() * (maxY - minY);
+        bottles.push(new PoisonBottle(x, y));
+    }
+
+    return bottles;
+}
+
 handleThrow() {
     setInterval(() => {
         if (window.keyboard && window.keyboard.D) {
@@ -129,7 +148,20 @@ checkCollisions() {
         }
     });
     this.cleanupDeadEnemies();
+    this.checkPoisonCollection();
     this.checkBubbleCollisions();
+}
+
+checkPoisonCollection() {
+    for (let i = this.poisonBottles.length - 1; i >= 0; i--) {
+        const bottle = this.poisonBottles[i];
+        if (!bottle.collected && this.character.isColliding(bottle)) {
+            bottle.collected = true;
+            this.character.poison = Math.min(this.character.poison + 20, 100);
+            this.poisonBar.setPercentage(this.character.poison);
+            this.poisonBottles.splice(i, 1);
+        }
+    }
 }
 
 cleanupDeadEnemies() {
@@ -152,7 +184,7 @@ checkBubbleCollisions() {
         const bubble = this.throwableObjects[i];
         let bubbleHit = false;
 
-        // Check collision with enemies (with small offset for bubbles)
+        // Prüfe Kollision mit Feinden (mit kleinem Offset für Bubbles)
         for (let j = this.enemies.length - 1; j >= 0; j--) {
             const enemy = this.enemies[j];
             if (enemy.isDead) {
@@ -172,7 +204,7 @@ checkBubbleCollisions() {
             }
         }
 
-        // Check collision with jellyfishes
+        // Prüfe Kollision mit Quallen
         if (!bubbleHit) {
             for (let j = this.jellyfishes.length - 1; j >= 0; j--) {
                 const jellyfish = this.jellyfishes[j];
@@ -194,7 +226,7 @@ checkBubbleCollisions() {
             }
         }
 
-        // Check collision with boss
+        // Prüfe Kollision mit Boss
         if (!bubbleHit && this.finalBoss && !this.finalBoss.isDead && this.isCollidingBubble(bubble, this.finalBoss)) {
             this.finalBoss.hp -= 50;
             if (this.finalBoss.hp <= 0) {
@@ -204,7 +236,7 @@ checkBubbleCollisions() {
             bubbleHit = true;
         }
 
-        // Remove bubble if it hit something or flew off-screen
+        // Entferne Bubble wenn sie etwas getroffen hat oder außerhalb des Bildschirms ist
         if (bubbleHit || bubble.x < -100 || bubble.x > this.mapWidth + 100) {
             this.throwableObjects.splice(i, 1);
         }
@@ -212,7 +244,7 @@ checkBubbleCollisions() {
 }
 
 isCollidingBubble(bubble, obj) {
-    const offset = 10; // Smaller offset for bubbles
+    const offset = 10; // Kleinerer Offset für Bubbles
     return bubble.x + offset < obj.x + obj.width - offset &&
            bubble.x + bubble.width - offset > obj.x + offset &&
            bubble.y + offset < obj.y + obj.height - offset &&
@@ -271,10 +303,17 @@ draw() {
         }
     });
 
-    // Jellyfishes
+    // Quallen
     this.jellyfishes.forEach((jellyfish) => {
         if (jellyfish.img && jellyfish.img.complete && jellyfish.img.naturalHeight !== 0) {
             this.ctx.drawImage(jellyfish.img, jellyfish.x, jellyfish.y, jellyfish.width, jellyfish.height);
+        }
+    });
+
+    // Giftflaschen
+    this.poisonBottles.forEach((bottle) => {
+        if (bottle.img && bottle.img.complete && bottle.img.naturalHeight !== 0) {
+            this.ctx.drawImage(bottle.img, bottle.x, bottle.y, bottle.width, bottle.height);
         }
     });
     
@@ -283,7 +322,7 @@ draw() {
         this.ctx.drawImage(this.finalBoss.img, this.finalBoss.x, this.finalBoss.y, this.finalBoss.width, this.finalBoss.height);
     }
 
-    // Throwable objects (bubbles)
+    // Werfbare Objekte (Bubbles)
     this.throwableObjects.forEach((bubble) => {
         if (bubble.img && bubble.img.complete && bubble.img.naturalHeight !== 0) {
             this.ctx.drawImage(bubble.img, bubble.x, bubble.y, bubble.width, bubble.height);
@@ -293,12 +332,12 @@ draw() {
     // Stelle den Kontext wieder her
     this.ctx.restore(); 
 
-    // Draw status bar (fixed position, not affected by camera)
+    // Zeichne Statusleiste (fixe Position, nicht von Kamera beeinflusst)
     if (this.statusBar && this.statusBar.img && this.statusBar.img.complete && this.statusBar.img.naturalHeight !== 0) {
         this.ctx.drawImage(this.statusBar.img, this.statusBar.x, this.statusBar.y, this.statusBar.width, this.statusBar.height);
     }
 
-    // Draw poison bar (fixed position, below status bar)
+    // Zeichne Giftleiste (fixe Position, unter der Statusleiste)
     if (this.poisonBar && this.poisonBar.img && this.poisonBar.img.complete && this.poisonBar.img.naturalHeight !== 0) {
         this.ctx.drawImage(this.poisonBar.img, this.poisonBar.x, this.poisonBar.y, this.poisonBar.width, this.poisonBar.height);
     } 

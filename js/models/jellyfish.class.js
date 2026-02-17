@@ -6,13 +6,13 @@ class Jellyfish extends MovableObject {
     isDead = false;
     state = 'swim';
     deadAnimationFinished = false;
-    type = 'regular'; // 'regular' or 'dangerous'
+    type = 'regular'; // 'regular' oder 'dangerous'
     color = 'yellow'; // 'yellow', 'lila', 'green', 'pink'
 
     constructor(x = null, y = null) {
         super();
         
-        // Random type and color
+        // Zufälliger Typ und Farbe
         this.type = Math.random() > 0.7 ? 'dangerous' : 'regular';
         
         if (this.type === 'regular') {
