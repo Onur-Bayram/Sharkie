@@ -5,6 +5,7 @@ class World {
  enemies = [];
  jellyfishes = [];
  poisonBottles = [];
+ animatedPoisonBottles = [];
  finalBoss = null;
  statusBar = new StatusBar();
  poisonBar = new PoisonBar();
@@ -60,6 +61,7 @@ constructor(canvas) {
     this.enemies = this.createEnemies();
     this.jellyfishes = this.createJellyfishes();
     this.poisonBottles = this.createPoisonBottles();
+    this.animatedPoisonBottles = this.createAnimatedPoisonBottles();
     this.finalBoss = new FinalBoss(this.mapWidth - 500, 80);
     this.handleThrow();
     this.draw();
@@ -101,16 +103,30 @@ createJellyfishes() {
 
 createPoisonBottles() {
     const bottles = [];
-    const count = 15;
+    const count = 12;
     const minX = 200;
     const maxX = 4500;
-    const minY = 80;
-    const maxY = Math.max(minY, this.canvas.height - 120);
+    const minY = 400; 
+    const maxY = 450;
 
     for (let i = 0; i < count; i++) {
         const x = minX + Math.random() * (maxX - minX);
         const y = minY + Math.random() * (maxY - minY);
         bottles.push(new PoisonBottle(x, y));
+    }
+
+    return bottles;
+}
+
+createAnimatedPoisonBottles() {
+    const bottles = [];
+    const count = 5;
+    const minX = 500;
+    const maxX = 4000;
+
+    for (let i = 0; i < count; i++) {
+        const x = minX + Math.random() * (maxX - minX);
+        bottles.push(new AnimatedPoisonBottle(x));
     }
 
     return bottles;
@@ -147,12 +163,17 @@ checkCollisions() {
             }
         }
     });
+    // Prüfe ob animierte Giftflaschen in Sichtweite sind
+    this.animatedPoisonBottles.forEach((bottle) => {
+        bottle.checkVisibility(this.character.x);
+    });
     this.cleanupDeadEnemies();
     this.checkPoisonCollection();
     this.checkBubbleCollisions();
 }
 
 checkPoisonCollection() {
+    // Statische Bodenflaschen (+20 Poison)
     for (let i = this.poisonBottles.length - 1; i >= 0; i--) {
         const bottle = this.poisonBottles[i];
         if (!bottle.collected && this.character.isColliding(bottle)) {
@@ -160,6 +181,17 @@ checkPoisonCollection() {
             this.character.poison = Math.min(this.character.poison + 20, 100);
             this.poisonBar.setPercentage(this.character.poison);
             this.poisonBottles.splice(i, 1);
+        }
+    }
+
+    // Animierte fallende Flaschen (+40 Poison)
+    for (let i = this.animatedPoisonBottles.length - 1; i >= 0; i--) {
+        const bottle = this.animatedPoisonBottles[i];
+        if (!bottle.collected && this.character.isColliding(bottle)) {
+            bottle.collected = true;
+            this.character.poison = Math.min(this.character.poison + 40, 100);
+            this.poisonBar.setPercentage(this.character.poison);
+            this.animatedPoisonBottles.splice(i, 1);
         }
     }
 }
@@ -312,6 +344,13 @@ draw() {
 
     // Giftflaschen
     this.poisonBottles.forEach((bottle) => {
+        if (bottle.img && bottle.img.complete && bottle.img.naturalHeight !== 0) {
+            this.ctx.drawImage(bottle.img, bottle.x, bottle.y, bottle.width, bottle.height);
+        }
+    });
+
+    // Animierte Giftflaschen (fallend)
+    this.animatedPoisonBottles.forEach((bottle) => {
         if (bottle.img && bottle.img.complete && bottle.img.naturalHeight !== 0) {
             this.ctx.drawImage(bottle.img, bottle.x, bottle.y, bottle.width, bottle.height);
         }
