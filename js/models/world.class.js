@@ -6,6 +6,7 @@ class World {
  jellyfishes = [];
  poisonBottles = [];
  animatedPoisonBottles = [];
+ coins = [];
  finalBoss = null;
  statusBar = new StatusBar();
  poisonBar = new PoisonBar();
@@ -63,6 +64,7 @@ constructor(canvas) {
     this.jellyfishes = this.createJellyfishes();
     this.poisonBottles = this.createPoisonBottles();
     this.animatedPoisonBottles = this.createAnimatedPoisonBottles();
+    this.coins = this.createCoins();
     this.finalBoss = new FinalBoss(this.mapWidth - 500, 80);
     this.handleThrow();
     this.draw();
@@ -133,6 +135,23 @@ createAnimatedPoisonBottles() {
     return bottles;
 }
 
+createCoins() {
+    const coins = [];
+    const count = 15;
+    const minX = 200;
+    const maxX = 4500;
+    const minY = 80;
+    const maxY = Math.max(minY, this.canvas.height - 120);
+
+    for (let i = 0; i < count; i++) {
+        const x = minX + Math.random() * (maxX - minX);
+        const y = minY + Math.random() * (maxY - minY);
+        coins.push(new Coin(x, y));
+    }
+
+    return coins;
+}
+
 handleThrow() {
     setInterval(() => {
         if (window.keyboard && window.keyboard.F) {
@@ -197,6 +216,15 @@ checkPoisonCollection() {
             this.character.poison = Math.min(this.character.poison + 50, 100);
             this.poisonBar.setPercentage(this.character.poison);
             this.animatedPoisonBottles.splice(i, 1);
+        }
+    }
+
+    // Coins sammeln
+    for (let i = this.coins.length - 1; i >= 0; i--) {
+        const coin = this.coins[i];
+        if (!coin.collected && this.character.isColliding(coin)) {
+            coin.collected = true;
+            this.coins.splice(i, 1);
         }
     }
 }
@@ -460,6 +488,13 @@ draw() {
     this.animatedPoisonBottles.forEach((bottle) => {
         if (bottle.img && bottle.img.complete && bottle.img.naturalHeight !== 0) {
             this.ctx.drawImage(bottle.img, bottle.x, bottle.y, bottle.width, bottle.height);
+        }
+    });
+
+    // Coins
+    this.coins.forEach((coin) => {
+        if (coin.img && coin.img.complete && coin.img.naturalHeight !== 0) {
+            this.ctx.drawImage(coin.img, coin.x, coin.y, coin.width, coin.height);
         }
     });
     
