@@ -177,6 +177,7 @@ checkCollisions() {
     // Boss Sichtbarkeit
     if (this.finalBoss) {
         this.finalBoss.checkVisibility(this.cameraX, this.canvas.width);
+        this.finalBoss.checkProximityAttack(this.character);
     }
 
     this.enemies.forEach((enemy) => {
@@ -198,6 +199,14 @@ checkCollisions() {
             }
         }
     });
+    // Boss Kollision
+    if (this.finalBoss && !this.finalBoss.isDead && !this.character.isDead && this.character.isColliding(this.finalBoss)) {
+        const currentTime = Date.now();
+        if (!this.character.isHurt || (currentTime - this.character.lastHitTime > 600)) {
+            this.character.hit('electric', 20);
+            this.statusBar.setPercentage(this.character.energy);
+        }
+    }
     // animierte Giftflaschen in Sichtweite sind
     this.animatedPoisonBottles.forEach((bottle) => {
         bottle.checkVisibility(this.character.x);
@@ -312,11 +321,7 @@ checkBubbleCollisions() {
 
             //  Kollision mit Boss
             if (!bubbleHit && this.finalBoss && !this.finalBoss.isDead && this.isCollidingBubble(bubble, this.finalBoss)) {
-                this.finalBoss.hp -= damage;
-                if (this.finalBoss.hp <= 0) {
-                    this.finalBoss.isDead = true;
-                    console.log('Boss defeated!');
-                }
+                this.finalBoss.hit(damage);
                 bubbleHit = true;
             }
         } else {
@@ -401,11 +406,7 @@ checkFinSlapCollisions() {
 
         // Kollision mit Boss
         if (!finSlapHit && this.finalBoss && !this.finalBoss.isDead && this.isCollidingFinSlap(finSlap, this.finalBoss)) {
-            this.finalBoss.hp -= finSlap.damage;
-            if (this.finalBoss.hp <= 0) {
-                this.finalBoss.isDead = true;
-                console.log('Boss besiegt!');
-            }
+            this.finalBoss.hit(finSlap.damage);
             finSlapHit = true;
         }
 
