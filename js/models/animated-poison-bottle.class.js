@@ -13,7 +13,7 @@ class AnimatedPoisonBottle extends MovableObject {
     width = 80;
     height = 80;
     collected = false;
-    fallSpeed = 0.3; 
+    fallSpeed = 0.7;
     isVisible = false;
     visibilityRange = 300; 
 
