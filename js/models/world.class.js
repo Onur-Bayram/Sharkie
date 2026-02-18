@@ -7,9 +7,12 @@ class World {
  poisonBottles = [];
  animatedPoisonBottles = [];
  coins = [];
+ totalCoins = 0;
+ collectedCoins = 0;
  finalBoss = null;
  statusBar = new StatusBar();
  poisonBar = new PoisonBar();
+ coinBar = new CoinBar();
  bubbleAnimations = [];
  finSlaps = [];
 
@@ -65,6 +68,9 @@ constructor(canvas) {
     this.poisonBottles = this.createPoisonBottles();
     this.animatedPoisonBottles = this.createAnimatedPoisonBottles();
     this.coins = this.createCoins();
+    this.totalCoins = this.coins.length;
+    this.collectedCoins = 0;
+    this.coinBar.setPercentage(0, this.totalCoins);
     this.finalBoss = new FinalBoss(this.mapWidth - 500, 80);
     this.handleThrow();
     this.draw();
@@ -137,7 +143,7 @@ createAnimatedPoisonBottles() {
 
 createCoins() {
     const coins = [];
-    const count = 15;
+    const count = 10;
     const minX = 200;
     const maxX = 4500;
     const minY = 80;
@@ -224,6 +230,8 @@ checkPoisonCollection() {
         const coin = this.coins[i];
         if (!coin.collected && this.character.isColliding(coin)) {
             coin.collected = true;
+            this.collectedCoins++;
+            this.coinBar.setPercentage(this.collectedCoins, this.totalCoins);
             this.coins.splice(i, 1);
         }
     }
@@ -525,6 +533,11 @@ draw() {
     // Zeichne Giftleiste (fixe Position, unter der Statusleiste)
     if (this.poisonBar && this.poisonBar.img && this.poisonBar.img.complete && this.poisonBar.img.naturalHeight !== 0) {
         this.ctx.drawImage(this.poisonBar.img, this.poisonBar.x, this.poisonBar.y, this.poisonBar.width, this.poisonBar.height);
+    }
+
+    // Zeichne Coin Leiste (fixe Position, rechts neben der Giftleiste)
+    if (this.coinBar && this.coinBar.img && this.coinBar.img.complete && this.coinBar.img.naturalHeight !== 0) {
+        this.ctx.drawImage(this.coinBar.img, this.coinBar.x, this.coinBar.y, this.coinBar.width, this.coinBar.height);
     } 
 
     let self = this;
