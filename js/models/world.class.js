@@ -13,6 +13,7 @@ class World {
  statusBar = new StatusBar();
  poisonBar = new PoisonBar();
  coinBar = new CoinBar();
+ bossBar = new BossBar();
  bubbleAnimations = [];
  finSlaps = [];
 
@@ -72,6 +73,7 @@ constructor(canvas) {
     this.collectedCoins = 0;
     this.coinBar.setPercentage(0, this.totalCoins);
     this.finalBoss = new FinalBoss(this.mapWidth - 500, 80);
+    this.bossBar.setPercentage(this.finalBoss.hp, this.finalBoss.hp);
     this.handleThrow();
     this.draw();
 }
@@ -177,6 +179,10 @@ checkCollisions() {
     // Boss Sichtbarkeit
     if (this.finalBoss) {
         this.finalBoss.checkVisibility(this.cameraX, this.canvas.width);
+        // Aktualisiere BossBar wenn Boss sichtbar wird
+        if (this.finalBoss.isVisible) {
+            this.bossBar.setPercentage(this.finalBoss.hp, 500);
+        }
         this.finalBoss.checkProximityAttack(this.character);
     }
 
@@ -322,6 +328,7 @@ checkBubbleCollisions() {
             //  Kollision mit Boss
             if (!bubbleHit && this.finalBoss && !this.finalBoss.isDead && this.isCollidingBubble(bubble, this.finalBoss)) {
                 this.finalBoss.hit(damage);
+                this.bossBar.setPercentage(this.finalBoss.hp, 500);
                 bubbleHit = true;
             }
         } else {
@@ -407,6 +414,7 @@ checkFinSlapCollisions() {
         // Kollision mit Boss
         if (!finSlapHit && this.finalBoss && !this.finalBoss.isDead && this.isCollidingFinSlap(finSlap, this.finalBoss)) {
             this.finalBoss.hit(finSlap.damage);
+            this.bossBar.setPercentage(this.finalBoss.hp, 500);
             finSlapHit = true;
         }
 
@@ -545,6 +553,11 @@ draw() {
     // Zeichne Coin Leiste (fixe Position, rechts neben der Giftleiste)
     if (this.coinBar && this.coinBar.img && this.coinBar.img.complete && this.coinBar.img.naturalHeight !== 0) {
         this.ctx.drawImage(this.coinBar.img, this.coinBar.x, this.coinBar.y, this.coinBar.width, this.coinBar.height);
+    }
+
+    // Zeichne Boss Leiste (fixe Position, wenn Boss sichtbar ist)
+    if (this.finalBoss && this.finalBoss.isVisible) {
+        this.bossBar.draw(this.ctx);
     } 
 
     let self = this;
