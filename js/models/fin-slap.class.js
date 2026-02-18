@@ -1,8 +1,6 @@
 class FinSlap extends MovableObject {
     IMAGES = [
         '1.Sharkie/4.Attack/Fin slap/1.png',
-        '1.Sharkie/4.Attack/Fin slap/2.png',
-        '1.Sharkie/4.Attack/Fin slap/3.png',
         '1.Sharkie/4.Attack/Fin slap/4.png',
         '1.Sharkie/4.Attack/Fin slap/5.png',
         '1.Sharkie/4.Attack/Fin slap/6.png',
@@ -15,7 +13,6 @@ class FinSlap extends MovableObject {
     direction = 1;
     currentImage = 0;
     createdTime = Date.now();
-    lifetime = 800; 
 
     constructor(x, y, direction = 1) {
         super();

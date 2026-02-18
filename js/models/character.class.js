@@ -237,22 +237,22 @@ class Character extends MovableObject{
             this.currentImage = 0;
             
             const direction = this.otherDirection ? -1 : 1;
-            const offsetX = this.otherDirection ? 0 : this.width;
+            const offsetX = this.otherDirection ? 0 : 120;
             
-            // Erstelle Fin Slap Attacke nach 400ms (mittelpunkt der animation)
+            // Erstelle Fin Slap Attacke nach 300ms (mittelpunkt der animation)
             let finSlap = null;
             setTimeout(() => {
                 finSlap = new FinSlap(this.x + offsetX, this.y + 50, direction);
                 if (this.world) {
                     this.world.finSlaps.push(finSlap);
                 }
-            }, 400);
+            }, 300);
             
-            // Beende die Fin Slap Animation nach 800ms
+            // Beende die Fin Slap Animation nach 600ms
             setTimeout(() => {
                 this.isFinSlapping = false;
                 this.currentImage = 0;
-            }, 800);
+            }, 600);
             
             return finSlap;
         }
