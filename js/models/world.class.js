@@ -174,6 +174,11 @@ handleThrow() {
 }
 
 checkCollisions() {
+    // Boss Sichtbarkeit
+    if (this.finalBoss) {
+        this.finalBoss.checkVisibility(this.cameraX, this.canvas.width);
+    }
+
     this.enemies.forEach((enemy) => {
         if (!enemy.isDead && this.character.isColliding(enemy)) {
             const currentTime = Date.now();
@@ -192,7 +197,7 @@ checkCollisions() {
             }
         }
     });
-    // nimierte Giftflaschen in Sichtweite sind
+    // animierte Giftflaschen in Sichtweite sind
     this.animatedPoisonBottles.forEach((bottle) => {
         bottle.checkVisibility(this.character.x);
     });
@@ -203,7 +208,7 @@ checkCollisions() {
 }
 
 checkPoisonCollection() {
-    // Statische Bodenflaschen (+30 Poison)
+    // Statische Bodenflaschen 
     for (let i = this.poisonBottles.length - 1; i >= 0; i--) {
         const bottle = this.poisonBottles[i];
         if (!bottle.collected && this.character.isColliding(bottle)) {
@@ -214,7 +219,7 @@ checkPoisonCollection() {
         }
     }
 
-    // Animierte fallende Flaschen (+50 Poison)
+    // Animierte fallende Flaschen 
     for (let i = this.animatedPoisonBottles.length - 1; i >= 0; i--) {
         const bottle = this.animatedPoisonBottles[i];
         if (!bottle.collected && this.character.isColliding(bottle)) {
@@ -282,7 +287,7 @@ checkBubbleCollisions() {
                 }
             }
 
-            // Prüfe Kollision mit Quallen
+            // Kollision mit Quallen
             if (!bubbleHit) {
                 for (let j = this.jellyfishes.length - 1; j >= 0; j--) {
                     const jellyfish = this.jellyfishes[j];
@@ -304,7 +309,7 @@ checkBubbleCollisions() {
                 }
             }
 
-            // Prüfe Kollision mit Boss
+            //  Kollision mit Boss
             if (!bubbleHit && this.finalBoss && !this.finalBoss.isDead && this.isCollidingBubble(bubble, this.finalBoss)) {
                 this.finalBoss.hp -= damage;
                 if (this.finalBoss.hp <= 0) {
@@ -314,10 +319,10 @@ checkBubbleCollisions() {
                 bubbleHit = true;
             }
         } else {
-            // WEISSE Blase (F) - macht Schaden NUR auf Quallen (Jellyfishes)
+            // WEISSE Blase (F)  macht Schaden NUR auf Quallen (Jellyfishes)
             const damage = 50;
 
-            // Prüfe Kollision NUR mit Quallen
+            //  Kollision NUR mit Quallen
             for (let j = this.jellyfishes.length - 1; j >= 0; j--) {
                 const jellyfish = this.jellyfishes[j];
                 if (jellyfish.isDead) {
@@ -346,7 +351,7 @@ checkBubbleCollisions() {
 }
 
 checkFinSlapCollisions() {
-    // Fin Slap - treffen ALLE Gegner
+    // Fin Slap treffen ALLE Gegner
     for (let i = this.finSlaps.length - 1; i >= 0; i--) {
         const finSlap = this.finSlaps[i];
         let finSlapHit = false;
@@ -371,7 +376,7 @@ checkFinSlapCollisions() {
             }
         }
 
-        // Prüfe Kollision mit Quallen
+        // Kollision mit Quallen
         if (!finSlapHit) {
             for (let j = this.jellyfishes.length - 1; j >= 0; j--) {
                 const jellyfish = this.jellyfishes[j];
@@ -393,7 +398,7 @@ checkFinSlapCollisions() {
             }
         }
 
-        // Prüfe Kollision mit Boss
+        // Kollision mit Boss
         if (!finSlapHit && this.finalBoss && !this.finalBoss.isDead && this.isCollidingFinSlap(finSlap, this.finalBoss)) {
             this.finalBoss.hp -= finSlap.damage;
             if (this.finalBoss.hp <= 0) {
