@@ -4,6 +4,9 @@ class Character extends MovableObject{
     isHurt = false;
     isAttacking = false;
     isFinSlapping = false;
+    isDead = false;
+    deadAnimationFinished = false;
+    lastDamageType = 'poison';
     lastHitTime = 0;
     energy = 100;
     maxEnergy = 100;
@@ -49,6 +52,34 @@ class Character extends MovableObject{
         '1.Sharkie/5.Hurt/2.Electric shock/3.png'
     ];
 
+    IMAGES_DEAD_POISON = [
+        '1.Sharkie/6.dead/1.Poisoned/1.png',
+        '1.Sharkie/6.dead/1.Poisoned/2.png',
+        '1.Sharkie/6.dead/1.Poisoned/3.png',
+        '1.Sharkie/6.dead/1.Poisoned/4.png',
+        '1.Sharkie/6.dead/1.Poisoned/5.png',
+        '1.Sharkie/6.dead/1.Poisoned/6.png',
+        '1.Sharkie/6.dead/1.Poisoned/7.png',
+        '1.Sharkie/6.dead/1.Poisoned/8.png',
+        '1.Sharkie/6.dead/1.Poisoned/9.png',
+        '1.Sharkie/6.dead/1.Poisoned/10.png',
+        '1.Sharkie/6.dead/1.Poisoned/11.png',
+        '1.Sharkie/6.dead/1.Poisoned/12.png'
+    ];
+
+    IMAGES_DEAD_ELECTRIC = [
+        '1.Sharkie/6.dead/2.Electro_shock/1.png',
+        '1.Sharkie/6.dead/2.Electro_shock/2.png',
+        '1.Sharkie/6.dead/2.Electro_shock/3.png',
+        '1.Sharkie/6.dead/2.Electro_shock/4.png',
+        '1.Sharkie/6.dead/2.Electro_shock/5.png',
+        '1.Sharkie/6.dead/2.Electro_shock/6.png',
+        '1.Sharkie/6.dead/2.Electro_shock/7.png',
+        '1.Sharkie/6.dead/2.Electro_shock/8.png',
+        '1.Sharkie/6.dead/2.Electro_shock/9.png',
+        '1.Sharkie/6.dead/2.Electro_shock/10.png'
+    ];
+
     IMAGES_FIN_SLAP = [
         '1.Sharkie/4.Attack/Fin slap/1.png',
         '1.Sharkie/4.Attack/Fin slap/2.png',
@@ -66,6 +97,8 @@ class Character extends MovableObject{
         this.loadImages(this.IMAGES_IDLE);
         this.loadImages(this.IMAGES_ATTACK);
         this.loadImages(this.IMAGES_HURT);
+        this.loadImages(this.IMAGES_DEAD_POISON);
+        this.loadImages(this.IMAGES_DEAD_ELECTRIC);
         this.loadImages(this.IMAGES_FIN_SLAP);
         this.width = 200;
         this.height = 140;
@@ -76,6 +109,23 @@ class Character extends MovableObject{
 
     animate() {
         setInterval(() => {
+            if (this.isDead) {
+                const images = this.getDeathImages();
+                if (this.deadAnimationFinished) {
+                    this.img = this.imageCache[images[images.length - 1]];
+                    return;
+                }
+
+                let path = images[this.currentImage % images.length];
+                this.img = this.imageCache[path];
+                this.currentImage++;
+
+                if (this.currentImage >= images.length) {
+                    this.deadAnimationFinished = true;
+                    this.currentImage = images.length - 1;
+                }
+                return;
+            }
             if (this.isHurt) {
                 let path = this.IMAGES_HURT[this.currentImage % this.IMAGES_HURT.length];
                 this.img = this.imageCache[path];
@@ -96,7 +146,17 @@ class Character extends MovableObject{
         }, 100);
     }
 
-    hit() {
+    hit(damageType) {
+        if (this.isDead) {
+            return;
+        }
+        if (this.energy <= 0) {
+            this.die();
+            return;
+        }
+        if (damageType) {
+            this.lastDamageType = damageType;
+        }
         this.isHurt = true;
         this.lastHitTime = Date.now();
         this.currentImage = 0;
@@ -105,15 +165,25 @@ class Character extends MovableObject{
             this.energy = 0;
         }
         console.log('Energie:', this.energy);
+
+        if (this.energy <= 0) {
+            this.die();
+            return;
+        }
         
         setTimeout(() => {
-            this.isHurt = false;
-            this.currentImage = 0;
+            if (!this.isDead) {
+                this.isHurt = false;
+                this.currentImage = 0;
+            }
         }, 500);
     }
 
     handleKeyboard() {
         setInterval(() => {
+            if (this.isDead) {
+                return;
+            }
             if (window.keyboard && window.keyboard.RIGHT) {
                 this.moveRight();
                 this.otherDirection = false;
@@ -155,12 +225,12 @@ class Character extends MovableObject{
 
     canThrowNormalBubble() {
         const currentTime = Date.now();
-        return currentTime - this.lastThrowTime > 1200 && !this.isAttacking;
+        return !this.isDead && currentTime - this.lastThrowTime > 1200 && !this.isAttacking;
     }
 
     canThrowPoisonBubble() {
         const currentTime = Date.now();
-        return this.poison >= 30 && (currentTime - this.lastThrowTime > 1200) && !this.isAttacking;
+        return !this.isDead && this.poison >= 30 && (currentTime - this.lastThrowTime > 1200) && !this.isAttacking;
     }
 
     throwNormalBubble() {
@@ -227,7 +297,7 @@ class Character extends MovableObject{
 
     canThrowFinSlap() {
         const currentTime = Date.now();
-        return currentTime - this.lastThrowTime > 1200 && !this.isAttacking && !this.isFinSlapping;
+        return !this.isDead && currentTime - this.lastThrowTime > 1200 && !this.isAttacking && !this.isFinSlapping;
     }
 
     throwFinSlap() {
@@ -257,6 +327,24 @@ class Character extends MovableObject{
             return finSlap;
         }
         return null;
+    }
+
+    getDeathImages() {
+        return this.lastDamageType === 'electric'
+            ? this.IMAGES_DEAD_ELECTRIC
+            : this.IMAGES_DEAD_POISON;
+    }
+
+    die() {
+        if (this.isDead) {
+            return;
+        }
+        this.isDead = true;
+        this.isHurt = false;
+        this.isAttacking = false;
+        this.isFinSlapping = false;
+        this.currentImage = 0;
+        this.deadAnimationFinished = false;
     }
 
 

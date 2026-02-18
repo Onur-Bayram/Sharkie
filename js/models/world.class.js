@@ -180,19 +180,19 @@ checkCollisions() {
     }
 
     this.enemies.forEach((enemy) => {
-        if (!enemy.isDead && this.character.isColliding(enemy)) {
+        if (!enemy.isDead && !this.character.isDead && this.character.isColliding(enemy)) {
             const currentTime = Date.now();
             if (!this.character.isHurt || (currentTime - this.character.lastHitTime > 600)) {
-                this.character.hit();
+                this.character.hit('poison');
                 this.statusBar.setPercentage(this.character.energy);
             }
         }
     });
     this.jellyfishes.forEach((jellyfish) => {
-        if (!jellyfish.isDead && this.character.isColliding(jellyfish)) {
+        if (!jellyfish.isDead && !this.character.isDead && this.character.isColliding(jellyfish)) {
             const currentTime = Date.now();
             if (!this.character.isHurt || (currentTime - this.character.lastHitTime > 600)) {
-                this.character.hit();
+                this.character.hit('electric');
                 this.statusBar.setPercentage(this.character.energy);
             }
         }
