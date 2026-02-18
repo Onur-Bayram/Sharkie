@@ -146,7 +146,7 @@ class Character extends MovableObject{
         }, 100);
     }
 
-    hit(damageType) {
+    hit(damageType, damage = 10) {
         if (this.isDead) {
             return;
         }
@@ -160,7 +160,7 @@ class Character extends MovableObject{
         this.isHurt = true;
         this.lastHitTime = Date.now();
         this.currentImage = 0;
-        this.energy -= 10;
+        this.energy -= damage;
         if (this.energy < 0) {
             this.energy = 0;
         }

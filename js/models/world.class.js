@@ -192,7 +192,8 @@ checkCollisions() {
         if (!jellyfish.isDead && !this.character.isDead && this.character.isColliding(jellyfish)) {
             const currentTime = Date.now();
             if (!this.character.isHurt || (currentTime - this.character.lastHitTime > 600)) {
-                this.character.hit('electric');
+                const damage = jellyfish.isElectric ? 30 : 10;
+                this.character.hit('electric', damage);
                 this.statusBar.setPercentage(this.character.energy);
             }
         }
