@@ -382,7 +382,7 @@ checkFinSlapCollisions() {
             if (this.isCollidingFinSlap(finSlap, enemy)) {
                 enemy.hp -= finSlap.damage;
                 if (enemy.hp <= 0) {
-                    enemy.die();
+                    enemy.die('finSlap', finSlap.direction);
                 }
                 finSlapHit = true;
                 break;

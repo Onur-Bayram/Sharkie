@@ -4,10 +4,15 @@ class Pufferfish extends MovableObject{
     IMAGES_TRANSITION = [];
     IMAGES_BUBBLESWIM = [];
     IMAGES_DEAD = [];
+    IMAGES_DEAD_FINSLAP = [];
     hp = 30;
     isDead = false;
     state = 'swim';
     deadAnimationFinished = false;
+    deadCause = null;
+    knockbackVX = 0;
+    knockbackVY = 0;
+    knockbackGravity = 0.30;
 
     constructor(x = null, y = null){
         super();
@@ -41,12 +46,14 @@ class Pufferfish extends MovableObject{
         ];
 
         this.IMAGES_DEAD = this.getDeadImages();
+        this.IMAGES_DEAD_FINSLAP = this.getDeadImagesFinSlap();
         
         this.loadImage(this.IMAGES_SWIM[0]);
         this.loadImages(this.IMAGES_SWIM);
         this.loadImages(this.IMAGES_TRANSITION);
         this.loadImages(this.IMAGES_BUBBLESWIM);
         this.loadImages(this.IMAGES_DEAD);
+        this.loadImages(this.IMAGES_DEAD_FINSLAP);
         
         this.x = x !== null ? x : 200 + Math.random() * 300;
         this.y = y !== null ? y : 150 + Math.random() * 200;
@@ -88,6 +95,9 @@ class Pufferfish extends MovableObject{
     
         setInterval(() => {
             if (this.isDead) {
+                if (this.deadCause === 'finSlap') {
+                    this.applyFinSlapKnockback();
+                }
                 return;
             }
 
@@ -155,6 +165,9 @@ class Pufferfish extends MovableObject{
 
     getCurrentImages() {
         if (this.isDead) {
+            if (this.deadCause === 'finSlap' && this.IMAGES_DEAD_FINSLAP.length > 0) {
+                return this.IMAGES_DEAD_FINSLAP;
+            }
             return this.IMAGES_DEAD;
         }
         if (this.state === 'bubble') {
@@ -188,14 +201,47 @@ class Pufferfish extends MovableObject{
         ];
     }
 
-    die() {
+    getDeadImagesFinSlap() {
+        if (this.colorVariant === 1) {
+            return [
+                '2.Enemy/1.Puffer fish (3 color options)/4.DIE/1.Dead 1 (can animate by going up).png',
+                '2.Enemy/1.Puffer fish (3 color options)/4.DIE/1.Dead 2 (can animate by going down to the floor after the Fin Slap attack).png',
+                '2.Enemy/1.Puffer fish (3 color options)/4.DIE/1.Dead 3 (can animate by going down to the floor after the Fin Slap attack).png'
+            ];
+        }
+        if (this.colorVariant === 2) {
+            return [
+                '2.Enemy/1.Puffer fish (3 color options)/4.DIE/2.png',
+                '2.Enemy/1.Puffer fish (3 color options)/4.DIE/2.2.png',
+                '2.Enemy/1.Puffer fish (3 color options)/4.DIE/2.3.png'
+            ];
+        }
+        return [
+            '2.Enemy/1.Puffer fish (3 color options)/4.DIE/3.png',
+            '2.Enemy/1.Puffer fish (3 color options)/4.DIE/3.2.png',
+            '2.Enemy/1.Puffer fish (3 color options)/4.DIE/3.3.png'
+        ];
+    }
+
+    die(cause = 'default', direction = 1) {
         if (this.isDead) {
             return;
         }
         this.isDead = true;
         this.state = 'dead';
+        this.deadCause = cause;
+        if (cause === 'finSlap') {
+            this.knockbackVX = 6 * direction;
+            this.knockbackVY = -4.0;
+        }
         this.currentImage = 0;
         this.deadAnimationFinished = false;
+    }
+
+    applyFinSlapKnockback() {
+        this.x += this.knockbackVX;
+        this.y += this.knockbackVY;
+        this.knockbackVY += this.knockbackGravity;
     }
 
 }
