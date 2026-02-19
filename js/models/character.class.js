@@ -9,6 +9,7 @@ class Character extends MovableObject{
     lastDamageType = 'poison';
     isLongIdle = false;
     lastActivity = Date.now();
+    isSwimming = false;
     lastHitTime = 0;
     energy = 100;
     maxEnergy = 100;
@@ -59,6 +60,15 @@ class Character extends MovableObject{
         '1.Sharkie/2.Long_IDLE/I12.png',
         '1.Sharkie/2.Long_IDLE/I13.png',
         '1.Sharkie/2.Long_IDLE/I14.png'
+    ];
+
+    IMAGES_SWIM = [
+        '1.Sharkie/3.Swim/1.png',
+        '1.Sharkie/3.Swim/2.png',
+        '1.Sharkie/3.Swim/3.png',
+        '1.Sharkie/3.Swim/4.png',
+        '1.Sharkie/3.Swim/5.png',
+        '1.Sharkie/3.Swim/6.png'
     ];
 
     IMAGES_ATTACK = [
@@ -123,6 +133,7 @@ class Character extends MovableObject{
         this.loadImages(this.IMAGES_IDLE);
         this.loadImages(this.IMAGES_LONG_IDLE);
         this.loadImages(this.IMAGES_SLEEP_LOOP);
+        this.loadImages(this.IMAGES_SWIM);
         this.loadImages(this.IMAGES_ATTACK);
         this.loadImages(this.IMAGES_HURT);
         this.loadImages(this.IMAGES_DEAD_POISON);
@@ -180,6 +191,10 @@ class Character extends MovableObject{
                     this.img = this.imageCache[path];
                     this.currentImage++;
                 }
+            } else if (this.isSwimming) {
+                let path = this.IMAGES_SWIM[this.currentImage % this.IMAGES_SWIM.length];
+                this.img = this.imageCache[path];
+                this.currentImage++;
             } else {
                 let path = this.IMAGES_IDLE[this.currentImage % this.IMAGES_IDLE.length];
                 this.img = this.imageCache[path];
@@ -255,10 +270,19 @@ class Character extends MovableObject{
                 moved = true;
             }
 
+            // Merke den bisherigen Swim-Status
+            const wasSwimming = this.isSwimming;
+            
+            // Setze Swim-Animation wenn sich der Hai bewegt 
+            this.isSwimming = moved && !this.isAttacking && !this.isFinSlapping && !this.isHurt;
+
             if (moved) {
                 this.lastActivity = Date.now();
                 this.isLongIdle = false;
-                this.currentImage = 0;
+                // zurücksetzen wenn wir gerade ZU Schwimmen wechseln
+                if (this.isSwimming && !wasSwimming) {
+                    this.currentImage = 0;
+                }
             } else {
                 const idleTime = Date.now() - this.lastActivity;    
                 if (idleTime > 5000) {
