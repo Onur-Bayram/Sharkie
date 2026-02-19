@@ -88,6 +88,14 @@ class Character extends MovableObject{
         '1.Sharkie/5.Hurt/2.Electric shock/3.png'
     ];
 
+    IMAGES_HURT_POISON = [
+        '1.Sharkie/5.Hurt/1.Poisoned/1.png',
+        '1.Sharkie/5.Hurt/1.Poisoned/2.png',
+        '1.Sharkie/5.Hurt/1.Poisoned/3.png',
+        '1.Sharkie/5.Hurt/1.Poisoned/4.png',
+        '1.Sharkie/5.Hurt/1.Poisoned/5.png'
+    ];
+
     IMAGES_DEAD_POISON = [
         '1.Sharkie/6.dead/1.Poisoned/1.png',
         '1.Sharkie/6.dead/1.Poisoned/2.png',
@@ -136,6 +144,7 @@ class Character extends MovableObject{
         this.loadImages(this.IMAGES_SWIM);
         this.loadImages(this.IMAGES_ATTACK);
         this.loadImages(this.IMAGES_HURT);
+        this.loadImages(this.IMAGES_HURT_POISON);
         this.loadImages(this.IMAGES_DEAD_POISON);
         this.loadImages(this.IMAGES_DEAD_ELECTRIC);
         this.loadImages(this.IMAGES_FIN_SLAP);
@@ -166,7 +175,10 @@ class Character extends MovableObject{
                 return;
             }
             if (this.isHurt) {
-                let path = this.IMAGES_HURT[this.currentImage % this.IMAGES_HURT.length];
+                const hurtImages = this.lastDamageType === 'electric'
+                    ? this.IMAGES_HURT
+                    : this.IMAGES_HURT_POISON;
+                let path = hurtImages[this.currentImage % hurtImages.length];
                 this.img = this.imageCache[path];
                 this.currentImage++;
             } else if (this.isFinSlapping) {
