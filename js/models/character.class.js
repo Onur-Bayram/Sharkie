@@ -7,6 +7,8 @@ class Character extends MovableObject{
     isDead = false;
     deadAnimationFinished = false;
     lastDamageType = 'poison';
+    isLongIdle = false;
+    lastActivity = Date.now();
     lastHitTime = 0;
     energy = 100;
     maxEnergy = 100;
@@ -33,6 +35,30 @@ class Character extends MovableObject{
         '1.Sharkie/1.IDLE/16.png',
         '1.Sharkie/1.IDLE/17.png',
         '1.Sharkie/1.IDLE/18.png'
+    ];
+
+    IMAGES_LONG_IDLE = [
+        '1.Sharkie/2.Long_IDLE/i1.png',
+        '1.Sharkie/2.Long_IDLE/I2.png',
+        '1.Sharkie/2.Long_IDLE/I3.png',
+        '1.Sharkie/2.Long_IDLE/I4.png',
+        '1.Sharkie/2.Long_IDLE/I5.png',
+        '1.Sharkie/2.Long_IDLE/I6.png',
+        '1.Sharkie/2.Long_IDLE/I7.png',
+        '1.Sharkie/2.Long_IDLE/I8.png',
+        '1.Sharkie/2.Long_IDLE/I9.png',
+        '1.Sharkie/2.Long_IDLE/I10.png',
+        '1.Sharkie/2.Long_IDLE/I11.png',
+        '1.Sharkie/2.Long_IDLE/I12.png',
+        '1.Sharkie/2.Long_IDLE/I13.png',
+        '1.Sharkie/2.Long_IDLE/I14.png'
+    ];
+
+    IMAGES_SLEEP_LOOP = [
+        '1.Sharkie/2.Long_IDLE/I11.png',
+        '1.Sharkie/2.Long_IDLE/I12.png',
+        '1.Sharkie/2.Long_IDLE/I13.png',
+        '1.Sharkie/2.Long_IDLE/I14.png'
     ];
 
     IMAGES_ATTACK = [
@@ -95,6 +121,8 @@ class Character extends MovableObject{
         super();
         this.loadImage('1.Sharkie/1.IDLE/1.png');
         this.loadImages(this.IMAGES_IDLE);
+        this.loadImages(this.IMAGES_LONG_IDLE);
+        this.loadImages(this.IMAGES_SLEEP_LOOP);
         this.loadImages(this.IMAGES_ATTACK);
         this.loadImages(this.IMAGES_HURT);
         this.loadImages(this.IMAGES_DEAD_POISON);
@@ -138,6 +166,20 @@ class Character extends MovableObject{
                 let path = this.IMAGES_ATTACK[this.currentImage % this.IMAGES_ATTACK.length];
                 this.img = this.imageCache[path];
                 this.currentImage++;
+            } else if (this.isLongIdle) {
+                // Schlafanimation - durchlaufe zuerst bis Frame 10, dann loope die Sleep-Frames (I11, I12, I13)
+                if (this.currentImage < this.IMAGES_LONG_IDLE.length) {
+                    // Spielabspiel bis zur Sleep-Animation
+                    let path = this.IMAGES_LONG_IDLE[this.currentImage];
+                    this.img = this.imageCache[path];
+                    this.currentImage++;
+                } else {
+                    // Loope die Sleep-Frames (I11, I12, I13)
+                    const sleepIndex = (this.currentImage - this.IMAGES_LONG_IDLE.length) % this.IMAGES_SLEEP_LOOP.length;
+                    let path = this.IMAGES_SLEEP_LOOP[sleepIndex];
+                    this.img = this.imageCache[path];
+                    this.currentImage++;
+                }
             } else {
                 let path = this.IMAGES_IDLE[this.currentImage % this.IMAGES_IDLE.length];
                 this.img = this.imageCache[path];
@@ -184,19 +226,46 @@ class Character extends MovableObject{
             if (this.isDead) {
                 return;
             }
+            let moved = false;
             if (window.keyboard && window.keyboard.RIGHT) {
                 this.moveRight();
                 this.otherDirection = false;
+                moved = true;
             }
             if (window.keyboard && window.keyboard.LEFT) {
                 this.moveLeft();
                 this.otherDirection = true;
+                moved = true;
             }
             if (window.keyboard && window.keyboard.UP) {
                 this.moveUp();
+                moved = true;
             }
             if (window.keyboard && window.keyboard.DOWN) {
                 this.moveDown();
+                moved = true;
+            }
+            if (window.keyboard && window.keyboard.D) {
+                moved = true;
+            }
+            if (window.keyboard && window.keyboard.F) {
+                moved = true;
+            }
+            if (window.keyboard && window.keyboard.SPACE) {
+                moved = true;
+            }
+
+            if (moved) {
+                this.lastActivity = Date.now();
+                this.isLongIdle = false;
+                this.currentImage = 0;
+            } else {
+                const idleTime = Date.now() - this.lastActivity;    
+                if (idleTime > 5000) {
+                    this.isLongIdle = true;
+                } else {
+                    this.isLongIdle = false;
+                }
             }
             
             // Begrenzung der Hai darf nicht aus dem Bild schwimmen
