@@ -73,7 +73,7 @@ constructor(canvas) {
     this.collectedCoins = 0;
     this.coinBar.setPercentage(0, this.totalCoins);
     this.finalBoss = new FinalBoss(this.mapWidth - 500, 80);
-    this.bossBar.setPercentage(this.finalBoss.hp, this.finalBoss.hp);
+    this.bossBar.setPercentage(this.finalBoss.hp, this.finalBoss.maxHp);
     this.handleThrow();
     this.draw();
 }
@@ -181,7 +181,7 @@ checkCollisions() {
         this.finalBoss.checkVisibility(this.cameraX, this.canvas.width);
         // Aktualisiere BossBar wenn Boss sichtbar wird
         if (this.finalBoss.isVisible) {
-            this.bossBar.setPercentage(this.finalBoss.hp, 500);
+            this.bossBar.setPercentage(this.finalBoss.hp, this.finalBoss.maxHp);
         }
         this.finalBoss.checkProximityAttack(this.character);
     }
@@ -205,11 +205,11 @@ checkCollisions() {
             }
         }
     });
-    // Boss Kollision
-    if (this.finalBoss && !this.finalBoss.isDead && !this.character.isDead && this.character.isColliding(this.finalBoss)) {
+    // Boss Kollision 
+    if (this.finalBoss && !this.finalBoss.isDead && !this.character.isDead && this.isCollidingBoss(this.character, this.finalBoss)) {
         const currentTime = Date.now();
         if (!this.character.isHurt || (currentTime - this.character.lastHitTime > 600)) {
-            this.character.hit('electric', 20);
+            this.character.hit('poison', 20);
             this.statusBar.setPercentage(this.character.energy);
         }
     }
@@ -328,7 +328,7 @@ checkBubbleCollisions() {
             //  Kollision mit Boss
             if (!bubbleHit && this.finalBoss && !this.finalBoss.isDead && this.isCollidingBubble(bubble, this.finalBoss)) {
                 this.finalBoss.hit(damage);
-                this.bossBar.setPercentage(this.finalBoss.hp, 500);
+                this.bossBar.setPercentage(this.finalBoss.hp, this.finalBoss.maxHp);
                 bubbleHit = true;
             }
         } else {
@@ -414,7 +414,7 @@ checkFinSlapCollisions() {
         // Kollision mit Boss
         if (!finSlapHit && this.finalBoss && !this.finalBoss.isDead && this.isCollidingFinSlap(finSlap, this.finalBoss)) {
             this.finalBoss.hit(finSlap.damage);
-            this.bossBar.setPercentage(this.finalBoss.hp, 500);
+            this.bossBar.setPercentage(this.finalBoss.hp, this.finalBoss.maxHp);
             finSlapHit = true;
         }
 
@@ -564,5 +564,14 @@ draw() {
     requestAnimationFrame(function() {
         self.draw();
     });
+}
+
+isCollidingBoss(character, boss) {
+    //  Hitbox für Boss-Schaden
+    const offset = 80;
+    return character.x + offset < boss.x + boss.width - offset &&
+           character.x + character.width - offset > boss.x + offset &&
+           character.y + offset < boss.y + boss.height - offset &&
+           character.y + character.height - offset > boss.y + offset;
 }
 }

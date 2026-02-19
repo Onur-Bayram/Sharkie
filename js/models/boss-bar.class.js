@@ -15,14 +15,24 @@ class BossBar {
     }
 
     draw(ctx) {
-        const percentage = this.currentHp / this.maxHp;
-        const barWidth = this.width * percentage;
+        const safeMax = Math.max(this.maxHp, 1);
+        const percentage = Math.min(Math.max(this.currentHp / safeMax, 0), 1);
+        const borderWidth = 3;
+        const padding = borderWidth + 2; // Platz für Rahmen + extra Abstand
+        const innerWidth = this.width - (padding * 2);
+        const innerHeight = this.height - (padding * 2);
+        const barWidth = innerWidth * percentage;
 
-        // Hintergrund (dunkelgrau)
+        // Äußerer Rahmen zuerst (Hintergrund)
         ctx.fillStyle = '#333333';
         ctx.fillRect(this.x, this.y, this.width, this.height);
 
-        // Lebensbalken (grün bei voll, rot bei wenig)
+        // Border (weißer Rahmen)
+        ctx.strokeStyle = '#FFFFFF';
+        ctx.lineWidth = borderWidth;
+        ctx.strokeRect(this.x + borderWidth/2, this.y + borderWidth/2, this.width - borderWidth, this.height - borderWidth);
+
+        // Lebensbalken (grün bei voll, rot bei wenig) - innerhalb des Rahmens
         if (percentage > 0.5) {
             ctx.fillStyle = '#00FF00'; // Grün
         } else if (percentage > 0.25) {
@@ -30,12 +40,7 @@ class BossBar {
         } else {
             ctx.fillStyle = '#FF0000'; // Rot
         }
-        ctx.fillRect(this.x, this.y, barWidth, this.height);
-
-        // Border
-        ctx.strokeStyle = '#FFFFFF';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(this.x, this.y, this.width, this.height);
+        ctx.fillRect(this.x + padding, this.y + padding, barWidth, innerHeight);
 
         // Text mit HP
         ctx.fillStyle = '#FFFFFF';
