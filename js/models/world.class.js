@@ -15,6 +15,7 @@ class World {
  coinBar = new CoinBar();
  bossBar = new BossBar();
  winScreen = new WinScreen();
+ audioManager = new AudioManager();
  bubbleAnimations = [];
  finSlaps = [];
 
@@ -76,6 +77,7 @@ constructor(canvas) {
     this.finalBoss = new FinalBoss(this.mapWidth - 500, 80);
     this.bossBar.setPercentage(this.finalBoss.hp, this.finalBoss.maxHp);
     this.handleThrow();
+    this.audioManager.play();
     this.draw();
 }
 
