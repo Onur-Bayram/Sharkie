@@ -450,6 +450,10 @@ class Character extends MovableObject{
         this.isFinSlapping = false;
         this.currentImage = 0;
         this.deadAnimationFinished = false;
+
+        if (this.world && this.world.audioManager) {
+            this.world.audioManager.playFailSound();
+        }
     }
 
 

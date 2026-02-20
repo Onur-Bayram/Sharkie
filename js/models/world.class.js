@@ -239,6 +239,7 @@ checkPoisonCollection() {
             bottle.collected = true;
             this.character.poison = Math.min(this.character.poison + 30, 100);
             this.poisonBar.setPercentage(this.character.poison);
+            this.audioManager.playPotionSound();
             this.poisonBottles.splice(i, 1);
         }
     }
@@ -250,6 +251,7 @@ checkPoisonCollection() {
             bottle.collected = true;
             this.character.poison = Math.min(this.character.poison + 50, 100);
             this.poisonBar.setPercentage(this.character.poison);
+            this.audioManager.playPotionSound();
             this.animatedPoisonBottles.splice(i, 1);
         }
     }
@@ -261,6 +263,7 @@ checkPoisonCollection() {
             coin.collected = true;
             this.collectedCoins++;
             this.coinBar.setPercentage(this.collectedCoins, this.totalCoins);
+            this.audioManager.playCoinSound();
             this.coins.splice(i, 1);
         }
     }
