@@ -1,5 +1,6 @@
 let canvas;
 let world;
+let startScreen;
 let character = new MovableObject();
 let keyboard = {
     LEFT: false,
@@ -13,11 +14,29 @@ let keyboard = {
 
 window.keyboard = keyboard;
 
-function init() {
+function showStartScreen() {
     canvas = document.getElementById("canvas");
-    world = new World (canvas);
-
+    const ctx = canvas.getContext('2d');
+    startScreen = new StartScreen();
     
+    // Animation loop for start screen
+    function drawStartScreen() {
+        startScreen.draw(ctx);
+        if (startScreen.isVisible) {
+            requestAnimationFrame(drawStartScreen);
+        }
+    }
+    drawStartScreen();
+    
+    // Make startGame globally accessible
+    window.startGame = init;
+}
+
+function init() {
+    if (!canvas) {
+        canvas = document.getElementById("canvas");
+    }
+    world = new World(canvas);
     console.log('My Charakter is', world.character);
 }
 
