@@ -3,6 +3,7 @@ class StartScreen {
     
     startButtonImg = new Image();
     sharkieImg = new Image();
+    backgroundImg = new Image();
     
     buttonX = 0;
     buttonY = 0;
@@ -17,6 +18,7 @@ class StartScreen {
     loadImages() {
         this.startButtonImg.src = '6.Botones/Start/1.png';
         this.sharkieImg.src = '1.Sharkie/1.IDLE/1.png';
+        this.backgroundImg.src = '3. Background/Mesa de trabajo 1.png';
     }
     
     setupClickHandler() {
@@ -45,9 +47,14 @@ class StartScreen {
         const canvasWidth = 800;
         const canvasHeight = 540;
         
-        // Hintergrund
-        ctx.fillStyle = '#1a6fa9';
-        ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+        // Hintergrund bild
+        if (this.backgroundImg.complete) {
+            ctx.drawImage(this.backgroundImg, 0, 0, canvasWidth, canvasHeight);
+        } else {
+            // fallback
+            ctx.fillStyle = '#1a6fa9';
+            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+        }
         
        
         

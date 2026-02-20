@@ -3,6 +3,7 @@ class WinScreen {
     isVisible = false;
     youWinWidth = 800;
     youWinHeight = 540;
+    soundPlayed = false;
 
     constructor() {
         this.youWinImg = new Image();
@@ -26,11 +27,18 @@ class WinScreen {
         }
     }
 
-    show() {
+    show(audioManager) {
+        if (!this.isVisible && !this.soundPlayed) {
+            this.soundPlayed = true;
+            if (audioManager) {
+                audioManager.playVictorySound();
+            }
+        }
         this.isVisible = true;
     }
 
     hide() {
         this.isVisible = false;
+        this.soundPlayed = false;
     }
 }

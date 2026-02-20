@@ -3,6 +3,7 @@ class AudioManager {
     coinSound = new Audio();
     failSound = new Audio();
     potionSound = new Audio();
+    victorySound = new Audio();
     isPlaying = false;
     sfxVolume = 0.6;
     
@@ -15,7 +16,7 @@ class AudioManager {
         this.bgMusic.loop = true;
         this.bgMusic.volume = 0.5;
 
-        this.coinSound.src = 'audio/Coin Sound.mp3';
+        this.coinSound.src = 'audio/Gold.mp3';
         this.coinSound.volume = this.sfxVolume;
 
         this.failSound.src = 'audio/Fail.mp3';
@@ -23,6 +24,9 @@ class AudioManager {
 
         this.potionSound.src = 'audio/Potion.mp3';
         this.potionSound.volume = this.sfxVolume;
+
+        this.victorySound.src = 'audio/8 BIT Victory sound effect.mp3';
+        this.victorySound.volume = this.sfxVolume;
     }
     
     play() {
@@ -62,5 +66,11 @@ class AudioManager {
         const potion = this.potionSound.cloneNode();
         potion.volume = this.sfxVolume;
         potion.play();
+    }
+
+    playVictorySound() {
+        const victory = this.victorySound.cloneNode();
+        victory.volume = this.sfxVolume;
+        victory.play();
     }
 }

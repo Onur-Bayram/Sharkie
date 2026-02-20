@@ -219,7 +219,7 @@ checkCollisions() {
 
     // Überprüfe ob Boss besiegt wurde
     if (this.finalBoss && this.finalBoss.isDead && this.finalBoss.deadAnimationFinished) {
-        this.winScreen.show();
+        this.winScreen.show(this.audioManager);
     }
     // animierte Giftflaschen in Sichtweite sind
     this.animatedPoisonBottles.forEach((bottle) => {
