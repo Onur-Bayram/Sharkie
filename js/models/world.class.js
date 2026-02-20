@@ -14,6 +14,7 @@ class World {
  poisonBar = new PoisonBar();
  coinBar = new CoinBar();
  bossBar = new BossBar();
+ winScreen = new WinScreen();
  bubbleAnimations = [];
  finSlaps = [];
 
@@ -212,6 +213,11 @@ checkCollisions() {
             this.character.hit('poison', 20);
             this.statusBar.setPercentage(this.character.energy);
         }
+    }
+
+    // Überprüfe ob Boss besiegt wurde
+    if (this.finalBoss && this.finalBoss.isDead && this.finalBoss.deadAnimationFinished) {
+        this.winScreen.show();
     }
     // animierte Giftflaschen in Sichtweite sind
     this.animatedPoisonBottles.forEach((bottle) => {
@@ -558,7 +564,10 @@ draw() {
     // Zeichne Boss Leiste (fixe Position, wenn Boss sichtbar ist)
     if (this.finalBoss && this.finalBoss.isVisible) {
         this.bossBar.draw(this.ctx);
-    } 
+    }
+
+    // Zeichne Win Screen wenn boss besiegt
+    this.winScreen.draw(this.ctx);
 
     let self = this;
     requestAnimationFrame(function() {
