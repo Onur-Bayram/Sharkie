@@ -1,6 +1,7 @@
 let canvas;
 let world;
 let startScreen;
+let fullscreenButton;
 let character = new MovableObject();
 let keyboard = {
     LEFT: false,
@@ -13,13 +14,51 @@ let keyboard = {
 };
 
 window.keyboard = keyboard;
+window.mousePos = { x: 0, y: 0 };
+
+// Original Canvas-Größe
+const ORIGINAL_WIDTH = 800;
+const ORIGINAL_HEIGHT = 540;
+
+// Funktion zum Anpassen der Canvas-Auflösung
+function updateCanvasResolution(isFullscreen) {
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    
+    if (isFullscreen) {
+        // Hochauflösendes Canvas für Vollbild (2x oder 3x)
+        const scale = window.devicePixelRatio || 2;
+        const multiplier = Math.min(scale, 3); // Max 3x für Performance
+        
+        canvas.width = ORIGINAL_WIDTH * multiplier;
+        canvas.height = ORIGINAL_HEIGHT * multiplier;
+        
+        // Context skalieren, damit Spiel-Koordinaten gleich bleiben
+        ctx.scale(multiplier, multiplier);
+        
+        console.log(`Canvas-Auflösung erhöht: ${canvas.width}x${canvas.height} (${multiplier}x)`);
+    } else {
+        // Zurück zur Original-Auflösung
+        canvas.width = ORIGINAL_WIDTH;
+        canvas.height = ORIGINAL_HEIGHT;
+        
+        console.log(`Canvas-Auflösung zurückgesetzt: ${canvas.width}x${canvas.height}`);
+    }
+    
+    // Glatte Darstellung
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+}
 
 function showStartScreen() {
     canvas = document.getElementById("canvas");
     const ctx = canvas.getContext('2d');
+    fullscreenButton = new FullscreenButton();
+    fullscreenButton.setCanvasContext(canvas, ctx);
     startScreen = new StartScreen();
     
-    // Animation loop for start screen
+    // Animations-Schleife für Startbildschirm
     function drawStartScreen() {
         startScreen.draw(ctx);
         if (startScreen.isVisible) {
@@ -28,7 +67,7 @@ function showStartScreen() {
     }
     drawStartScreen();
     
-    // Make startGame globally accessible
+    // startGame global verfügbar machen
     window.startGame = init;
 }
 
@@ -36,7 +75,12 @@ function init() {
     if (!canvas) {
         canvas = document.getElementById("canvas");
     }
-    world = new World(canvas);
+    if (!fullscreenButton) {
+        const ctx = canvas.getContext('2d');
+        fullscreenButton = new FullscreenButton();
+        fullscreenButton.setCanvasContext(canvas, ctx);
+    }
+    world = new World(canvas, fullscreenButton);
     console.log('My Charakter is', world.character);
 }
 
@@ -60,3 +104,90 @@ document.addEventListener('keyup', (e) => {
     if (e.key === ' ') keyboard.SPACE = false;
 });
 
+document.addEventListener('mousemove', (e) => {
+    if (canvas) {
+        const rect = canvas.getBoundingClientRect();
+        
+        // Berechne das tatsächliche Seitenverhältnis
+        const canvasRatio = canvas.width / canvas.height;
+        const rectRatio = rect.width / rect.height;
+        
+        let drawWidth, drawHeight, offsetX, offsetY;
+        
+        // Letterboxing berücksichtigen object-fit: contain
+        if (rectRatio > canvasRatio) {
+            // Schwarze Balken links und rechts
+            drawHeight = rect.height;
+            drawWidth = rect.height * canvasRatio;
+            offsetX = (rect.width - drawWidth) / 2;
+            offsetY = 0;
+        } else {
+            // Schwarze Balken oben und unten
+            drawWidth = rect.width;
+            drawHeight = rect.width / canvasRatio;
+            offsetX = 0;
+            offsetY = (rect.height - drawHeight) / 2;
+        }
+        
+        // Mausposition relativ zum tatsächlichen Canvas-Bild
+        const mouseX = e.clientX - rect.left - offsetX;
+        const mouseY = e.clientY - rect.top - offsetY;
+        
+        // Skalierung auf Canvas-Koordinaten 
+        window.mousePos.x = (mouseX / drawWidth) * ORIGINAL_WIDTH;
+        window.mousePos.y = (mouseY / drawHeight) * ORIGINAL_HEIGHT;
+    }
+});
+
+document.addEventListener('click', (e) => {
+    if (canvas && fullscreenButton) {
+        const rect = canvas.getBoundingClientRect();
+        
+        // Berechne das tatsächliche Seitenverhältnis
+        const canvasRatio = canvas.width / canvas.height;
+        const rectRatio = rect.width / rect.height;
+        
+        let drawWidth, drawHeight, offsetX, offsetY;
+        
+        // Letterboxing berücksichtigen 
+        if (rectRatio > canvasRatio) {
+            // Schwarze Balken links und rechts
+            drawHeight = rect.height;
+            drawWidth = rect.height * canvasRatio;
+            offsetX = (rect.width - drawWidth) / 2;
+            offsetY = 0;
+        } else {
+            // Schwarze Balken oben und unten
+            drawWidth = rect.width;
+            drawHeight = rect.width / canvasRatio;
+            offsetX = 0;
+            offsetY = (rect.height - drawHeight) / 2;
+        }
+        
+        // Mausposition relativ zum tatsächlichen Canvas-Bild
+        const mouseX = e.clientX - rect.left - offsetX;
+        const mouseY = e.clientY - rect.top - offsetY;
+        
+        // Skalierung auf Canvas-Koordinaten, immer auf ORIGINAL_WIDTH/HEIGHT
+        const x = (mouseX / drawWidth) * ORIGINAL_WIDTH;
+        const y = (mouseY / drawHeight) * ORIGINAL_HEIGHT;
+        
+        console.log('Click:', {
+            x: x.toFixed(1), 
+            y: y.toFixed(1), 
+            buttonX: fullscreenButton.buttonX, 
+            buttonY: fullscreenButton.buttonY,
+            rectRatio: rectRatio.toFixed(2),
+            canvasRatio: canvasRatio.toFixed(2),
+            offsetX: offsetX.toFixed(1),
+            offsetY: offsetY.toFixed(1)
+        });
+        fullscreenButton.handleClick(x, y);
+    }
+});
+
+// Fullscreen change event listener (z.B. wenn ESC gedrückt wird)
+document.addEventListener('fullscreenchange', () => {
+    const isFullscreen = !!document.fullscreenElement;
+    updateCanvasResolution(isFullscreen);
+    console.log('Fullscreen changed:', isFullscreen);});

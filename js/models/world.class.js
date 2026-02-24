@@ -1,6 +1,8 @@
 class World {
 
  cameraX = 0;
+ GAME_WIDTH = 800;  // Spiel-Koordinaten bleiben immer 800x540
+ GAME_HEIGHT = 540;
  character = new Character();
  enemies = [];
  jellyfishes = [];
@@ -16,6 +18,7 @@ class World {
  bossBar = new BossBar();
  winScreen = new WinScreen();
  audioManager = new AudioManager();
+ fullscreenButton = null;
  bubbleAnimations = [];
  finSlaps = [];
 
@@ -60,9 +63,10 @@ canvas;
 ctx; 
 
     
-constructor(canvas) {
+constructor(canvas, fullscreenButton) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
+    this.fullscreenButton = fullscreenButton;
     this.character.world = this;
     this.backgroundObjects = [...this.backgroundObjectsLight, ...this.backgroundObjectsDark];
     this.lightLayers = this.backgroundObjectsLight.filter((bg, index) => index % 5 === 4);
@@ -181,7 +185,7 @@ handleThrow() {
 checkCollisions() {
     // Boss Sichtbarkeit
     if (this.finalBoss) {
-        this.finalBoss.checkVisibility(this.cameraX, this.canvas.width);
+        this.finalBoss.checkVisibility(this.cameraX, this.GAME_WIDTH);
         // Aktualisiere BossBar wenn Boss sichtbar wird
         if (this.finalBoss.isVisible) {
             this.bossBar.setPercentage(this.finalBoss.hp, this.finalBoss.maxHp);
@@ -458,14 +462,14 @@ draw() {
     this.checkCollisions();
     
     // Kamera folgt dem Hai  zentriere den Hai auf dem Bildschirm
-    this.cameraX = this.character.x - this.canvas.width / 2 + this.character.width / 2;
+    this.cameraX = this.character.x - this.GAME_WIDTH / 2 + this.character.width / 2;
     
     // Begrenzung der Kamera 
     if (this.cameraX < 0) {
         this.cameraX = 0;
     }
-    if (this.cameraX > this.mapWidth - this.canvas.width) {
-        this.cameraX = this.mapWidth - this.canvas.width;
+    if (this.cameraX > this.mapWidth - this.GAME_WIDTH) {
+        this.cameraX = this.mapWidth - this.GAME_WIDTH;
     }
 
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -573,6 +577,11 @@ draw() {
 
     // Zeichne Win Screen wenn boss besiegt
     this.winScreen.draw(this.ctx);
+
+    // Draw Fullscreen Button
+    if (this.fullscreenButton) {
+        this.fullscreenButton.draw();
+    }
 
     let self = this;
     requestAnimationFrame(function() {

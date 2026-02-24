@@ -227,6 +227,18 @@ class Character extends MovableObject{
             this.lastDamageType = damageType;
         }
         this.isHurt = true;
+        
+        // Sound abspielen je nach Schadenstyp
+        if (this.world && this.world.audioManager) {
+            if (this.lastDamageType === 'electric') {
+                console.debug('Character: electric hit - playing sound');
+                this.world.audioManager.playElectricSound();
+            } else {
+                console.debug('Character: normal hit - playing sound');
+                this.world.audioManager.playHurtSound();
+            }
+        }
+        
         this.lastHitTime = Date.now();
         this.currentImage = 0;
         this.energy -= damage;
@@ -353,6 +365,9 @@ class Character extends MovableObject{
                 bubbleAnimation = new BubbleAnimation(this.x + offsetX, this.y + 50, direction, false);
                 if (this.world) {
                     this.world.bubbleAnimations.push(bubbleAnimation);
+                    if (this.world.audioManager) {
+                        this.world.audioManager.playBubbleShootSound();
+                    }
                 }
             }, 800);
             
@@ -386,6 +401,9 @@ class Character extends MovableObject{
                 bubbleAnimation = new BubbleAnimation(this.x + offsetX, this.y + 50, direction, true);
                 if (this.world) {
                     this.world.bubbleAnimations.push(bubbleAnimation);
+                    if (this.world.audioManager) {
+                        this.world.audioManager.playPoisonShootSound();
+                    }
                 }
             }, 800);
             
@@ -420,6 +438,10 @@ class Character extends MovableObject{
                 finSlap = new FinSlap(this.x + offsetX, this.y + 50, direction);
                 if (this.world) {
                     this.world.finSlaps.push(finSlap);
+                    if (this.world.audioManager) {
+                        console.debug('FinSlap: playing sound');
+                        this.world.audioManager.playFinSlapSound();
+                    }
                 }
             }, 300);
             

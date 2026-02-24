@@ -4,6 +4,11 @@ class AudioManager {
     failSound = new Audio();
     potionSound = new Audio();
     victorySound = new Audio();
+    finSlapSound = new Audio();
+    electricSound = new Audio();
+    hurtSound = new Audio();
+    bubbleShootSound = new Audio();
+    poisonShootSound = new Audio();
     isPlaying = false;
     sfxVolume = 0.6;
     
@@ -27,6 +32,21 @@ class AudioManager {
 
         this.victorySound.src = 'audio/8 BIT Victory sound effect.mp3';
         this.victorySound.volume = this.sfxVolume;
+        
+        this.finSlapSound.src = 'audio/Punch.mp3';
+        this.finSlapSound.volume = this.sfxVolume;
+
+        this.electricSound.src = 'audio/Electricity.mp3';
+        this.electricSound.volume = this.sfxVolume;
+
+        this.hurtSound.src = 'audio/confusion.mp3';
+        this.hurtSound.volume = this.sfxVolume;
+
+        this.bubbleShootSound.src = 'audio/Bubbleshoot.mp3';
+        this.bubbleShootSound.volume = this.sfxVolume;
+
+        this.poisonShootSound.src = 'audio/Poisenshoot.mp3';
+        this.poisonShootSound.volume = this.sfxVolume;
     }
     
     play() {
@@ -72,5 +92,35 @@ class AudioManager {
         const victory = this.victorySound.cloneNode();
         victory.volume = this.sfxVolume;
         victory.play();
+    }
+
+    playFinSlapSound() {
+        const fin = this.finSlapSound.cloneNode();
+        fin.volume = this.sfxVolume;
+        fin.play();
+    }
+
+    playElectricSound() {
+        const elec = this.electricSound.cloneNode();
+        elec.volume = this.sfxVolume;
+        elec.play();
+    }
+
+    playHurtSound() {
+        const hurt = this.hurtSound.cloneNode();
+        hurt.volume = this.sfxVolume;
+        hurt.play();
+    }
+
+    playBubbleShootSound() {
+        const bubble = this.bubbleShootSound.cloneNode();
+        bubble.volume = this.sfxVolume;
+        bubble.play();
+    }
+
+    playPoisonShootSound() {
+        const poison = this.poisonShootSound.cloneNode();
+        poison.volume = this.sfxVolume;
+        poison.play();
     }
 }
