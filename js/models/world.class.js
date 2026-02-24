@@ -17,6 +17,7 @@ class World {
  coinBar = new CoinBar();
  bossBar = new BossBar();
  winScreen = new WinScreen();
+ gameOverScreen = new GameOverScreen();
  audioManager = new AudioManager();
  fullscreenButton = null;
  bubbleAnimations = [];
@@ -577,6 +578,9 @@ draw() {
 
     // Zeichne Win Screen wenn boss besiegt
     this.winScreen.draw(this.ctx);
+
+    // Zeichne Game Over Screen wenn character tot
+    this.gameOverScreen.draw(this.ctx);
 
     // Draw Fullscreen Button
     if (this.fullscreenButton) {

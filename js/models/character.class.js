@@ -473,9 +473,12 @@ class Character extends MovableObject{
         this.currentImage = 0;
         this.deadAnimationFinished = false;
 
-        if (this.world && this.world.audioManager) {
-            this.world.audioManager.playFailSound();
-        }
+        // Zeige Game Over Screen nach kurzer Verzögerung
+        setTimeout(() => {
+            if (this.world && this.world.gameOverScreen) {
+                this.world.gameOverScreen.show(this.world.audioManager);
+            }
+        }, 1000);
     }
 
 
