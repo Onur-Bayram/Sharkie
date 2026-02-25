@@ -18,6 +18,7 @@ class World {
  bossBar = new BossBar();
  winScreen = new WinScreen();
  gameOverScreen = new GameOverScreen();
+ restartButton = new RestartButton();
  audioManager = new AudioManager();
  fullscreenButton = null;
  bubbleAnimations = [];
@@ -81,8 +82,14 @@ constructor(canvas, fullscreenButton) {
     this.coinBar.setPercentage(0, this.totalCoins);
     this.finalBoss = new FinalBoss(this.mapWidth - 500, 80);
     this.bossBar.setPercentage(this.finalBoss.hp, this.finalBoss.maxHp);
+    
     this.handleThrow();
     this.audioManager.play();
+    
+    this.winScreen.hide();
+    this.gameOverScreen.hide();
+    this.restartButton.hide();
+    
     this.draw();
 }
 
@@ -223,8 +230,9 @@ checkCollisions() {
     }
 
     // Überprüfe ob Boss besiegt wurde
-    if (this.finalBoss && this.finalBoss.isDead && this.finalBoss.deadAnimationFinished) {
-        this.winScreen.show(this.audioManager);
+    if (this.finalBoss && this.finalBoss.isDead && this.finalBoss.deadAnimationFinished && !this.character.isDead) {
+        if (this.winScreen) this.winScreen.show(this.audioManager);
+        if (this.restartButton) this.restartButton.show();
     }
     // animierte Giftflaschen in Sichtweite sind
     this.animatedPoisonBottles.forEach((bottle) => {
@@ -576,11 +584,16 @@ draw() {
         this.bossBar.draw(this.ctx);
     }
 
-    // Zeichne Win Screen wenn boss besiegt
-    this.winScreen.draw(this.ctx);
-
-    // Zeichne Game Over Screen wenn character tot
-    this.gameOverScreen.draw(this.ctx);
+    // Zeichne Game Over Screen wenn Character tot
+    if (this.character.isDead) {
+        this.gameOverScreen.draw(this.ctx);
+        this.restartButton.draw(this.ctx);
+    }
+    // Zeichne Win Screen NUR wenn Boss tot UND Character NICHT tot
+    else if (this.finalBoss && this.finalBoss.isDead && this.finalBoss.deadAnimationFinished) {
+        this.winScreen.draw(this.ctx);
+        this.restartButton.draw(this.ctx);
+    }
 
     // Draw Fullscreen Button
     if (this.fullscreenButton) {

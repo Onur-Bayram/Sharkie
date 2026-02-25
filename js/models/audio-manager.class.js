@@ -70,6 +70,23 @@ class AudioManager {
         this.bgMusic.volume = Math.max(0, Math.min(1, volume));
     }
 
+    setMusicVolume(volume) {
+        this.bgMusic.volume = Math.max(0, Math.min(1, volume));
+    }
+
+    setSFXVolume(volume) {
+        this.sfxVolume = Math.max(0, Math.min(1, volume));
+        this.coinSound.volume = this.sfxVolume;
+        this.failSound.volume = this.sfxVolume;
+        this.potionSound.volume = this.sfxVolume;
+        this.victorySound.volume = this.sfxVolume;
+        this.finSlapSound.volume = this.sfxVolume;
+        this.electricSound.volume = this.sfxVolume;
+        this.hurtSound.volume = this.sfxVolume;
+        this.bubbleShootSound.volume = this.sfxVolume;
+        this.poisonShootSound.volume = this.sfxVolume;
+    }
+
     playCoinSound() {
         const coin = this.coinSound.cloneNode();
         coin.volume = this.sfxVolume;

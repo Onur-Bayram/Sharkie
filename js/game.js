@@ -1,6 +1,7 @@
 let canvas;
 let world;
 let startScreen;
+let optionsScreen;
 let fullscreenButton;
 let character = new MovableObject();
 let keyboard = {
@@ -15,6 +16,10 @@ let keyboard = {
 
 window.keyboard = keyboard;
 window.mousePos = { x: 0, y: 0 };
+window.gameSettings = {
+    musicVolume: 0.3,
+    sfxVolume: 0.5
+};
 
 // Original Canvas-Größe
 const ORIGINAL_WIDTH = 800;
@@ -57,11 +62,68 @@ function showStartScreen() {
     fullscreenButton = new FullscreenButton();
     fullscreenButton.setCanvasContext(canvas, ctx);
     startScreen = new StartScreen();
+    optionsScreen = new OptionsScreen();
+    
+    // optionsScreen global verfügbar machen
+    window.optionsScreen = optionsScreen;
+    
+    // Zentraler Event Handler für Start Screen
+    const getCanvasCoords = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const canvasRatio = 800 / 540;
+        const rectRatio = rect.width / rect.height;
+        
+        let drawWidth, drawHeight, offsetX, offsetY;
+        
+        if (rectRatio > canvasRatio) {
+            drawHeight = rect.height;
+            drawWidth = rect.height * canvasRatio;
+            offsetX = (rect.width - drawWidth) / 2;
+            offsetY = 0;
+        } else {
+            drawWidth = rect.width;
+            drawHeight = rect.width / canvasRatio;
+            offsetX = 0;
+            offsetY = (rect.height - drawHeight) / 2;
+        }
+        
+        const mouseX = e.clientX - rect.left - offsetX;
+        const mouseY = e.clientY - rect.top - offsetY;
+        const x = (mouseX / drawWidth) * 800;
+        const y = (mouseY / drawHeight) * 540;
+        
+        return { x, y };
+    };
+    
+    canvas.addEventListener('click', (e) => {
+        const { x, y } = getCanvasCoords(e);
+        // Prüfe Options Screen ZUERST (hat Vorrang)
+        if (optionsScreen.handleClick(x, y)) {
+            return; // Wenn Options Screen den Klick verarbeitet hat, nicht weitermachen
+        }
+        // Nur wenn Options Screen nicht sichtbar oder Klick nicht verarbeitet
+        startScreen.handleClick(x, y);
+    });
+    
+    canvas.addEventListener('mousedown', (e) => {
+        const { x, y } = getCanvasCoords(e);
+        optionsScreen.handleMouseDown(x, y);
+    });
+    
+    canvas.addEventListener('mousemove', (e) => {
+        const { x, y } = getCanvasCoords(e);
+        optionsScreen.handleMouseMove(x, y);
+    });
+    
+    canvas.addEventListener('mouseup', () => {
+        optionsScreen.handleMouseUp();
+    });
     
     // Animations-Schleife für Startbildschirm
     function drawStartScreen() {
         startScreen.draw(ctx);
-        if (startScreen.isVisible) {
+        optionsScreen.draw(ctx);
+        if (startScreen.isVisible || optionsScreen.isVisible) {
             requestAnimationFrame(drawStartScreen);
         }
     }
@@ -81,6 +143,22 @@ function init() {
         fullscreenButton.setCanvasContext(canvas, ctx);
     }
     world = new World(canvas, fullscreenButton);
+    
+    // Wende gespeicherte Audio-Einstellungen an
+    if (window.gameSettings) {
+        if (window.gameSettings.musicVolume !== undefined && world.audioManager) {
+            world.audioManager.setMusicVolume(window.gameSettings.musicVolume);
+        }
+        if (window.gameSettings.sfxVolume !== undefined && world.audioManager) {
+            world.audioManager.setSFXVolume(window.gameSettings.sfxVolume);
+        }
+    }
+    
+    // Restart Button 
+    if (world.restartButton) {
+        world.restartButton.setCanvasContext(canvas.getContext('2d'));
+    }
+    
     console.log('My Charakter is', world.character);
 }
 
@@ -136,11 +214,16 @@ document.addEventListener('mousemove', (e) => {
         // Skalierung auf Canvas-Koordinaten 
         window.mousePos.x = (mouseX / drawWidth) * ORIGINAL_WIDTH;
         window.mousePos.y = (mouseY / drawHeight) * ORIGINAL_HEIGHT;
+        
+        //  Hover-State des Restart Buttons
+        if (world && world.restartButton) {
+            world.restartButton.updateHoverState(window.mousePos.x, window.mousePos.y);
+        }
     }
 });
 
 document.addEventListener('click', (e) => {
-    if (canvas && fullscreenButton) {
+    if (canvas && fullscreenButton && world) {
         const rect = canvas.getBoundingClientRect();
         
         // Berechne das tatsächliche Seitenverhältnis
@@ -183,6 +266,7 @@ document.addEventListener('click', (e) => {
             offsetY: offsetY.toFixed(1)
         });
         fullscreenButton.handleClick(x, y);
+        world.restartButton.handleClick(x, y);
     }
 });
 

@@ -2,10 +2,12 @@ class GameOverScreen {
     gameOverImages = [];
     currentImage = 0;
     isVisible = false;
-    gameOverWidth = 500;
-    gameOverHeight = 337;
+    gameOverWidth = 280;
+    gameOverHeight = 189;
     soundPlayed = false;
     animationInterval = null;
+    opacity = 0;
+    fadeInSpeed = 0.03;
 
     constructor() {
         this.loadImages();
@@ -32,21 +34,42 @@ class GameOverScreen {
             return;
         }
 
-        // Vollständig schwarzer Hintergrund
+        // Fade-In Effekt
+        if (this.opacity < 1) {
+            this.opacity += this.fadeInSpeed;
+            if (this.opacity > 1) this.opacity = 1;
+        }
+
+        ctx.save();
+        
+        // Vollständig schwarzer Hintergrund mit Fade
+        ctx.globalAlpha = this.opacity;
         ctx.fillStyle = 'black';
         ctx.fillRect(0, 0, 800, 540);
 
-        // GAME OVER Bild 
+        // GAME OVER Bild mit Fade und leichtem Glow
         const currentImg = this.gameOverImages[this.currentImage];
         if (currentImg && currentImg.complete) {
             const x = (800 - this.gameOverWidth) / 2;
-            const y = (540 - this.gameOverHeight) / 2;
+            const y = (540 - this.gameOverHeight) / 2 - 80;
+            
+            // Bessere Bildqualität beim Skalieren
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            
+            // Leichter Glow-Effekt
+            ctx.shadowColor = 'rgba(255, 255, 255, 0.3)';
+            ctx.shadowBlur = 10;
+            
             ctx.drawImage(currentImg, x, y, this.gameOverWidth, this.gameOverHeight);
         }
+        
+        ctx.restore();
     }
 
     show(audioManager) {
         if (!this.isVisible && !this.soundPlayed) {
+            this.opacity = 0;
             this.soundPlayed = true;
             if (audioManager) {
                 audioManager.playFailSound();
@@ -80,6 +103,7 @@ class GameOverScreen {
     hide() {
         this.isVisible = false;
         this.soundPlayed = false;
+        this.opacity = 0;
         this.stopAnimation();
     }
 }
