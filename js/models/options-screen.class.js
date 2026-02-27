@@ -2,6 +2,30 @@ class OptionsScreen {
     isVisible = false;
     backgroundImg = new Image();
     
+    // Screen mode: 'menu' oder 'volume'
+    currentMode = 'menu';
+    
+    // Menu Button Positionen
+    languageButtonX = 275;
+    languageButtonY = 100;
+    languageButtonWidth = 250;
+    languageButtonHeight = 70;
+    
+    helpButtonX = 275;
+    helpButtonY = 185;
+    helpButtonWidth = 250;
+    helpButtonHeight = 70;
+    
+    audioButtonX = 275;
+    audioButtonY = 270;
+    audioButtonWidth = 250;
+    audioButtonHeight = 70;
+    
+    impressumButtonX = 275;
+    impressumButtonY = 355;
+    impressumButtonWidth = 250;
+    impressumButtonHeight = 70;
+    
     // Slider-Positionen
     musicSliderX = 200;
     musicSliderY = 200;
@@ -31,6 +55,9 @@ class OptionsScreen {
     handleMouseDown(x, y) {
         if (!this.isVisible) return false;
         
+        // Mouse events nur im Audio-Mode
+        if (this.currentMode !== 'audio') return false;
+        
         // Check music slider
         const musicHandleX = this.musicSliderX + this.musicVolume * this.sliderWidth;
         if (Math.abs(x - musicHandleX) < 30 && Math.abs(y - this.musicSliderY) < 30) {
@@ -50,6 +77,9 @@ class OptionsScreen {
     
     handleMouseMove(x, y) {
         if (!this.isVisible) return false;
+        
+        // Mouse events nur im Audio-Mode aktivieren
+        if (this.currentMode !== 'audio') return false;
         
         if (this.draggingMusic) {
             const newVolume = (x - this.musicSliderX) / this.sliderWidth;
@@ -88,13 +118,58 @@ class OptionsScreen {
     handleClick(x, y) {
         if (!this.isVisible) return false;
         
+        // Menu Mode: Hauptmenü mit den 3 Buttons
+        if (this.currentMode === 'menu') {
+            // Language Button klicken
+            if (x >= this.languageButtonX && x <= this.languageButtonX + this.languageButtonWidth &&
+                y >= this.languageButtonY && y <= this.languageButtonY + this.languageButtonHeight) {
+                console.log('Sprachen Button geklickt');
+                this.currentMode = 'language';
+                return true;
+            }
+            
+            // Help Button klicken
+            if (x >= this.helpButtonX && x <= this.helpButtonX + this.helpButtonWidth &&
+                y >= this.helpButtonY && y <= this.helpButtonY + this.helpButtonHeight) {
+                console.log('Hilfe Button geklickt');
+                this.currentMode = 'help';
+                return true;
+            }
+            
+            // Audio Button klicken
+            if (x >= this.audioButtonX && x <= this.audioButtonX + this.audioButtonWidth &&
+                y >= this.audioButtonY && y <= this.audioButtonY + this.audioButtonHeight) {
+                console.log('Audio Button geklickt');
+                this.currentMode = 'audio';
+                return true;
+            }
+            
+            // Impressum Button klicken
+            if (x >= this.impressumButtonX && x <= this.impressumButtonX + this.impressumButtonWidth &&
+                y >= this.impressumButtonY && y <= this.impressumButtonY + this.impressumButtonHeight) {
+                console.log('Impressum Button geklickt');
+                this.currentMode = 'impressum';
+                return true;
+            }
+            
+            return true;
+        }
+        
+        // Volume Mode oder andere: Slider und Back Button
         // Vergrößerte Hitbox für Back Button (20px Toleranz auf allen Seiten)
         const hitboxPadding = 20;
         if (x >= this.backButtonX - hitboxPadding && 
             x <= this.backButtonX + this.backButtonWidth + hitboxPadding &&
             y >= this.backButtonY - hitboxPadding && 
             y <= this.backButtonY + this.backButtonHeight + hitboxPadding) {
-            this.hide();
+            
+            // Wenn in einem Submenu, zurück zum Hauptmenü
+            if (this.currentMode !== 'volume') {
+                this.currentMode = 'menu';
+            } else {
+                // Wenn im Volume-Mode, komplett schließen
+                this.hide();
+            }
             return true;
         }
         
@@ -118,11 +193,109 @@ class OptionsScreen {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
         ctx.fillRect(0, 0, canvasWidth, canvasHeight);
         
+        // Verschiedene Screens basierend auf currentMode
+        if (this.currentMode === 'menu') {
+            this.drawMenuScreen(ctx, canvasWidth, canvasHeight);
+        } else if (this.currentMode === 'language') {
+            this.drawLanguageScreen(ctx, canvasWidth, canvasHeight);
+        } else if (this.currentMode === 'help') {
+            this.drawHelpScreen(ctx, canvasWidth, canvasHeight);
+        } else if (this.currentMode === 'audio') {
+            this.drawAudioScreen(ctx, canvasWidth, canvasHeight);
+        } else if (this.currentMode === 'impressum') {
+            this.drawImpressumScreen(ctx, canvasWidth, canvasHeight);
+        } else {
+            this.drawVolumeScreen(ctx, canvasWidth, canvasHeight);
+        }
+    }
+    
+    drawMenuScreen(ctx, canvasWidth, canvasHeight) {
         // Titel
         ctx.fillStyle = 'white';
         ctx.font = 'bold 40px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText('OPTIONS', canvasWidth / 2, 100);
+        ctx.fillText('OPTIONS', canvasWidth / 2, 50);
+        
+        // Language Button
+        this.drawButton(ctx, this.languageButtonX, this.languageButtonY, 
+                       this.languageButtonWidth, this.languageButtonHeight, 'SPRACHEN');
+        
+        // Help Button
+        this.drawButton(ctx, this.helpButtonX, this.helpButtonY, 
+                       this.helpButtonWidth, this.helpButtonHeight, 'HILFE');
+        
+        // Audio Button
+        this.drawButton(ctx, this.audioButtonX, this.audioButtonY, 
+                       this.audioButtonWidth, this.audioButtonHeight, 'AUDIO');
+        
+        // Impressum Button
+        this.drawButton(ctx, this.impressumButtonX, this.impressumButtonY, 
+                       this.impressumButtonWidth, this.impressumButtonHeight, 'IMPRESSUM');
+    }
+    
+    drawButton(ctx, x, y, width, height, text) {
+        // Button Hintergrund
+        ctx.fillStyle = 'rgba(100, 150, 200, 0.9)';
+        ctx.fillRect(x, y, width, height);
+        
+        // Button Border
+        ctx.strokeStyle = 'rgba(150, 200, 255, 1)';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(x, y, width, height);
+        
+        // Button Text
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 22px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, x + width / 2, y + height / 2);
+    }
+    
+    drawLanguageScreen(ctx, canvasWidth, canvasHeight) {
+        // Titel
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 40px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('SPRACHEN', canvasWidth / 2, 80);
+        
+        // Sprachen Opionen
+        ctx.font = 'bold 24px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Deutsch', canvasWidth / 2, 200);
+        ctx.fillText('English', canvasWidth / 2, 280);
+        ctx.fillText('Español', canvasWidth / 2, 360);
+        
+        // Back Button
+        this.drawButton(ctx, this.backButtonX, this.backButtonY, 
+                       this.backButtonWidth, this.backButtonHeight, 'ZURÜCK');
+    }
+    
+    drawHelpScreen(ctx, canvasWidth, canvasHeight) {
+        // Titel
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 40px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('HILFE', canvasWidth / 2, 80);
+        
+        // Hilfe Text
+        ctx.font = '18px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Verwende die Pfeiltasten zum Bewegen', canvasWidth / 2, 180);
+        ctx.fillText('Drücke SPACE um zu schießen', canvasWidth / 2, 220);
+        ctx.fillText('Sammle Münzen und weiche Feinden aus', canvasWidth / 2, 260);
+        ctx.fillText('Beende alle Level um zu gewinnen', canvasWidth / 2, 300);
+        
+        // Back Button
+        this.drawButton(ctx, this.backButtonX, this.backButtonY, 
+                       this.backButtonWidth, this.backButtonHeight, 'ZURÜCK');
+    }
+    
+    drawAudioScreen(ctx, canvasWidth, canvasHeight) {
+        // Titel
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 40px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('AUDIO', canvasWidth / 2, 80);
         
         // Musik Label
         ctx.font = 'bold 24px Arial';
@@ -139,16 +312,54 @@ class OptionsScreen {
         this.drawSlider(ctx, this.sfxSliderX, this.sfxSliderY, this.sfxVolume);
         
         // Back Button
-        ctx.fillStyle = 'rgba(100, 150, 200, 0.9)';
-        ctx.fillRect(this.backButtonX, this.backButtonY, this.backButtonWidth, this.backButtonHeight);
-        ctx.strokeStyle = 'rgba(150, 200, 255, 1)';
-        ctx.lineWidth = 3;
-        ctx.strokeRect(this.backButtonX, this.backButtonY, this.backButtonWidth, this.backButtonHeight);
-        
+        this.drawButton(ctx, this.backButtonX, this.backButtonY, 
+                       this.backButtonWidth, this.backButtonHeight, 'ZURÜCK');
+    }
+    
+    drawImpressumScreen(ctx, canvasWidth, canvasHeight) {
+        // Titel
         ctx.fillStyle = 'white';
-        ctx.font = 'bold 22px Arial';
+        ctx.font = 'bold 40px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText('ZURÜCK', this.backButtonX + this.backButtonWidth / 2, this.backButtonY + this.backButtonHeight / 2 + 8);
+        ctx.fillText('IMPRESSUM', canvasWidth / 2, 80);
+        
+        // Impressum Text
+        ctx.font = '16px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Sharkie Game © 2026', canvasWidth / 2, 180);
+        ctx.fillText('Eine Unterwasser Abenteuer Game', canvasWidth / 2, 220);
+        ctx.fillText('Entwickelt mit ❤️', canvasWidth / 2, 260);
+        ctx.fillText('Alle Rechte vorbehalten', canvasWidth / 2, 300);
+        
+        // Back Button
+        this.drawButton(ctx, this.backButtonX, this.backButtonY, 
+                       this.backButtonWidth, this.backButtonHeight, 'ZURÜCK');
+    }
+    
+    drawVolumeScreen(ctx, canvasWidth, canvasHeight) {
+        // Titel
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 40px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('LAUTSTÄRKE', canvasWidth / 2, 100);
+        
+        // Musik Label
+        ctx.font = 'bold 24px Arial';
+        ctx.textAlign = 'left';
+        ctx.fillText('Hintergrundmusik', this.musicSliderX, this.musicSliderY - 30);
+        
+        // Musik Slider
+        this.drawSlider(ctx, this.musicSliderX, this.musicSliderY, this.musicVolume);
+        
+        // SFX Label
+        ctx.fillText('Sound-Effekte', this.sfxSliderX, this.sfxSliderY - 30);
+        
+        // SFX Slider
+        this.drawSlider(ctx, this.sfxSliderX, this.sfxSliderY, this.sfxVolume);
+        
+        // Back Button
+        this.drawButton(ctx, this.backButtonX, this.backButtonY, 
+                       this.backButtonWidth, this.backButtonHeight, 'ZURÜCK');
     }
     
     drawSlider(ctx, x, y, volume) {
@@ -179,9 +390,11 @@ class OptionsScreen {
     
     show() {
         this.isVisible = true;
+        this.currentMode = 'menu'; // Always start with menu
     }
     
     hide() {
         this.isVisible = false;
+        this.currentMode = 'menu'; // Reset to menu when hiding
     }
 }

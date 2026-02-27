@@ -42,9 +42,78 @@
     
     <h1>Sharkie</h1>
 
-    <canvas id="canvas" width="800" height="540"> </canvas>
+    <canvas id="canvas" width="800" height="540" class="hidden"></canvas>
 
+    <!-- Start Screen -->
+    <div id="start-screen" class="screen-overlay">
+        <div class="screen-content">
+            <button class="game-button primary-button" data-action="start-game">START</button>
+            <button class="game-button secondary-button" data-action="open-options">OPTIONS</button>
+        </div>
+    </div>
 
+    <!-- Options Screen -->
+    <div id="options-screen" class="screen-overlay is-hidden">
+        <div class="screen-content">
+            <!-- Main Menu -->
+            <div id="options-menu" class="options-container">
+                <button class="game-button option-button" data-action="open-submenu" data-target="language">
+                    <span class="button-icon">🌍</span> SPRACHEN
+                </button>
+                <button class="game-button option-button" data-action="open-submenu" data-target="help">
+                    <span class="button-icon">❓</span> HILFE
+                </button>
+                <button class="game-button option-button" data-action="open-submenu" data-target="audio">
+                    <span class="button-icon">🔊</span> AUDIO
+                </button>
+                <button class="game-button option-button" data-action="open-submenu" data-target="impressum">
+                    <span class="button-icon">ℹ️</span> IMPRESSUM
+                </button>
+            </div>
+            <button class="game-button back-button below-panel" data-action="back-start">ZURÜCK ZUM START</button>
+
+            <!-- Language Submenu -->
+            <div id="options-language" class="options-submenu is-hidden">
+                <h3 class="submenu-title">SPRACHEN</h3>
+                <div class="language-options">
+                    <button class="game-button lang-button active" data-action="set-language" data-lang="de">🇩🇪 Deutsch</button>
+                </div>
+                <button class="game-button back-button" data-action="back-options">ZURÜCK</button>
+            </div>
+
+            <!-- Help Submenu -->
+            <div id="options-help" class="options-submenu is-hidden">
+                <h3 class="submenu-title">HILFE</h3>
+                <div class="help-content"></div>
+                <button class="game-button back-button" data-action="back-options">ZURÜCK</button>
+            </div>
+
+            <!-- Audio Submenu -->
+            <div id="options-audio" class="options-submenu is-hidden">
+                <h3 class="submenu-title">AUDIO</h3>
+                <div class="audio-controls">
+                    <div class="slider-container">
+                        <label for="music-slider">🎵 Hintergrundmusik</label>
+                        <input type="range" id="music-slider" min="0" max="100" value="30">
+                        <span id="music-value" class="volume-value">30%</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="sfx-slider">🔔 Sound-Effekte</label>
+                        <input type="range" id="sfx-slider" min="0" max="100" value="50">
+                        <span id="sfx-value" class="volume-value">50%</span>
+                    </div>
+                </div>
+                <button class="game-button back-button" data-action="back-options">ZURÜCK</button>
+            </div>
+
+            <!-- Impressum Submenu -->
+            <div id="options-impressum" class="options-submenu is-hidden">
+                <h3 class="submenu-title">IMPRESSUM</h3>
+                <div class="impressum-content"></div>
+                <button class="game-button back-button" data-action="back-options">ZURÜCK</button>
+            </div>
+        </div>
+    </div>
 
 </body>
 </html>

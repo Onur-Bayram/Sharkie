@@ -1,3 +1,10 @@
+:root {
+    --panel-width: 700px;
+    --panel-height: 480px;
+    --panel-radius: 10px;
+    --panel-bg: linear-gradient(135deg, rgba(10, 95, 125, 0.95), rgba(26, 111, 169, 0.95));
+}
+
 body { 
 display: flex;
 flex-direction: column;
@@ -169,6 +176,15 @@ canvas {
     border-radius: 10px;
 }
 
+/* Verstecke Canvas initial, zeige es nur wenn Spiel startet */
+canvas.hidden {
+    display: none;
+}
+
+.is-hidden {
+    display: none !important;
+}
+
 /* Vollbildmodus */
 canvas:fullscreen {
     width: 100%;
@@ -176,4 +192,343 @@ canvas:fullscreen {
     object-fit: contain;
     border-radius: 0;
     image-rendering: auto;
+}
+
+/* Screen Overlays */
+.screen-overlay {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: var(--panel-width);
+    height: var(--panel-height);
+    background: var(--panel-bg);
+    backdrop-filter: blur(10px);
+    border-radius: var(--panel-radius);
+    box-shadow: 
+        0 0 50px rgba(0, 0, 0, 0.8),
+        0 0 100px rgba(0, 212, 255, 0.3);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Start Screen with Background Image */
+#start-screen {
+    background-image: url('3. Background/Mesa de trabajo 1.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+#start-screen::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: var(--panel-radius);
+    z-index: 0;
+}
+
+#start-screen .screen-content {
+    position: relative;
+    z-index: 1;
+    justify-content: flex-end;
+    padding-bottom: 60px;
+}
+
+/* Options Screen with Background Image */
+#options-screen {
+    background-image: url('3. Background/Mesa de trabajo 1.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+#options-screen::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: var(--panel-radius);
+    z-index: 0;
+}
+
+#options-screen .screen-content {
+    position: relative;
+    z-index: 1;
+}
+
+.screen-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(20px, 4vw, 36px);
+}
+
+.screen-title {
+    font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', cursive, sans-serif;
+    font-size: 48px;
+    color: #00d4ff;
+    text-shadow: 
+        0 0 10px rgba(0, 212, 255, 0.8),
+        0 0 20px rgba(0, 212, 255, 0.6),
+        3px 3px 0 #0a5f7d;
+    margin-bottom: 30px;
+    animation: float 3s ease-in-out infinite;
+}
+
+.sharkie-logo {
+    width: 200px;
+    height: auto;
+    margin-bottom: 40px;
+    filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.8)) drop-shadow(0 0 40px rgba(255, 255, 255, 0.5));
+    animation: float 3s ease-in-out infinite;
+    position: relative;
+    z-index: 10;
+}
+
+/* Game Buttons */
+.game-button {
+    font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', cursive, sans-serif;
+    font-size: clamp(16px, 2.3vw, 22px);
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(135deg, rgba(0, 180, 220, 0.85), rgba(0, 140, 180, 0.85));
+    border: 3px solid rgba(150, 230, 255, 0.9);
+    border-radius: 15px;
+    padding: clamp(10px, 2vw, 15px) clamp(22px, 4vw, 40px);
+    margin: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 212, 255, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    backdrop-filter: blur(5px);
+}
+
+.game-button:hover {
+    background: linear-gradient(135deg, rgba(120, 170, 220, 1), rgba(90, 140, 190, 1));
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 212, 255, 0.5);
+    border-color: #00d4ff;
+}
+
+.game-button:active {
+    transform: translateY(0);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+.primary-button {
+    font-size: clamp(20px, 3vw, 28px);
+    padding: clamp(14px, 2.6vw, 20px) clamp(36px, 6vw, 60px);
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.9), rgba(0, 150, 200, 0.9));
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.secondary-button {
+    font-size: clamp(16px, 2vw, 20px);
+}
+
+#start-screen .primary-button {
+    margin-top: 50px;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 212, 255, 0.4);
+    }
+    50% {
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 30px rgba(0, 212, 255, 0.7);
+    }
+}
+
+/* Options Screen */
+.options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    max-width: 500px;
+    align-items: center;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.option-button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    font-size: clamp(16px, 2vw, 20px);
+    padding: clamp(12px, 2.4vw, 18px) clamp(20px, 4vw, 30px);
+}
+
+.button-icon {
+    font-size: clamp(20px, 3vw, 28px);
+}
+
+.options-submenu {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.submenu-title {
+    font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', cursive, sans-serif;
+    font-size: 36px;
+    color: #00d4ff;
+    text-shadow: 
+        0 0 10px rgba(0, 212, 255, 0.8),
+        2px 2px 0 #0a5f7d;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.back-button {
+    margin-top: 20px;
+    background: linear-gradient(135deg, rgba(150, 80, 80, 0.9), rgba(120, 60, 60, 0.9));
+}
+
+.back-button:hover {
+    background: linear-gradient(135deg, rgba(180, 100, 100, 1), rgba(150, 80, 80, 1));
+}
+
+.below-panel {
+    position: fixed;
+    top: calc(50% + (var(--panel-height) / 2) + 15px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, rgba(150, 80, 80, 0.9), rgba(120, 60, 60, 0.9)) !important;
+}
+
+.below-panel:hover {
+    transform: translateX(-50%) translateY(-3px) !important;
+}
+
+/* Language Options */
+.language-options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.lang-button {
+    width: 100%;
+    font-size: 20px;
+    padding: 15px 30px;
+}
+
+.lang-button.active {
+    background: linear-gradient(135deg, rgba(0, 200, 100, 0.9), rgba(0, 150, 70, 0.9));
+    border-color: #00ff88;
+}
+
+/* Help Content */
+.help-content {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    padding: 30px;
+    margin-bottom: 20px;
+}
+
+.help-content p {
+    font-family: Arial, sans-serif;
+    font-size: 18px;
+    color: white;
+    margin: 15px 0;
+    text-align: center;
+}
+
+/* Audio Controls */
+.audio-controls {
+    width: 100%;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.slider-container {
+    margin: 25px 0;
+}
+
+.slider-container label {
+    display: block;
+    font-family: Arial, sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 10px;
+}
+
+.slider-container input[type="range"] {
+    width: 100%;
+    height: 8px;
+    background: rgba(100, 100, 100, 0.5);
+    border-radius: 5px;
+    outline: none;
+    -webkit-appearance: none;
+    margin: 10px 0;
+}
+
+.slider-container input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    background: linear-gradient(135deg, #00d4ff, #0088cc);
+    border: 3px solid white;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
+}
+
+.slider-container input[type="range"]::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    background: linear-gradient(135deg, #00d4ff, #0088cc);
+    border: 3px solid white;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
+}
+
+.volume-value {
+    display: inline-block;
+    font-family: Arial, sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    color: #00d4ff;
+    margin-left: 15px;
+}
+
+/* Impressum Content */
+.impressum-content {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    padding: 30px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.impressum-line {
+    font-family: Arial, sans-serif;
+    font-size: 18px;
+    color: white;
+    margin: 15px 0;
 }

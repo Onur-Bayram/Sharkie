@@ -1,7 +1,5 @@
 let canvas;
 let world;
-let startScreen;
-let optionsScreen;
 let fullscreenButton;
 let character = new MovableObject();
 let keyboard = {
@@ -13,6 +11,11 @@ let keyboard = {
     F: false,
     SPACE: false
 };
+
+const $ = (id) => document.getElementById(id);
+const showEl = (id) => $(id).classList.remove('is-hidden');
+const hideEl = (id) => $(id).classList.add('is-hidden');
+let uiBound = false;
 
 window.keyboard = keyboard;
 window.mousePos = { x: 0, y: 0 };
@@ -57,85 +60,42 @@ function updateCanvasResolution(isFullscreen) {
 }
 
 function showStartScreen() {
-    canvas = document.getElementById("canvas");
+    canvas = $("canvas");
     const ctx = canvas.getContext('2d');
     fullscreenButton = new FullscreenButton();
     fullscreenButton.setCanvasContext(canvas, ctx);
-    startScreen = new StartScreen();
-    optionsScreen = new OptionsScreen();
     
-    // optionsScreen global verfügbar machen
-    window.optionsScreen = optionsScreen;
+    // Canvas-basierte Screens nicht mehr verwenden für Start/Options
+    // startScreen = new StartScreen();
+    // optionsScreen = new OptionsScreen();
     
-    // Zentraler Event Handler für Start Screen
-    const getCanvasCoords = (e) => {
-        const rect = canvas.getBoundingClientRect();
-        const canvasRatio = 800 / 540;
-        const rectRatio = rect.width / rect.height;
-        
-        let drawWidth, drawHeight, offsetX, offsetY;
-        
-        if (rectRatio > canvasRatio) {
-            drawHeight = rect.height;
-            drawWidth = rect.height * canvasRatio;
-            offsetX = (rect.width - drawWidth) / 2;
-            offsetY = 0;
-        } else {
-            drawWidth = rect.width;
-            drawHeight = rect.width / canvasRatio;
-            offsetX = 0;
-            offsetY = (rect.height - drawHeight) / 2;
+    // Show HTML start screen
+    showEl('start-screen');
+    hideEl('options-screen');
+    
+    // Initialize audio sliders with saved values
+    const musicSlider = $('music-slider');
+    const sfxSlider = $('sfx-slider');
+    if (window.gameSettings) {
+        if (window.gameSettings.musicVolume !== undefined) {
+            musicSlider.value = window.gameSettings.musicVolume * 100;
+            $('music-value').textContent = Math.round(window.gameSettings.musicVolume * 100) + '%';
         }
-        
-        const mouseX = e.clientX - rect.left - offsetX;
-        const mouseY = e.clientY - rect.top - offsetY;
-        const x = (mouseX / drawWidth) * 800;
-        const y = (mouseY / drawHeight) * 540;
-        
-        return { x, y };
-    };
-    
-    canvas.addEventListener('click', (e) => {
-        const { x, y } = getCanvasCoords(e);
-        // Prüfe Options Screen ZUERST (hat Vorrang)
-        if (optionsScreen.handleClick(x, y)) {
-            return; // Wenn Options Screen den Klick verarbeitet hat, nicht weitermachen
-        }
-        // Nur wenn Options Screen nicht sichtbar oder Klick nicht verarbeitet
-        startScreen.handleClick(x, y);
-    });
-    
-    canvas.addEventListener('mousedown', (e) => {
-        const { x, y } = getCanvasCoords(e);
-        optionsScreen.handleMouseDown(x, y);
-    });
-    
-    canvas.addEventListener('mousemove', (e) => {
-        const { x, y } = getCanvasCoords(e);
-        optionsScreen.handleMouseMove(x, y);
-    });
-    
-    canvas.addEventListener('mouseup', () => {
-        optionsScreen.handleMouseUp();
-    });
-    
-    // Animations-Schleife für Startbildschirm
-    function drawStartScreen() {
-        startScreen.draw(ctx);
-        optionsScreen.draw(ctx);
-        if (startScreen.isVisible || optionsScreen.isVisible) {
-            requestAnimationFrame(drawStartScreen);
+        if (window.gameSettings.sfxVolume !== undefined) {
+            sfxSlider.value = window.gameSettings.sfxVolume * 100;
+            $('sfx-value').textContent = Math.round(window.gameSettings.sfxVolume * 100) + '%';
         }
     }
-    drawStartScreen();
     
+    bindUI();
+
     // startGame global verfügbar machen
     window.startGame = init;
 }
 
 function init() {
     if (!canvas) {
-        canvas = document.getElementById("canvas");
+        canvas = $("canvas");
     }
     if (!fullscreenButton) {
         const ctx = canvas.getContext('2d');
@@ -274,4 +234,136 @@ document.addEventListener('click', (e) => {
 document.addEventListener('fullscreenchange', () => {
     const isFullscreen = !!document.fullscreenElement;
     updateCanvasResolution(isFullscreen);
-    console.log('Fullscreen changed:', isFullscreen);});
+    console.log('Fullscreen changed:', isFullscreen);
+});
+
+// ========== HTML Screen Management ==========
+
+function startGameFromHTML() {
+    // Hide start screen
+    hideEl('start-screen');
+    // Show canvas
+    $('canvas').classList.remove('hidden');
+    // Start the actual game
+    init();
+}
+
+function showOptionsScreen() {
+    // Hide start screen
+    hideEl('start-screen');
+    // Show options screen
+    showEl('options-screen');
+    // Show main menu
+    showOptionsSubmenu('menu');
+}
+
+function showOptionsSubmenu(submenu) {
+    // Hide all submenus
+    hideEl('options-menu');
+    hideEl('options-language');
+    hideEl('options-help');
+    hideEl('options-audio');
+    hideEl('options-impressum');
+    
+    // Show selected submenu
+    if (submenu === 'menu') {
+        showEl('options-menu');
+    } else if (submenu === 'language') {
+        showEl('options-language');
+    } else if (submenu === 'help') {
+        showEl('options-help');
+    } else if (submenu === 'audio') {
+        showEl('options-audio');
+    } else if (submenu === 'impressum') {
+        showEl('options-impressum');
+    }
+}
+
+function backToOptionsMenu() {
+    showOptionsSubmenu('menu');
+}
+
+function hideOptionsScreen() {
+    hideEl('options-screen');
+    showEl('start-screen');
+}
+
+function bindUI() {
+    if (uiBound) return;
+    uiBound = true;
+
+    document.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-action]');
+        if (!button) return;
+
+        const action = button.dataset.action;
+        if (action === 'start-game') {
+            startGameFromHTML();
+        } else if (action === 'open-options') {
+            showOptionsScreen();
+        } else if (action === 'open-submenu') {
+            showOptionsSubmenu(button.dataset.target);
+        } else if (action === 'back-options') {
+            backToOptionsMenu();
+        } else if (action === 'back-start') {
+            hideOptionsScreen();
+        } else if (action === 'set-language') {
+            changeLanguage(button.dataset.lang, button);
+        }
+    });
+
+    const musicSlider = $('music-slider');
+    if (musicSlider) {
+        musicSlider.addEventListener('input', (event) => updateMusicVolume(event.target.value));
+    }
+
+    const sfxSlider = $('sfx-slider');
+    if (sfxSlider) {
+        sfxSlider.addEventListener('input', (event) => updateSFXVolume(event.target.value));
+    }
+}
+
+function changeLanguage(lang, button) {
+    // Remove active class from all language buttons
+    document.querySelectorAll('.lang-button').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Add active class to the clicked button
+    if (button) {
+        button.classList.add('active');
+    }
+    
+    console.log('Language changed to:', lang);
+    // Save language preference
+    window.gameSettings = window.gameSettings || {};
+    window.gameSettings.language = lang;
+}
+
+function updateMusicVolume(value) {
+    $('music-value').textContent = value + '%';
+    const volume = value / 100;
+    
+    // Save globally
+    window.gameSettings = window.gameSettings || {};
+    window.gameSettings.musicVolume = volume;
+    
+    // Apply if game is running
+    if (window.world && window.world.audioManager) {
+        window.world.audioManager.setMusicVolume(volume);
+    }
+}
+
+function updateSFXVolume(value) {
+    $('sfx-value').textContent = value + '%';
+    const volume = value / 100;
+    
+    // Save globally
+    window.gameSettings = window.gameSettings || {};
+    window.gameSettings.sfxVolume = volume;
+    
+    // Apply if game is running
+    if (window.world && window.world.audioManager) {
+        window.world.audioManager.setSFXVolume(volume);
+    }
+}
