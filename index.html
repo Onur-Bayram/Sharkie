@@ -78,14 +78,30 @@
                 <div class="language-options">
                     <button class="game-button lang-button active" data-action="set-language" data-lang="de">🇩🇪 Deutsch</button>
                 </div>
-                <button class="game-button back-button" data-action="back-options">ZURÜCK</button>
             </div>
 
             <!-- Help Submenu -->
             <div id="options-help" class="options-submenu is-hidden">
-                <h3 class="submenu-title">HILFE</h3>
-                <div class="help-content"></div>
-                <button class="game-button back-button" data-action="back-options">ZURÜCK</button>
+                <h3 class="submenu-title">STEUERUNG</h3>
+                <div class="help-content">
+                    <div class="control-item">
+                        <span class="control-key">← → ↑ ↓</span>
+                        <span class="control-desc">Sharkie bewegen</span>
+                    </div>
+                    <div class="control-item">
+                        <span class="control-key">F</span>
+                        <span class="control-desc">Normale Blasen werfen</span>
+                    </div>
+                    <div class="control-item">
+                        <span class="control-key">D</span>
+                        <span class="control-desc">Gift-Blasen werfen</span>
+                    </div>
+                    <div class="control-item">
+                        <span class="control-key">SPACE</span>
+                        <span class="control-desc">Flossen-Schlag Angriff</span>
+                    </div>
+                    <p class="help-tip">Sammle Münzen • Weiche Feinden aus • Besiege den Boss!</p>
+                </div>
             </div>
 
             <!-- Audio Submenu -->
@@ -103,15 +119,43 @@
                         <span id="sfx-value" class="volume-value">50%</span>
                     </div>
                 </div>
-                <button class="game-button back-button" data-action="back-options">ZURÜCK</button>
             </div>
 
             <!-- Impressum Submenu -->
             <div id="options-impressum" class="options-submenu is-hidden">
                 <h3 class="submenu-title">IMPRESSUM</h3>
-                <div class="impressum-content"></div>
-                <button class="game-button back-button" data-action="back-options">ZURÜCK</button>
+                <div class="impressum-content">
+                    <p class="impressum-line"><strong>Angaben gemäß § 5 DDG</strong></p>
+                    <p class="impressum-line">
+                        Onur Bayram<br>
+                        Rumpenheimer Straße 106,<br>
+                        63075 Offenbach am Main
+                    </p>
+                    <p class="impressum-line">
+                        <strong>Vertreten durch:</strong><br>
+                        Onur Bayram
+                    </p>
+                    <p class="impressum-line">
+                        <strong>Kontakt:</strong><br>
+                        Telefon: 0-17622120150<br>
+                        E-Mail: <a href="mailto:onur-bayram@hotmail.de">onur-bayram@hotmail.de</a>
+                    </p>
+                    <p class="impressum-line">
+                        <strong>Verbraucherstreitbeilegung / Universalschlichtungsstelle</strong><br>
+                        Wir nehmen nicht an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teil und sind dazu auch nicht verpflichtet.
+                    </p>
+                    <p class="impressum-line">
+                        Erstellt mit <a href="https://impressum-generator.de" rel="dofollow" target="_blank">Impressum-Generator.de</a>,
+                        dem Tool für Impressum und
+                        <a href="https://impressum-generator.de/datenschutz-generator" rel="dofollow" target="_blank">Datenschutz-Erklärung</a>.
+                        Nach einer Vorlage der
+                        <a href="https://www.kanzlei-hasselbach.de/" rel="dofollow" target="_blank">Kanzlei Hasselbach</a>.
+                    </p>
+                </div>
             </div>
+            
+            <!-- Back Icon Button für Submenüs -->
+            <button class="back-icon-button" data-action="back-options" title="Zurück">↩️</button>
         </div>
     </div>
 

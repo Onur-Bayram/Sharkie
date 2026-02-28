@@ -280,10 +280,7 @@ class OptionsScreen {
         // Hilfe Text
         ctx.font = '18px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText('Verwende die Pfeiltasten zum Bewegen', canvasWidth / 2, 180);
-        ctx.fillText('Drücke SPACE um zu schießen', canvasWidth / 2, 220);
-        ctx.fillText('Sammle Münzen und weiche Feinden aus', canvasWidth / 2, 260);
-        ctx.fillText('Beende alle Level um zu gewinnen', canvasWidth / 2, 300);
+        ctx.fillText('Siehe Options Screen im HTML', canvasWidth / 2, 200);
         
         // Back Button
         this.drawButton(ctx, this.backButtonX, this.backButtonY, 
@@ -322,14 +319,6 @@ class OptionsScreen {
         ctx.font = 'bold 40px Arial';
         ctx.textAlign = 'center';
         ctx.fillText('IMPRESSUM', canvasWidth / 2, 80);
-        
-        // Impressum Text
-        ctx.font = '16px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('Sharkie Game © 2026', canvasWidth / 2, 180);
-        ctx.fillText('Eine Unterwasser Abenteuer Game', canvasWidth / 2, 220);
-        ctx.fillText('Entwickelt mit ❤️', canvasWidth / 2, 260);
-        ctx.fillText('Alle Rechte vorbehalten', canvasWidth / 2, 300);
         
         // Back Button
         this.drawButton(ctx, this.backButtonX, this.backButtonY, 
