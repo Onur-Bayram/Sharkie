@@ -19,14 +19,93 @@ let uiBound = false;
 
 window.keyboard = keyboard;
 window.mousePos = { x: 0, y: 0 };
+
+const savedLanguage = localStorage.getItem('sharkieLanguage') || 'de';
 window.gameSettings = {
     musicVolume: 0.3,
-    sfxVolume: 0.5
+    sfxVolume: 0.5,
+    language: savedLanguage
+};
+
+const TRANSLATIONS = {
+    de: {
+        start: 'START',
+        options: 'OPTIONEN',
+        menu_languages: 'SPRACHEN',
+        menu_help: 'HILFE',
+        menu_audio: 'AUDIO',
+        menu_impressum: 'IMPRESSUM',
+        back_start: 'ZURÜCK ZUM START',
+        submenu_languages: 'SPRACHEN',
+        submenu_controls: 'STEUERUNG',
+        submenu_audio: 'AUDIO',
+        submenu_impressum: 'IMPRESSUM',
+        help_move: 'Sharkie bewegen',
+        help_bubble: 'Normale Blasen werfen',
+        help_poison: 'Gift-Blasen werfen',
+        help_attack: 'Flossen-Schlag Angriff',
+        help_tip: 'Sammle Münzen • Weiche Feinden aus • Besiege den Boss!',
+        audio_music: 'Hintergrundmusik',
+        audio_sfx: 'Sound-Effekte',
+        back: 'Zurück'
+    },
+    en: {
+        start: 'START',
+        options: 'OPTIONS',
+        menu_languages: 'LANGUAGES',
+        menu_help: 'HELP',
+        menu_audio: 'AUDIO',
+        menu_impressum: 'LEGAL NOTICE',
+        back_start: 'BACK TO START',
+        submenu_languages: 'LANGUAGES',
+        submenu_controls: 'CONTROLS',
+        submenu_audio: 'AUDIO',
+        submenu_impressum: 'LEGAL NOTICE',
+        help_move: 'Move Sharkie',
+        help_bubble: 'Throw normal bubbles',
+        help_poison: 'Throw poison bubbles',
+        help_attack: 'Fin-slap attack',
+        help_tip: 'Collect coins • Dodge enemies • Defeat the boss!',
+        audio_music: 'Background music',
+        audio_sfx: 'Sound effects',
+        back: 'Back'
+    }
 };
 
 // Original Canvas-Größe
 const ORIGINAL_WIDTH = 800;
 const ORIGINAL_HEIGHT = 540;
+
+function getLanguageStrings(lang) {
+    return TRANSLATIONS[lang] || TRANSLATIONS.de;
+}
+
+function setActiveLanguageButton(lang) {
+    document.querySelectorAll('.lang-button').forEach((btn) => {
+        btn.classList.toggle('active', btn.dataset.lang === lang);
+    });
+}
+
+function applyLanguage(lang) {
+    const strings = getLanguageStrings(lang);
+
+    document.querySelectorAll('[data-i18n]').forEach((element) => {
+        const key = element.dataset.i18n;
+        if (strings[key]) {
+            element.textContent = strings[key];
+        }
+    });
+
+    document.querySelectorAll('[data-i18n-title]').forEach((element) => {
+        const key = element.dataset.i18nTitle;
+        if (strings[key]) {
+            element.setAttribute('title', strings[key]);
+        }
+    });
+
+    document.documentElement.lang = lang === 'en' ? 'en' : 'de';
+    setActiveLanguageButton(lang);
+}
 
 // Funktion zum Anpassen der Canvas-Auflösung
 function updateCanvasResolution(isFullscreen) {
@@ -88,6 +167,7 @@ function showStartScreen() {
     }
     
     bindUI();
+    applyLanguage(window.gameSettings.language || 'de');
 
     // startGame global verfügbar machen
     window.startGame = init;
@@ -324,20 +404,21 @@ function bindUI() {
 }
 
 function changeLanguage(lang, button) {
-    // Remove active class from all language buttons
-    document.querySelectorAll('.lang-button').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    
-    // Add active class to the clicked button
-    if (button) {
-        button.classList.add('active');
+    if (!TRANSLATIONS[lang]) {
+        lang = 'de';
     }
-    
+
+    if (button) {
+        setActiveLanguageButton(lang);
+    }
+
     console.log('Language changed to:', lang);
-    // Save language preference
+
     window.gameSettings = window.gameSettings || {};
     window.gameSettings.language = lang;
+
+    localStorage.setItem('sharkieLanguage', lang);
+    applyLanguage(lang);
 }
 
 function updateMusicVolume(value) {

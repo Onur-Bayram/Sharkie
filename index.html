@@ -47,8 +47,8 @@
     <!-- Start Screen -->
     <div id="start-screen" class="screen-overlay">
         <div class="screen-content">
-            <button class="game-button primary-button" data-action="start-game">START</button>
-            <button class="game-button secondary-button" data-action="open-options">OPTIONS</button>
+            <button class="game-button primary-button" data-action="start-game"><span data-i18n="start">START</span></button>
+            <button class="game-button secondary-button" data-action="open-options"><span data-i18n="options">OPTIONS</span></button>
         </div>
     </div>
 
@@ -58,63 +58,64 @@
             <!-- Main Menu -->
             <div id="options-menu" class="options-container">
                 <button class="game-button option-button" data-action="open-submenu" data-target="language">
-                    <span class="button-icon">🌍</span> SPRACHEN
+                    <span class="button-icon">🌍</span><span data-i18n="menu_languages">SPRACHEN</span>
                 </button>
                 <button class="game-button option-button" data-action="open-submenu" data-target="help">
-                    <span class="button-icon">❓</span> HILFE
+                    <span class="button-icon">❓</span><span data-i18n="menu_help">HILFE</span>
                 </button>
                 <button class="game-button option-button" data-action="open-submenu" data-target="audio">
-                    <span class="button-icon">🔊</span> AUDIO
+                    <span class="button-icon">🔊</span><span data-i18n="menu_audio">AUDIO</span>
                 </button>
                 <button class="game-button option-button" data-action="open-submenu" data-target="impressum">
-                    <span class="button-icon">ℹ️</span> IMPRESSUM
+                    <span class="button-icon">ℹ️</span><span data-i18n="menu_impressum">IMPRESSUM</span>
                 </button>
             </div>
-            <button class="game-button back-button below-panel" data-action="back-start">ZURÜCK ZUM START</button>
+            <button class="game-button back-button below-panel" data-action="back-start" data-i18n="back_start">ZURÜCK ZUM START</button>
 
             <!-- Language Submenu -->
             <div id="options-language" class="options-submenu is-hidden">
-                <h3 class="submenu-title">SPRACHEN</h3>
+                <h3 class="submenu-title" data-i18n="submenu_languages">SPRACHEN</h3>
                 <div class="language-options">
                     <button class="game-button lang-button active" data-action="set-language" data-lang="de">🇩🇪 Deutsch</button>
+                    <button class="game-button lang-button" data-action="set-language" data-lang="en">🇬🇧 English</button>
                 </div>
             </div>
 
             <!-- Help Submenu -->
             <div id="options-help" class="options-submenu is-hidden">
-                <h3 class="submenu-title">STEUERUNG</h3>
+                <h3 class="submenu-title" data-i18n="submenu_controls">STEUERUNG</h3>
                 <div class="help-content">
                     <div class="control-item">
                         <span class="control-key">← → ↑ ↓</span>
-                        <span class="control-desc">Sharkie bewegen</span>
+                        <span class="control-desc" data-i18n="help_move">Sharkie bewegen</span>
                     </div>
                     <div class="control-item">
                         <span class="control-key">F</span>
-                        <span class="control-desc">Normale Blasen werfen</span>
+                        <span class="control-desc" data-i18n="help_bubble">Normale Blasen werfen</span>
                     </div>
                     <div class="control-item">
                         <span class="control-key">D</span>
-                        <span class="control-desc">Gift-Blasen werfen</span>
+                        <span class="control-desc" data-i18n="help_poison">Gift-Blasen werfen</span>
                     </div>
                     <div class="control-item">
                         <span class="control-key">SPACE</span>
-                        <span class="control-desc">Flossen-Schlag Angriff</span>
+                        <span class="control-desc" data-i18n="help_attack">Flossen-Schlag Angriff</span>
                     </div>
-                    <p class="help-tip">Sammle Münzen • Weiche Feinden aus • Besiege den Boss!</p>
+                    <p class="help-tip" data-i18n="help_tip">Sammle Münzen • Weiche Feinden aus • Besiege den Boss!</p>
                 </div>
             </div>
 
             <!-- Audio Submenu -->
             <div id="options-audio" class="options-submenu is-hidden">
-                <h3 class="submenu-title">AUDIO</h3>
+                <h3 class="submenu-title" data-i18n="submenu_audio">AUDIO</h3>
                 <div class="audio-controls">
                     <div class="slider-container">
-                        <label for="music-slider">🎵 Hintergrundmusik</label>
+                        <label for="music-slider">🎵 <span data-i18n="audio_music">Hintergrundmusik</span></label>
                         <input type="range" id="music-slider" min="0" max="100" value="30">
                         <span id="music-value" class="volume-value">30%</span>
                     </div>
                     <div class="slider-container">
-                        <label for="sfx-slider">🔔 Sound-Effekte</label>
+                        <label for="sfx-slider">🔔 <span data-i18n="audio_sfx">Sound-Effekte</span></label>
                         <input type="range" id="sfx-slider" min="0" max="100" value="50">
                         <span id="sfx-value" class="volume-value">50%</span>
                     </div>
@@ -123,7 +124,7 @@
 
             <!-- Impressum Submenu -->
             <div id="options-impressum" class="options-submenu is-hidden">
-                <h3 class="submenu-title">IMPRESSUM</h3>
+                <h3 class="submenu-title" data-i18n="submenu_impressum">IMPRESSUM</h3>
                 <div class="impressum-content">
                     <p class="impressum-line"><strong>Angaben gemäß § 5 DDG</strong></p>
                     <p class="impressum-line">
@@ -155,7 +156,7 @@
             </div>
             
             <!-- Back Icon Button für Submenüs -->
-            <button class="back-icon-button" data-action="back-options" title="Zurück">↩️</button>
+            <button class="back-icon-button" data-action="back-options" data-i18n-title="back" title="Zurück">↩️</button>
         </div>
     </div>
 
