@@ -16,6 +16,7 @@ const $ = (id) => document.getElementById(id);
 const showEl = (id) => $(id).classList.remove('is-hidden');
 const hideEl = (id) => $(id).classList.add('is-hidden');
 let uiBound = false;
+let isGamePaused = false;
 
 window.keyboard = keyboard;
 window.mousePos = { x: 0, y: 0 };
@@ -36,6 +37,7 @@ const TRANSLATIONS = {
         menu_audio: 'AUDIO',
         menu_impressum: 'IMPRESSUM',
         back_start: 'ZURÜCK ZUM START',
+        back_game: 'ZURÜCK ZUM SPIEL',
         submenu_languages: 'SPRACHEN',
         submenu_controls: 'STEUERUNG',
         submenu_audio: 'AUDIO',
@@ -57,6 +59,7 @@ const TRANSLATIONS = {
         menu_audio: 'AUDIO',
         menu_impressum: 'LEGAL NOTICE',
         back_start: 'BACK TO START',
+        back_game: 'BACK TO GAME',
         submenu_languages: 'LANGUAGES',
         submenu_controls: 'CONTROLS',
         submenu_audio: 'AUDIO',
@@ -148,11 +151,11 @@ function showStartScreen() {
     // startScreen = new StartScreen();
     // optionsScreen = new OptionsScreen();
     
-    // Show HTML start screen
+    // HTML-Startbildschirm anzeigen
     showEl('start-screen');
     hideEl('options-screen');
     
-    // Initialize audio sliders with saved values
+    // Audio-Slider mit gespeicherten Werten initialisieren
     const musicSlider = $('music-slider');
     const sfxSlider = $('sfx-slider');
     if (window.gameSettings) {
@@ -310,42 +313,59 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// Fullscreen change event listener (z.B. wenn ESC gedrückt wird)
+// Event-Listener für Vollbildwechsel (z.B. wenn ESC gedrückt wird)
 document.addEventListener('fullscreenchange', () => {
     const isFullscreen = !!document.fullscreenElement;
     updateCanvasResolution(isFullscreen);
     console.log('Fullscreen changed:', isFullscreen);
 });
 
-// ========== HTML Screen Management ==========
 
 function startGameFromHTML() {
-    // Hide start screen
+    // Startbildschirm ausblenden
     hideEl('start-screen');
-    // Show canvas
+    // Canvas anzeigen
     $('canvas').classList.remove('hidden');
-    // Start the actual game
+    // Menübutton anzeigen
+    showEl('game-menu-button');
+    // Spiel starten
     init();
 }
 
 function showOptionsScreen() {
-    // Hide start screen
+    // Ingame-Menübutton ausblenden, solange Optionen geöffnet sind
+    hideEl('game-menu-button');
+    // Startbildschirm ausblenden
     hideEl('start-screen');
-    // Show options screen
+    // Optionen-Bildschirm anzeigen
     showEl('options-screen');
-    // Show main menu
+    // Hauptmenü anzeigen
     showOptionsSubmenu('menu');
+    // Untere Buttons je nach Spielstatus umschalten
+    updateBackButtons();
+}
+
+function updateBackButtons() {
+    if (isGamePaused) {
+        // "Zurück zum Spiel" anzeigen, wenn aus dem laufenden Spiel pausiert wurde
+        hideEl('back-to-start-button');
+        showEl('back-to-game-button');
+    } else {
+        // "Zurück zum Start" aus dem Hauptmenü anzeigen
+        showEl('back-to-start-button');
+        hideEl('back-to-game-button');
+    }
 }
 
 function showOptionsSubmenu(submenu) {
-    // Hide all submenus
+    // Alle Untermenüs ausblenden
     hideEl('options-menu');
     hideEl('options-language');
     hideEl('options-help');
     hideEl('options-audio');
     hideEl('options-impressum');
     
-    // Show selected submenu
+    // Gewähltes Untermenü anzeigen
     if (submenu === 'menu') {
         showEl('options-menu');
     } else if (submenu === 'language') {
@@ -365,7 +385,44 @@ function backToOptionsMenu() {
 
 function hideOptionsScreen() {
     hideEl('options-screen');
+    $('canvas').classList.add('hidden');
+    hideEl('game-menu-button');
     showEl('start-screen');
+    isGamePaused = false;
+}
+
+function backToGame() {
+    // Optionen-Bildschirm ausblenden
+    hideEl('options-screen');
+    // Canvas und Menübutton anzeigen
+    $('canvas').classList.remove('hidden');
+    showEl('game-menu-button');
+    // Spiel fortsetzen
+    if (world && typeof world.resumeGame === 'function') {
+        world.resumeGame();
+    }
+    isGamePaused = false;
+}
+
+function pauseAndReturnToMenu() {
+    // Markieren, dass das Spiel pausiert ist
+    isGamePaused = true;
+    // Spiel-Loop/Audio pausieren und Eingaben zurücksetzen
+    if (world) {
+        if (typeof world.pauseGame === 'function') {
+            world.pauseGame();
+        }
+    }
+    keyboard.LEFT = false;
+    keyboard.RIGHT = false;
+    keyboard.UP = false;
+    keyboard.DOWN = false;
+    keyboard.D = false;
+    keyboard.F = false;
+    keyboard.SPACE = false;
+
+    // Optionen-Panel öffnen (wie bei Klick auf OPTIONS)
+    showOptionsScreen();
 }
 
 function bindUI() {
@@ -387,6 +444,10 @@ function bindUI() {
             backToOptionsMenu();
         } else if (action === 'back-start') {
             hideOptionsScreen();
+        } else if (action === 'back-game') {
+            backToGame();
+        } else if (action === 'game-menu') {
+            pauseAndReturnToMenu();
         } else if (action === 'set-language') {
             changeLanguage(button.dataset.lang, button);
         }
@@ -425,11 +486,11 @@ function updateMusicVolume(value) {
     $('music-value').textContent = value + '%';
     const volume = value / 100;
     
-    // Save globally
+    // Global speichern
     window.gameSettings = window.gameSettings || {};
     window.gameSettings.musicVolume = volume;
     
-    // Apply if game is running
+    // Anwenden falls das Spiel läuft
     if (window.world && window.world.audioManager) {
         window.world.audioManager.setMusicVolume(volume);
     }
@@ -439,11 +500,11 @@ function updateSFXVolume(value) {
     $('sfx-value').textContent = value + '%';
     const volume = value / 100;
     
-    // Save globally
+    // Global speichern
     window.gameSettings = window.gameSettings || {};
     window.gameSettings.sfxVolume = volume;
     
-    // Apply if game is running
+    // Anwenden, falls das Spiel läuft
     if (window.world && window.world.audioManager) {
         window.world.audioManager.setSFXVolume(volume);
     }

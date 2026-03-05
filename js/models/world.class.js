@@ -23,6 +23,8 @@ class World {
  fullscreenButton = null;
  bubbleAnimations = [];
  finSlaps = [];
+ isPaused = false;
+ animationFrameId = null;
 
 backgroundObjectsLight = [
     new BackgroundObject('3. Background/Layers/5. Water/L.png', 0, 0),
@@ -177,6 +179,9 @@ createCoins() {
 
 handleThrow() {
     setInterval(() => {
+        if (this.isPaused) {
+            return;
+        }
         if (window.keyboard && window.keyboard.F) {
             this.character.throwNormalBubble();
         }
@@ -466,6 +471,10 @@ isCollidingBubble(bubble, obj) {
 }
 
 draw() {
+    if (this.isPaused) {
+        return;
+    }
+
     const now = performance.now();
     
     this.checkCollisions();
@@ -601,9 +610,31 @@ draw() {
     }
 
     let self = this;
-    requestAnimationFrame(function() {
+    this.animationFrameId = requestAnimationFrame(function() {
         self.draw();
     });
+}
+
+pauseGame() {
+    this.isPaused = true;
+    if (this.animationFrameId) {
+        cancelAnimationFrame(this.animationFrameId);
+        this.animationFrameId = null;
+    }
+    if (this.audioManager) {
+        this.audioManager.pause();
+    }
+}
+
+resumeGame() {
+    if (!this.isPaused) {
+        return;
+    }
+    this.isPaused = false;
+    if (this.audioManager) {
+        this.audioManager.play();
+    }
+    this.draw();
 }
 
 isCollidingBoss(character, boss) {

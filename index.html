@@ -42,7 +42,14 @@
     
     <h1>Sharkie</h1>
 
-    <canvas id="canvas" width="800" height="540" class="hidden"></canvas>
+    <div class="game-panel">
+        <canvas id="canvas" width="800" height="540" class="hidden"></canvas>
+        
+        <!-- In-Game Menu Button -->
+        <button id="game-menu-button" class="game-menu-button is-hidden" data-action="game-menu">
+            <span>⏸ MENU</span>
+        </button>
+    </div>
 
     <!-- Start Screen -->
     <div id="start-screen" class="screen-overlay">
@@ -70,14 +77,15 @@
                     <span class="button-icon">ℹ️</span><span data-i18n="menu_impressum">IMPRESSUM</span>
                 </button>
             </div>
-            <button class="game-button back-button below-panel" data-action="back-start" data-i18n="back_start">ZURÜCK ZUM START</button>
+            <button class="game-button back-button below-panel" id="back-to-start-button" data-action="back-start" data-i18n="back_start">ZURÜCK ZUM START</button>
+            <button class="game-button back-button below-panel is-hidden" id="back-to-game-button" data-action="back-game" data-i18n="back_game">ZURÜCK ZUM SPIEL</button>
 
             <!-- Language Submenu -->
             <div id="options-language" class="options-submenu is-hidden">
                 <h3 class="submenu-title" data-i18n="submenu_languages">SPRACHEN</h3>
                 <div class="language-options">
                     <button class="game-button lang-button active" data-action="set-language" data-lang="de">🇩🇪 Deutsch</button>
-                    <button class="game-button lang-button" data-action="set-language" data-lang="en">🇬🇧 English</button>
+                    <button class="game-button lang-button" data-action="set-language" data-lang="en">🇬🇧 Englisch</button>
                 </div>
             </div>
 
