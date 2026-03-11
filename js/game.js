@@ -17,6 +17,7 @@ const showEl = (id) => $(id).classList.remove('is-hidden');
 const hideEl = (id) => $(id).classList.add('is-hidden');
 let uiBound = false;
 let isGamePaused = false;
+let wasPausedByOrientation = false;
 
 window.keyboard = keyboard;
 window.mousePos = { x: 0, y: 0 };
@@ -147,9 +148,10 @@ function showStartScreen() {
     fullscreenButton = new FullscreenButton();
     fullscreenButton.setCanvasContext(canvas, ctx);
     
-    // Canvas-basierte Screens nicht mehr verwenden für Start/Options
-    // startScreen = new StartScreen();
-    // optionsScreen = new OptionsScreen();
+    // Canvas-basierte Ansichten für Start und Optionen hier nicht mehr verwenden
+    // HTML-Startbildschirm und HTML-Optionsbildschirm werden stattdessen verwendet
+    // Startbildschirm wird über die Oberfläche gesteuert
+    // Optionsbildschirm wird über die Oberfläche gesteuert
     
     // HTML-Startbildschirm anzeigen
     showEl('start-screen');
@@ -171,6 +173,7 @@ function showStartScreen() {
     
     bindUI();
     applyLanguage(window.gameSettings.language || 'de');
+    updateOrientationLock();
 
     // startGame global verfügbar machen
     window.startGame = init;
@@ -197,7 +200,7 @@ function init() {
         }
     }
     
-    // Restart Button 
+    // Restart-Button initialisieren
     if (world.restartButton) {
         world.restartButton.setCanvasContext(canvas.getContext('2d'));
     }
@@ -226,94 +229,33 @@ document.addEventListener('keyup', (e) => {
 });
 
 document.addEventListener('mousemove', (e) => {
-    if (canvas) {
-        const rect = canvas.getBoundingClientRect();
-        
-        // Berechne das tatsächliche Seitenverhältnis
-        const canvasRatio = canvas.width / canvas.height;
-        const rectRatio = rect.width / rect.height;
-        
-        let drawWidth, drawHeight, offsetX, offsetY;
-        
-        // Letterboxing berücksichtigen object-fit: contain
-        if (rectRatio > canvasRatio) {
-            // Schwarze Balken links und rechts
-            drawHeight = rect.height;
-            drawWidth = rect.height * canvasRatio;
-            offsetX = (rect.width - drawWidth) / 2;
-            offsetY = 0;
-        } else {
-            // Schwarze Balken oben und unten
-            drawWidth = rect.width;
-            drawHeight = rect.width / canvasRatio;
-            offsetX = 0;
-            offsetY = (rect.height - drawHeight) / 2;
-        }
-        
-        // Mausposition relativ zum tatsächlichen Canvas-Bild
-        const mouseX = e.clientX - rect.left - offsetX;
-        const mouseY = e.clientY - rect.top - offsetY;
-        
-        // Skalierung auf Canvas-Koordinaten 
-        window.mousePos.x = (mouseX / drawWidth) * ORIGINAL_WIDTH;
-        window.mousePos.y = (mouseY / drawHeight) * ORIGINAL_HEIGHT;
-        
-        //  Hover-State des Restart Buttons
-        if (world && world.restartButton) {
-            world.restartButton.updateHoverState(window.mousePos.x, window.mousePos.y);
-        }
+    const position = getCanvasPointerPosition(e.clientX, e.clientY);
+    if (!position) {
+        return;
+    }
+
+    window.mousePos.x = position.x;
+    window.mousePos.y = position.y;
+
+    if (world && world.restartButton) {
+        world.restartButton.updateHoverState(position.x, position.y);
     }
 });
 
 document.addEventListener('click', (e) => {
-    if (canvas && fullscreenButton && world) {
-        const rect = canvas.getBoundingClientRect();
-        
-        // Berechne das tatsächliche Seitenverhältnis
-        const canvasRatio = canvas.width / canvas.height;
-        const rectRatio = rect.width / rect.height;
-        
-        let drawWidth, drawHeight, offsetX, offsetY;
-        
-        // Letterboxing berücksichtigen 
-        if (rectRatio > canvasRatio) {
-            // Schwarze Balken links und rechts
-            drawHeight = rect.height;
-            drawWidth = rect.height * canvasRatio;
-            offsetX = (rect.width - drawWidth) / 2;
-            offsetY = 0;
-        } else {
-            // Schwarze Balken oben und unten
-            drawWidth = rect.width;
-            drawHeight = rect.width / canvasRatio;
-            offsetX = 0;
-            offsetY = (rect.height - drawHeight) / 2;
-        }
-        
-        // Mausposition relativ zum tatsächlichen Canvas-Bild
-        const mouseX = e.clientX - rect.left - offsetX;
-        const mouseY = e.clientY - rect.top - offsetY;
-        
-        // Skalierung auf Canvas-Koordinaten, immer auf ORIGINAL_WIDTH/HEIGHT
-        const x = (mouseX / drawWidth) * ORIGINAL_WIDTH;
-        const y = (mouseY / drawHeight) * ORIGINAL_HEIGHT;
-        
-        console.log('Click:', {
-            x: x.toFixed(1), 
-            y: y.toFixed(1), 
-            buttonX: fullscreenButton.buttonX, 
-            buttonY: fullscreenButton.buttonY,
-            rectRatio: rectRatio.toFixed(2),
-            canvasRatio: canvasRatio.toFixed(2),
-            offsetX: offsetX.toFixed(1),
-            offsetY: offsetY.toFixed(1)
-        });
-        fullscreenButton.handleClick(x, y);
-        world.restartButton.handleClick(x, y);
-    }
+    handleCanvasPointer(e.clientX, e.clientY);
 });
 
-// Event-Listener für Vollbildwechsel (z.B. wenn ESC gedrückt wird)
+document.addEventListener('touchstart', (e) => {
+    if (!e.touches || e.touches.length === 0) {
+        return;
+    }
+
+    const touch = e.touches[0];
+    handleCanvasPointer(touch.clientX, touch.clientY);
+}, { passive: true });
+
+// Reagiert auf Wechsel zwischen Vollbild- und Fenstermodus
 document.addEventListener('fullscreenchange', () => {
     const isFullscreen = !!document.fullscreenElement;
     updateCanvasResolution(isFullscreen);
@@ -322,6 +264,11 @@ document.addEventListener('fullscreenchange', () => {
 
 
 function startGameFromHTML() {
+    if (isPortraitPhoneLayout()) {
+        updateOrientationLock();
+        return;
+    }
+
     // Startbildschirm ausblenden
     hideEl('start-screen');
     // Canvas anzeigen
@@ -347,14 +294,20 @@ function showOptionsScreen() {
 
 function updateBackButtons() {
     if (isGamePaused) {
-        // "Zurück zum Spiel" anzeigen, wenn aus dem laufenden Spiel pausiert wurde
+        // Im pausierten Spiel: zurück zum Start ausblenden
         hideEl('back-to-start-button');
-        showEl('back-to-game-button');
+        if (isResponsiveLayout()) {
+            hideEl('back-to-game-button');
+        } else {
+            showEl('back-to-game-button');
+        }
     } else {
         // "Zurück zum Start" aus dem Hauptmenü anzeigen
         showEl('back-to-start-button');
         hideEl('back-to-game-button');
     }
+
+    updateBackIconVisibility();
 }
 
 function showOptionsSubmenu(submenu) {
@@ -365,7 +318,7 @@ function showOptionsSubmenu(submenu) {
     hideEl('options-audio');
     hideEl('options-impressum');
     
-    // Gewähltes Untermenü anzeigen
+    // Gewähltes Untermenü einblenden
     if (submenu === 'menu') {
         showEl('options-menu');
     } else if (submenu === 'language') {
@@ -377,6 +330,8 @@ function showOptionsSubmenu(submenu) {
     } else if (submenu === 'impressum') {
         showEl('options-impressum');
     }
+
+    updateBackIconVisibility();
 }
 
 function backToOptionsMenu() {
@@ -387,6 +342,7 @@ function hideOptionsScreen() {
     hideEl('options-screen');
     $('canvas').classList.add('hidden');
     hideEl('game-menu-button');
+    $('options-screen').querySelector('.back-icon-button')?.classList.remove('is-visible');
     showEl('start-screen');
     isGamePaused = false;
 }
@@ -394,7 +350,8 @@ function hideOptionsScreen() {
 function backToGame() {
     // Optionen-Bildschirm ausblenden
     hideEl('options-screen');
-    // Canvas und Menübutton anzeigen
+    $('options-screen').querySelector('.back-icon-button')?.classList.remove('is-visible');
+    // Canvas und Menübutton wieder anzeigen
     $('canvas').classList.remove('hidden');
     showEl('game-menu-button');
     // Spiel fortsetzen
@@ -413,15 +370,9 @@ function pauseAndReturnToMenu() {
             world.pauseGame();
         }
     }
-    keyboard.LEFT = false;
-    keyboard.RIGHT = false;
-    keyboard.UP = false;
-    keyboard.DOWN = false;
-    keyboard.D = false;
-    keyboard.F = false;
-    keyboard.SPACE = false;
+    resetKeyboardState();
 
-    // Optionen-Panel öffnen (wie bei Klick auf OPTIONS)
+    // Optionen-Panel öffnen (wie bei Klick auf „Optionen“)
     showOptionsScreen();
 }
 
@@ -429,6 +380,13 @@ function bindUI() {
     if (uiBound) return;
     uiBound = true;
 
+    // Reagiert auf Größen- und Ausrichtungsänderungen des Geräts
+    window.addEventListener('resize', updateOrientationLock);
+    window.addEventListener('orientationchange', updateOrientationLock);
+    window.addEventListener('resize', updateBackIconVisibility);
+    window.addEventListener('orientationchange', updateBackIconVisibility);
+
+    // Zentrale Klicksteuerung für alle Elemente mit data-action
     document.addEventListener('click', (event) => {
         const button = event.target.closest('[data-action]');
         if (!button) return;
@@ -441,7 +399,12 @@ function bindUI() {
         } else if (action === 'open-submenu') {
             showOptionsSubmenu(button.dataset.target);
         } else if (action === 'back-options') {
-            backToOptionsMenu();
+            const isInMainOptionsMenu = !$('options-menu').classList.contains('is-hidden');
+            if (isInMainOptionsMenu && isGamePaused && isResponsiveLayout()) {
+                backToGame();
+            } else {
+                backToOptionsMenu();
+            }
         } else if (action === 'back-start') {
             hideOptionsScreen();
         } else if (action === 'back-game') {
@@ -490,7 +453,7 @@ function updateMusicVolume(value) {
     window.gameSettings = window.gameSettings || {};
     window.gameSettings.musicVolume = volume;
     
-    // Anwenden falls das Spiel läuft
+    // Direkt anwenden, falls das Spiel bereits läuft
     if (window.world && window.world.audioManager) {
         window.world.audioManager.setMusicVolume(volume);
     }
@@ -504,8 +467,143 @@ function updateSFXVolume(value) {
     window.gameSettings = window.gameSettings || {};
     window.gameSettings.sfxVolume = volume;
     
-    // Anwenden, falls das Spiel läuft
+    // Direkt anwenden, falls das Spiel bereits läuft
     if (window.world && window.world.audioManager) {
         window.world.audioManager.setSFXVolume(volume);
     }
+}
+
+// Rechnet Maus- oder Touch-Koordinaten in Spielkoordinaten um
+function getCanvasPointerPosition(clientX, clientY) {
+    if (!canvas) {
+        return null;
+    }
+
+    const rect = canvas.getBoundingClientRect();
+    const canvasRatio = ORIGINAL_WIDTH / ORIGINAL_HEIGHT;
+    const rectRatio = rect.width / rect.height;
+
+    let drawWidth = rect.width;
+    let drawHeight = rect.height;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    if (rectRatio > canvasRatio) {
+        drawHeight = rect.height;
+        drawWidth = rect.height * canvasRatio;
+        offsetX = (rect.width - drawWidth) / 2;
+    } else {
+        drawWidth = rect.width;
+        drawHeight = rect.width / canvasRatio;
+        offsetY = (rect.height - drawHeight) / 2;
+    }
+
+    const relativeX = clientX - rect.left - offsetX;
+    const relativeY = clientY - rect.top - offsetY;
+
+    if (relativeX < 0 || relativeY < 0 || relativeX > drawWidth || relativeY > drawHeight) {
+        return null;
+    }
+
+    const x = (relativeX / drawWidth) * ORIGINAL_WIDTH;
+    const y = (relativeY / drawHeight) * ORIGINAL_HEIGHT;
+
+    return {
+        x,
+        y
+    };
+}
+
+// Verarbeitet Klicks und Touch-Eingaben auf dem Canvas
+function handleCanvasPointer(clientX, clientY) {
+    if (!canvas || !fullscreenButton || !world) {
+        return;
+    }
+
+    const position = getCanvasPointerPosition(clientX, clientY);
+    if (!position) {
+        return;
+    }
+
+    fullscreenButton.handleClick(position.x, position.y);
+
+    if (world.restartButton) {
+        world.restartButton.handleClick(position.x, position.y);
+    }
+}
+
+// Setzt alle aktuell gedrückten Tasten zurück
+function resetKeyboardState() {
+    keyboard.LEFT = false;
+    keyboard.RIGHT = false;
+    keyboard.UP = false;
+    keyboard.DOWN = false;
+    keyboard.D = false;
+    keyboard.F = false;
+    keyboard.SPACE = false;
+}
+
+// Prüft, ob ein Smartphone im Hochformat verwendet wird
+function isPortraitPhoneLayout() {
+    return window.matchMedia('(max-width: 768px) and (orientation: portrait) and (hover: none) and (pointer: coarse)').matches;
+}
+
+// Sperrt das Spiel im Smartphone-Hochformat und pausiert es bei Bedarf
+function updateOrientationLock() {
+    const isLocked = isPortraitPhoneLayout();
+    document.body.classList.toggle('portrait-lock', isLocked);
+
+    if (!canvas) {
+        canvas = $('canvas');
+    }
+
+    if (isLocked) {
+        if (world && !isGamePaused && !canvas.classList.contains('hidden')) {
+            if (typeof world.pauseGame === 'function') {
+                world.pauseGame();
+            }
+            wasPausedByOrientation = true;
+        }
+        resetKeyboardState();
+        return;
+    }
+
+    if (
+        wasPausedByOrientation &&
+        world &&
+        !isGamePaused &&
+        $('options-screen').classList.contains('is-hidden') &&
+        canvas &&
+        !canvas.classList.contains('hidden') &&
+        typeof world.resumeGame === 'function'
+    ) {
+        world.resumeGame();
+    }
+
+    wasPausedByOrientation = false;
+}
+
+// Prüft, ob gerade ein responsiver Breakpoint aktiv ist
+function isResponsiveLayout() {
+    return window.matchMedia('(max-width: 1024px)').matches;
+}
+
+// Blendet das Zurück-Symbol abhängig vom aktuellen Menüstatus ein oder aus
+function updateBackIconVisibility() {
+    const optionsScreen = $('options-screen');
+    const backIconButton = optionsScreen?.querySelector('.back-icon-button');
+    if (!optionsScreen || !backIconButton) {
+        return;
+    }
+
+    if (optionsScreen.classList.contains('is-hidden')) {
+        backIconButton.classList.remove('is-visible');
+        return;
+    }
+
+    const isInMainOptionsMenu = !$('options-menu').classList.contains('is-hidden');
+    const shouldShowInResponsiveMainMenu = isInMainOptionsMenu && isGamePaused && isResponsiveLayout();
+    const shouldShowInSubmenu = !isInMainOptionsMenu;
+
+    backIconButton.classList.toggle('is-visible', shouldShowInResponsiveMainMenu || shouldShowInSubmenu);
 }

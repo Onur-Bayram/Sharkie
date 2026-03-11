@@ -2,10 +2,10 @@ class OptionsScreen {
     isVisible = false;
     backgroundImg = new Image();
     
-    // Screen mode: 'menu' oder 'volume'
+    // Bildschirmmodus: `menu` oder `volume`
     currentMode = 'menu';
     
-    // Menu Button Positionen
+    // Positionen der Menü-Buttons
     languageButtonX = 275;
     languageButtonY = 100;
     languageButtonWidth = 250;
@@ -42,7 +42,7 @@ class OptionsScreen {
     draggingMusic = false;
     draggingSFX = false;
     
-    // Back Button
+    // Zurück-Button
     backButtonX = 300;
     backButtonY = 450;
     backButtonWidth = 200;
@@ -55,17 +55,17 @@ class OptionsScreen {
     handleMouseDown(x, y) {
         if (!this.isVisible) return false;
         
-        // Mouse events nur im Audio-Mode
+        // Maus-Ereignisse nur im Audio-Modus
         if (this.currentMode !== 'audio') return false;
         
-        // Check music slider
+        // Musik-Regler prüfen
         const musicHandleX = this.musicSliderX + this.musicVolume * this.sliderWidth;
         if (Math.abs(x - musicHandleX) < 30 && Math.abs(y - this.musicSliderY) < 30) {
             this.draggingMusic = true;
             return true;
         }
         
-        // Check SFX slider
+        // SFX-Regler prüfen
         const sfxHandleX = this.sfxSliderX + this.sfxVolume * this.sliderWidth;
         if (Math.abs(x - sfxHandleX) < 30 && Math.abs(y - this.sfxSliderY) < 30) {
             this.draggingSFX = true;
@@ -78,7 +78,7 @@ class OptionsScreen {
     handleMouseMove(x, y) {
         if (!this.isVisible) return false;
         
-        // Mouse events nur im Audio-Mode aktivieren
+        // Maus-Ereignisse nur im Audio-Modus aktivieren
         if (this.currentMode !== 'audio') return false;
         
         if (this.draggingMusic) {
@@ -118,9 +118,9 @@ class OptionsScreen {
     handleClick(x, y) {
         if (!this.isVisible) return false;
         
-        // Menu Mode: Hauptmenü mit den 3 Buttons
+        // Menümodus: Hauptmenü mit den vier Buttons
         if (this.currentMode === 'menu') {
-            // Language Button klicken
+            // Sprach-Button anklicken
             if (x >= this.languageButtonX && x <= this.languageButtonX + this.languageButtonWidth &&
                 y >= this.languageButtonY && y <= this.languageButtonY + this.languageButtonHeight) {
                 console.log('Sprachen Button geklickt');
@@ -128,7 +128,7 @@ class OptionsScreen {
                 return true;
             }
             
-            // Help Button klicken
+            // Hilfe-Button anklicken
             if (x >= this.helpButtonX && x <= this.helpButtonX + this.helpButtonWidth &&
                 y >= this.helpButtonY && y <= this.helpButtonY + this.helpButtonHeight) {
                 console.log('Hilfe Button geklickt');
@@ -136,7 +136,7 @@ class OptionsScreen {
                 return true;
             }
             
-            // Audio Button klicken
+            // Audio-Button anklicken
             if (x >= this.audioButtonX && x <= this.audioButtonX + this.audioButtonWidth &&
                 y >= this.audioButtonY && y <= this.audioButtonY + this.audioButtonHeight) {
                 console.log('Audio Button geklickt');
@@ -144,7 +144,7 @@ class OptionsScreen {
                 return true;
             }
             
-            // Impressum Button klicken
+            // Impressum-Button anklicken
             if (x >= this.impressumButtonX && x <= this.impressumButtonX + this.impressumButtonWidth &&
                 y >= this.impressumButtonY && y <= this.impressumButtonY + this.impressumButtonHeight) {
                 console.log('Impressum Button geklickt');
@@ -155,26 +155,26 @@ class OptionsScreen {
             return true;
         }
         
-        // Volume Mode oder andere: Slider und Back Button
-        // Vergrößerte Hitbox für Back Button (20px Toleranz auf allen Seiten)
+        // Lautstärke-Modus oder andere Untermenüs: Regler und Zurück-Button
+        // Vergrößerte Trefferfläche für den Zurück-Button (20 px Toleranz auf allen Seiten)
         const hitboxPadding = 20;
         if (x >= this.backButtonX - hitboxPadding && 
             x <= this.backButtonX + this.backButtonWidth + hitboxPadding &&
             y >= this.backButtonY - hitboxPadding && 
             y <= this.backButtonY + this.backButtonHeight + hitboxPadding) {
             
-            // Wenn in einem Submenu, zurück zum Hauptmenü
+            // Wenn ein Untermenü offen ist, zurück zum Hauptmenü
             if (this.currentMode !== 'volume') {
                 this.currentMode = 'menu';
             } else {
-                // Wenn im Volume-Mode, komplett schließen
+                // Wenn der Lautstärke-Modus offen ist, komplett schließen
                 this.hide();
             }
             return true;
         }
         
         // Auch wenn nicht auf ZURÜCK geklickt wurde, blockiere andere Klicks
-        // während Options Screen sichtbar ist
+        // solange der Optionsbildschirm sichtbar ist
         return true;
     }
     
@@ -193,7 +193,7 @@ class OptionsScreen {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
         ctx.fillRect(0, 0, canvasWidth, canvasHeight);
         
-        // Verschiedene Screens basierend auf currentMode
+        // Verschiedene Ansichten basierend auf `currentMode`
         if (this.currentMode === 'menu') {
             this.drawMenuScreen(ctx, canvasWidth, canvasHeight);
         } else if (this.currentMode === 'language') {
@@ -216,34 +216,34 @@ class OptionsScreen {
         ctx.textAlign = 'center';
         ctx.fillText('OPTIONS', canvasWidth / 2, 50);
         
-        // Language Button
+        // Sprach-Button
         this.drawButton(ctx, this.languageButtonX, this.languageButtonY, 
                        this.languageButtonWidth, this.languageButtonHeight, 'SPRACHEN');
         
-        // Help Button
+        // Hilfe-Button
         this.drawButton(ctx, this.helpButtonX, this.helpButtonY, 
                        this.helpButtonWidth, this.helpButtonHeight, 'HILFE');
         
-        // Audio Button
+        // Audio-Button
         this.drawButton(ctx, this.audioButtonX, this.audioButtonY, 
                        this.audioButtonWidth, this.audioButtonHeight, 'AUDIO');
         
-        // Impressum Button
+        // Impressum-Button
         this.drawButton(ctx, this.impressumButtonX, this.impressumButtonY, 
                        this.impressumButtonWidth, this.impressumButtonHeight, 'IMPRESSUM');
     }
     
     drawButton(ctx, x, y, width, height, text) {
-        // Button Hintergrund
+        // Button-Hintergrund
         ctx.fillStyle = 'rgba(100, 150, 200, 0.9)';
         ctx.fillRect(x, y, width, height);
         
-        // Button Border
+        // Button-Rand
         ctx.strokeStyle = 'rgba(150, 200, 255, 1)';
         ctx.lineWidth = 3;
         ctx.strokeRect(x, y, width, height);
         
-        // Button Text
+        // Button-Text
         ctx.fillStyle = 'white';
         ctx.font = 'bold 22px Arial';
         ctx.textAlign = 'center';
@@ -258,14 +258,14 @@ class OptionsScreen {
         ctx.textAlign = 'center';
         ctx.fillText('SPRACHEN', canvasWidth / 2, 80);
         
-        // Sprachen Opionen
+        // Sprachoptionen
         ctx.font = 'bold 24px Arial';
         ctx.textAlign = 'center';
         ctx.fillText('Deutsch', canvasWidth / 2, 200);
-        ctx.fillText('English', canvasWidth / 2, 280);
+        ctx.fillText('Englisch', canvasWidth / 2, 280);
         ctx.fillText('Español', canvasWidth / 2, 360);
         
-        // Back Button
+        // Zurück-Button
         this.drawButton(ctx, this.backButtonX, this.backButtonY, 
                        this.backButtonWidth, this.backButtonHeight, 'ZURÜCK');
     }
@@ -277,12 +277,12 @@ class OptionsScreen {
         ctx.textAlign = 'center';
         ctx.fillText('HILFE', canvasWidth / 2, 80);
         
-        // Hilfe Text
+        // Hilfetext
         ctx.font = '18px Arial';
         ctx.textAlign = 'center';
         ctx.fillText('Siehe Options Screen im HTML', canvasWidth / 2, 200);
         
-        // Back Button
+        // Zurück-Button
         this.drawButton(ctx, this.backButtonX, this.backButtonY, 
                        this.backButtonWidth, this.backButtonHeight, 'ZURÜCK');
     }
@@ -294,21 +294,21 @@ class OptionsScreen {
         ctx.textAlign = 'center';
         ctx.fillText('AUDIO', canvasWidth / 2, 80);
         
-        // Musik Label
+        // Musik-Beschriftung
         ctx.font = 'bold 24px Arial';
         ctx.textAlign = 'left';
         ctx.fillText('Hintergrundmusik', this.musicSliderX, this.musicSliderY - 30);
         
-        // Musik Slider
+        // Musik-Regler
         this.drawSlider(ctx, this.musicSliderX, this.musicSliderY, this.musicVolume);
         
-        // SFX Label
+        // SFX-Beschriftung
         ctx.fillText('Sound-Effekte', this.sfxSliderX, this.sfxSliderY - 30);
         
-        // SFX Slider
+        // SFX-Regler
         this.drawSlider(ctx, this.sfxSliderX, this.sfxSliderY, this.sfxVolume);
         
-        // Back Button
+        // Zurück-Button
         this.drawButton(ctx, this.backButtonX, this.backButtonY, 
                        this.backButtonWidth, this.backButtonHeight, 'ZURÜCK');
     }
@@ -320,7 +320,7 @@ class OptionsScreen {
         ctx.textAlign = 'center';
         ctx.fillText('IMPRESSUM', canvasWidth / 2, 80);
         
-        // Back Button
+        // Zurück-Button
         this.drawButton(ctx, this.backButtonX, this.backButtonY, 
                        this.backButtonWidth, this.backButtonHeight, 'ZURÜCK');
     }
@@ -332,21 +332,21 @@ class OptionsScreen {
         ctx.textAlign = 'center';
         ctx.fillText('LAUTSTÄRKE', canvasWidth / 2, 100);
         
-        // Musik Label
+        // Musik-Beschriftung
         ctx.font = 'bold 24px Arial';
         ctx.textAlign = 'left';
         ctx.fillText('Hintergrundmusik', this.musicSliderX, this.musicSliderY - 30);
         
-        // Musik Slider
+        // Musik-Regler
         this.drawSlider(ctx, this.musicSliderX, this.musicSliderY, this.musicVolume);
         
-        // SFX Label
+        // SFX-Beschriftung
         ctx.fillText('Sound-Effekte', this.sfxSliderX, this.sfxSliderY - 30);
         
-        // SFX Slider
+        // SFX-Regler
         this.drawSlider(ctx, this.sfxSliderX, this.sfxSliderY, this.sfxVolume);
         
-        // Back Button
+        // Zurück-Button
         this.drawButton(ctx, this.backButtonX, this.backButtonY, 
                        this.backButtonWidth, this.backButtonHeight, 'ZURÜCK');
     }
@@ -379,11 +379,11 @@ class OptionsScreen {
     
     show() {
         this.isVisible = true;
-        this.currentMode = 'menu'; // Always start with menu
+        this.currentMode = 'menu'; // Immer mit dem Hauptmenü starten
     }
     
     hide() {
         this.isVisible = false;
-        this.currentMode = 'menu'; // Reset to menu when hiding
+        this.currentMode = 'menu'; // Beim Ausblenden auf das Hauptmenü zurücksetzen
     }
 }

@@ -34,7 +34,7 @@ class GameOverScreen {
             return;
         }
 
-        // Fade-In Effekt
+        // Einblende-Effekt
         if (this.opacity < 1) {
             this.opacity += this.fadeInSpeed;
             if (this.opacity > 1) this.opacity = 1;
@@ -47,7 +47,7 @@ class GameOverScreen {
         ctx.fillStyle = 'black';
         ctx.fillRect(0, 0, 800, 540);
 
-        // GAME OVER Bild mit Fade und leichtem Glow
+        // Bild für das Spielende mit Einblende-Effekt und leichtem Leuchten
         const currentImg = this.gameOverImages[this.currentImage];
         if (currentImg && currentImg.complete) {
             const x = (800 - this.gameOverWidth) / 2;
