@@ -50,6 +50,7 @@ const TRANSLATIONS = {
         menu_audio: 'AUDIO',
         menu_impressum: 'IMPRESSUM',
         back_start: 'ZURÜCK ZUM START',
+        to_title: 'ZUM TITEL',
         back_game: 'ZURÜCK ZUM SPIEL',
         submenu_languages: 'SPRACHEN',
         submenu_controls: 'STEUERUNG',
@@ -72,6 +73,7 @@ const TRANSLATIONS = {
         menu_audio: 'AUDIO',
         menu_impressum: 'LEGAL NOTICE',
         back_start: 'BACK TO START',
+        to_title: 'TO TITLE',
         back_game: 'BACK TO GAME',
         submenu_languages: 'LANGUAGES',
         submenu_controls: 'CONTROLS',
@@ -301,9 +303,19 @@ function showOptionsScreen() {
 }
 
 function updateBackButtons() {
+    const backToStartButton = $('back-to-start-button');
+    const returnToTitleButton = $('return-to-title-button');
+
     if (isGamePaused) {
-        // Im pausierten Spiel: zurück zum Start ausblenden
         hideEl('back-to-start-button');
+        showEl('return-to-title-button');
+        if (backToStartButton) {
+            backToStartButton.dataset.i18n = 'to_title';
+            backToStartButton.textContent = getLanguageStrings(window.gameSettings.language || 'de').to_title;
+        }
+        if (returnToTitleButton) {
+            returnToTitleButton.textContent = getLanguageStrings(window.gameSettings.language || 'de').to_title;
+        }
         if (isResponsiveLayout()) {
             hideEl('back-to-game-button');
         } else {
@@ -312,6 +324,11 @@ function updateBackButtons() {
     } else {
         // "Zurück zum Start" aus dem Hauptmenü anzeigen
         showEl('back-to-start-button');
+        hideEl('return-to-title-button');
+        if (backToStartButton) {
+            backToStartButton.dataset.i18n = 'back_start';
+            backToStartButton.textContent = getLanguageStrings(window.gameSettings.language || 'de').back_start;
+        }
         hideEl('back-to-game-button');
     }
 
@@ -354,6 +371,15 @@ function hideOptionsScreen() {
     $('options-screen').querySelector('.back-icon-button')?.classList.remove('is-visible');
     showEl('start-screen');
     isGamePaused = false;
+}
+
+function returnToTitle() {
+    if (document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
+    }
+
+    // Vollstaendiger Reset verhindert doppelte World-Intervalle aus alten Spielstaenden.
+    window.location.reload();
 }
 
 function backToGame() {
@@ -404,9 +430,23 @@ function bindUI() {
     // HTML-Vollbild-Button für Touch-Geräte
     const htmlFsBtn = $('html-fullscreen-button');
     if (htmlFsBtn) {
-        htmlFsBtn.addEventListener('click', (e) => {
+        // Verhindert, dass Spieltasten den fokussierten Vollbild-Button erneut ausloesen.
+        htmlFsBtn.addEventListener('keydown', (e) => {
+            const isSpace = e.code === 'Space' || e.key === ' ';
+            const isEnter = e.key === 'Enter';
+            if (!isSpace && !isEnter) return;
+
+            e.preventDefault();
             e.stopPropagation();
-            const container = $('canvas')?.closest('.game-panel');
+            htmlFsBtn.blur();
+        });
+
+        htmlFsBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            htmlFsBtn.blur();
+
+            const container = document.body || $('canvas')?.closest('.game-panel');
             if (!container) return;
             if (!document.fullscreenElement) {
                 container.requestFullscreen();
@@ -430,13 +470,19 @@ function bindUI() {
             showOptionsSubmenu(button.dataset.target);
         } else if (action === 'back-options') {
             const isInMainOptionsMenu = !$('options-menu').classList.contains('is-hidden');
-            if (isInMainOptionsMenu && isGamePaused && isResponsiveLayout()) {
+            if (!isInMainOptionsMenu) {
+                backToOptionsMenu();
+            } else if (isGamePaused) {
                 backToGame();
             } else {
-                backToOptionsMenu();
+                hideOptionsScreen();
             }
         } else if (action === 'back-start') {
-            hideOptionsScreen();
+            if (isGamePaused) {
+                returnToTitle();
+            } else {
+                hideOptionsScreen();
+            }
         } else if (action === 'back-game') {
             backToGame();
         } else if (action === 'game-menu') {
@@ -635,11 +681,8 @@ function updateBackIconVisibility() {
         return;
     }
 
-    const isInMainOptionsMenu = !$('options-menu').classList.contains('is-hidden');
-    const shouldShowInResponsiveMainMenu = isInMainOptionsMenu && isGamePaused && isResponsiveLayout();
-    const shouldShowInSubmenu = !isInMainOptionsMenu;
-
-    backIconButton.classList.toggle('is-visible', shouldShowInResponsiveMainMenu || shouldShowInSubmenu);
+    // Haelt das Zurueck-Symbol oben rechts in allen Optionsansichten verfuegbar.
+    backIconButton.classList.add('is-visible');
 }
 
 function isTouchGameplayDevice() {

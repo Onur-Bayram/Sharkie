@@ -24,6 +24,7 @@ class World {
  finSlaps = [];
  isPaused = false;
  animationFrameId = null;
+ darkZoneVoicePlayed = false;
 
 backgroundObjectsLight = [
     new BackgroundObject('3. Background/Layers/5. Water/L.png', 0, 0),
@@ -198,7 +199,7 @@ checkCollisions() {
     if (this.finalBoss) {
         this.finalBoss.checkVisibility(this.cameraX, this.GAME_WIDTH);
         // Aktualisiere BossBar wenn Boss sichtbar wird
-        if (this.finalBoss.isVisible) {
+        if (this.finalBoss.isActive) {
             this.bossBar.setPercentage(this.finalBoss.hp, this.finalBoss.maxHp);
         }
         this.finalBoss.checkProximityAttack(this.character);
@@ -488,6 +489,12 @@ draw() {
         this.cameraX = this.mapWidth - this.GAME_WIDTH;
     }
 
+    if (!this.darkZoneVoicePlayed && this.character.x >= this.bossZoneStart) {
+        this.audioManager.setBackgroundMusicEnabled(false);
+        this.audioManager.playDarkZoneVoiceSound();
+        this.darkZoneVoicePlayed = true;
+    }
+
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     
     // Speichere den aktuellen Kontext und verschiebe um die Kamera
@@ -587,7 +594,7 @@ draw() {
     }
 
     // Zeichne Boss Leiste (fixe Position, wenn Boss sichtbar ist)
-    if (this.finalBoss && this.finalBoss.isVisible) {
+    if (this.finalBoss && this.finalBoss.isActive) {
         this.bossBar.draw(this.ctx);
     }
 

@@ -191,7 +191,8 @@ canvas.hidden {
 }
 
 /* Vollbildmodus */
-.game-panel:fullscreen {
+.game-panel:fullscreen,
+:fullscreen .game-panel {
     width: 100vw;
     height: 100vh;
     max-width: 100vw;
@@ -200,7 +201,8 @@ canvas.hidden {
     background: #000;
 }
 
-.game-panel:fullscreen canvas {
+.game-panel:fullscreen canvas,
+:fullscreen .game-panel canvas {
     width: 100%;
     height: 100%;
     object-fit: contain;
@@ -208,7 +210,8 @@ canvas.hidden {
     image-rendering: auto;
 }
 
-.game-panel:fullscreen .mobile-controls {
+.game-panel:fullscreen .mobile-controls,
+:fullscreen .game-panel .mobile-controls {
     width: min(100vw, calc(100vh * 800 / 540));
     left: 50%;
     right: auto;
@@ -216,8 +219,33 @@ canvas.hidden {
     padding: 6px 8px;
 }
 
-.game-panel:fullscreen .action-buttons {
+.game-panel:fullscreen .action-buttons,
+:fullscreen .game-panel .action-buttons {
     margin-right: 64px;
+}
+
+/* Wenn der Body das Vollbild-Root ist, bleibt nur die Spieloberflaeche sichtbar und korrekt angeordnet. */
+body:fullscreen {
+    padding: 0;
+    justify-content: center;
+    overflow: hidden;
+}
+
+body:fullscreen > h1,
+body:fullscreen > .light-rays,
+body:fullscreen > .bubble {
+    display: none !important;
+}
+
+body:fullscreen .game-panel {
+    position: fixed;
+    inset: 0;
+    margin: 0;
+    display: block;
+}
+
+body:fullscreen .screen-overlay {
+    z-index: 200;
 }
 
 /* Bildschirm-Overlays */
@@ -399,6 +427,18 @@ canvas.hidden {
     gap: 15px;
     font-size: clamp(16px, 2vw, 20px);
     padding: clamp(12px, 2.4vw, 18px) clamp(20px, 4vw, 30px);
+}
+
+#return-to-title-button {
+    background: linear-gradient(135deg, rgba(0, 200, 140, 0.9), rgba(0, 140, 95, 0.9));
+    border-color: rgba(160, 255, 215, 0.95);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 255, 170, 0.28);
+}
+
+#return-to-title-button:hover {
+    background: linear-gradient(135deg, rgba(20, 220, 160, 1), rgba(0, 160, 110, 1));
+    border-color: #8fffd0;
+    box-shadow: 0 8px 20px rgba(0, 255, 170, 0.35);
 }
 
 .button-icon {
@@ -970,6 +1010,11 @@ canvas.hidden {
         font-size: 11px;
     }
 
+    #return-to-title-button {
+        margin-top: 8px;
+        min-height: 42px;
+    }
+
     .game-button {
         padding: 7px 10px;
         font-size: 11px;
@@ -1075,6 +1120,10 @@ canvas.hidden {
     .option-button,
     .game-button {
         font-size: 9px;
+    }
+
+    #return-to-title-button {
+        min-height: 40px;
     }
 
     .submenu-title {

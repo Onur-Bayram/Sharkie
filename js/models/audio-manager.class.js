@@ -9,7 +9,9 @@ class AudioManager {
     hurtSound = new Audio();
     bubbleShootSound = new Audio();
     poisonShootSound = new Audio();
+    darkZoneVoiceSound = new Audio();
     isPlaying = false;
+    isBackgroundMusicEnabled = true;
     sfxVolume = 0.6;
     
     constructor() {
@@ -47,10 +49,13 @@ class AudioManager {
 
         this.poisonShootSound.src = 'audio/Poisenshoot.mp3';
         this.poisonShootSound.volume = this.sfxVolume;
+
+        this.darkZoneVoiceSound.src = 'audio/DU KANNST NICHT VORBEI!!!.mp3';
+        this.darkZoneVoiceSound.volume = this.sfxVolume;
     }
     
     play() {
-        if (this.isPlaying) return;
+        if (!this.isBackgroundMusicEnabled || this.isPlaying) return;
         this.bgMusic.play();
         this.isPlaying = true;
     }
@@ -74,6 +79,17 @@ class AudioManager {
         this.bgMusic.volume = Math.max(0, Math.min(1, volume));
     }
 
+    setBackgroundMusicEnabled(enabled) {
+        this.isBackgroundMusicEnabled = !!enabled;
+
+        if (!this.isBackgroundMusicEnabled) {
+            this.pause();
+            return;
+        }
+
+        this.play();
+    }
+
     setSFXVolume(volume) {
         this.sfxVolume = Math.max(0, Math.min(1, volume));
         this.coinSound.volume = this.sfxVolume;
@@ -85,6 +101,7 @@ class AudioManager {
         this.hurtSound.volume = this.sfxVolume;
         this.bubbleShootSound.volume = this.sfxVolume;
         this.poisonShootSound.volume = this.sfxVolume;
+        this.darkZoneVoiceSound.volume = this.sfxVolume;
     }
 
     playCoinSound() {
@@ -139,5 +156,11 @@ class AudioManager {
         const poison = this.poisonShootSound.cloneNode();
         poison.volume = this.sfxVolume;
         poison.play();
+    }
+
+    playDarkZoneVoiceSound() {
+        const voice = this.darkZoneVoiceSound.cloneNode();
+        voice.volume = this.sfxVolume;
+        voice.play();
     }
 }
