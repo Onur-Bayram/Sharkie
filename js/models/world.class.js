@@ -20,7 +20,6 @@ class World {
  gameOverScreen = new GameOverScreen();
  restartButton = new RestartButton();
  audioManager = new AudioManager();
- fullscreenButton = null;
  bubbleAnimations = [];
  finSlaps = [];
  isPaused = false;
@@ -67,10 +66,9 @@ canvas;
 ctx; 
 
     
-constructor(canvas, fullscreenButton) {
+constructor(canvas) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
-    this.fullscreenButton = fullscreenButton;
     this.character.world = this;
     this.backgroundObjects = [...this.backgroundObjectsLight, ...this.backgroundObjectsDark];
     this.lightLayers = this.backgroundObjectsLight.filter((bg, index) => index % 5 === 4);
@@ -602,11 +600,6 @@ draw() {
     else if (this.finalBoss && this.finalBoss.isDead && this.finalBoss.deadAnimationFinished) {
         this.winScreen.draw(this.ctx);
         this.restartButton.draw(this.ctx);
-    }
-
-    // Draw Fullscreen Button
-    if (this.fullscreenButton) {
-        this.fullscreenButton.draw();
     }
 
     let self = this;

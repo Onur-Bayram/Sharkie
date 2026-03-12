@@ -191,12 +191,33 @@ canvas.hidden {
 }
 
 /* Vollbildmodus */
-canvas:fullscreen {
+.game-panel:fullscreen {
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
+    max-height: 100vh;
+    border-radius: 0;
+    background: #000;
+}
+
+.game-panel:fullscreen canvas {
     width: 100%;
     height: 100%;
     object-fit: contain;
     border-radius: 0;
     image-rendering: auto;
+}
+
+.game-panel:fullscreen .mobile-controls {
+    width: min(100vw, calc(100vh * 800 / 540));
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    padding: 6px 8px;
+}
+
+.game-panel:fullscreen .action-buttons {
+    margin-right: 64px;
 }
 
 /* Bildschirm-Overlays */
@@ -640,6 +661,29 @@ canvas:fullscreen {
     color: #00d4ff;
 }
 
+/* HTML-Vollbild-Button (nur auf Touch-Geräten sichtbar) */
+.html-fullscreen-button {
+    display: none;
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    width: 44px;
+    height: 44px;
+    background: rgba(0, 180, 220, 0.8);
+    border: 2px solid rgba(150, 230, 255, 0.9);
+    border-radius: 8px;
+    color: white;
+    font-size: 22px;
+    cursor: pointer;
+    z-index: 50;
+    touch-action: manipulation;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+    backdrop-filter: blur(5px);
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
 /* Menübutton im Spiel */
 .game-menu-button {
     position: absolute;
@@ -728,7 +772,7 @@ canvas:fullscreen {
     left: 0;
     right: 0;
     width: 100%;
-    display: flex;
+    display: none;
     justify-content: space-between;
     align-items: flex-end;
     padding: 8px 10px;
@@ -741,20 +785,16 @@ canvas:fullscreen {
     pointer-events: auto;
 }
 
-.mobile-controls.is-hidden {
-    display: none !important;
-}
-
 .dpad {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 7px;
 }
 
 .dpad-horizontal {
     display: flex;
-    gap: 4px;
+    gap: 7px;
 }
 
 .dpad-button {
@@ -778,22 +818,12 @@ canvas:fullscreen {
     transform: scale(0.92);
 }
 
-.dpad-down {
-    transform: rotate(180deg);
-}
 
-.dpad-left {
-    transform: rotate(90deg);
-}
-
-.dpad-right {
-    transform: rotate(-90deg);
-}
 
 .action-buttons {
     display: flex;
     align-items: flex-end;
-    gap: 6px;
+    gap: 10px;
 }
 
 .action-button {
@@ -854,6 +884,23 @@ canvas:fullscreen {
         max-width: var(--panel-width);
         height: 86vh;
         max-height: var(--panel-height);
+    }
+
+    .action-buttons {
+        margin-right: 60px;
+    }
+}
+
+@media (max-width: 1280px) {
+    .action-buttons {
+        margin-right: 60px;
+    }
+}
+
+/* Touch-Geräte: Buttons auch im Vollbild anzeigen */
+@media (hover: none) and (pointer: coarse) {
+    .action-buttons {
+        margin-right: 60px;
     }
 }
 
@@ -954,7 +1001,6 @@ canvas:fullscreen {
     }
 
     #mobile-controls {
-        display: flex !important;
         padding: 6px 8px;
     }
 
@@ -1065,15 +1111,13 @@ canvas:fullscreen {
     }
 
     h1 {
-        font-size: 14px;
-        margin: 2px 0 0;
-        animation: none;
+        display: none;
     }
 
     .game-panel {
-        width: calc(64vh * 800 / 540);
+        width: 100vw;
         max-width: 100vw;
-        max-height: 64vh;
+        max-height: 100vh;
         aspect-ratio: 800 / 540;
         margin: 0 auto;
     }
@@ -1125,6 +1169,26 @@ canvas:fullscreen {
         margin-bottom: 4px;
         overflow-y: auto;
         scrollbar-gutter: stable;
+    }
+
+    .mobile-controls {
+        padding: 4px 6px;
+    }
+
+    .action-buttons {
+        margin-right: 60px;
+    }
+
+    .dpad-button {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+
+    .action-button {
+        width: 34px;
+        height: 34px;
+        font-size: 12px;
     }
 
     .option-button,

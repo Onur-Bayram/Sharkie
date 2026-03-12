@@ -1,6 +1,5 @@
 let canvas;
 let world;
-let fullscreenButton;
 let character = new MovableObject();
 let keyboard = {
     LEFT: false,
@@ -15,9 +14,22 @@ let keyboard = {
 const $ = (id) => document.getElementById(id);
 const showEl = (id) => $(id).classList.remove('is-hidden');
 const hideEl = (id) => $(id).classList.add('is-hidden');
+const hideMobileControls = () => {
+    const controls = $('mobile-controls');
+    if (!controls) return;
+    controls.classList.add('is-hidden');
+    controls.style.display = 'none';
+};
+const showMobileControls = () => {
+    const controls = $('mobile-controls');
+    if (!controls) return;
+    controls.classList.remove('is-hidden');
+    controls.style.display = 'flex';
+};
 let uiBound = false;
 let isGamePaused = false;
 let wasPausedByOrientation = false;
+const activeMobilePointers = new Map();
 
 window.keyboard = keyboard;
 window.mousePos = { x: 0, y: 0 };
@@ -144,9 +156,6 @@ function updateCanvasResolution(isFullscreen) {
 
 function showStartScreen() {
     canvas = $("canvas");
-    const ctx = canvas.getContext('2d');
-    fullscreenButton = new FullscreenButton();
-    fullscreenButton.setCanvasContext(canvas, ctx);
     
     // Canvas-basierte Ansichten für Start und Optionen hier nicht mehr verwenden
     // HTML-Startbildschirm und HTML-Optionsbildschirm werden stattdessen verwendet
@@ -156,6 +165,7 @@ function showStartScreen() {
     // HTML-Startbildschirm anzeigen
     showEl('start-screen');
     hideEl('options-screen');
+    hideMobileControls();
     
     // Audio-Slider mit gespeicherten Werten initialisieren
     const musicSlider = $('music-slider');
@@ -183,12 +193,7 @@ function init() {
     if (!canvas) {
         canvas = $("canvas");
     }
-    if (!fullscreenButton) {
-        const ctx = canvas.getContext('2d');
-        fullscreenButton = new FullscreenButton();
-        fullscreenButton.setCanvasContext(canvas, ctx);
-    }
-    world = new World(canvas, fullscreenButton);
+    world = new World(canvas);
     
     // Wende gespeicherte Audio-Einstellungen an
     if (window.gameSettings) {
@@ -243,14 +248,15 @@ document.addEventListener('mousemove', (e) => {
 });
 
 document.addEventListener('click', (e) => {
+    // Mobile-Controls nie als Canvas-Klick behandeln
+    if (e.target.closest('#mobile-controls')) return;
     handleCanvasPointer(e.clientX, e.clientY);
 });
 
 document.addEventListener('touchstart', (e) => {
-    if (!e.touches || e.touches.length === 0) {
-        return;
-    }
-
+    if (!e.touches || e.touches.length === 0) return;
+    // Mobile-Controls nie als Canvas-Touch behandeln
+    if (e.target.closest('#mobile-controls')) return;
     const touch = e.touches[0];
     handleCanvasPointer(touch.clientX, touch.clientY);
 }, { passive: true });
@@ -277,6 +283,7 @@ function startGameFromHTML() {
     showEl('game-menu-button');
     // Spiel starten
     init();
+    updateMobileControlsVisibility();
 }
 
 function showOptionsScreen() {
@@ -290,6 +297,7 @@ function showOptionsScreen() {
     showOptionsSubmenu('menu');
     // Untere Buttons je nach Spielstatus umschalten
     updateBackButtons();
+    hideMobileControls();
 }
 
 function updateBackButtons() {
@@ -342,6 +350,7 @@ function hideOptionsScreen() {
     hideEl('options-screen');
     $('canvas').classList.add('hidden');
     hideEl('game-menu-button');
+    hideMobileControls();
     $('options-screen').querySelector('.back-icon-button')?.classList.remove('is-visible');
     showEl('start-screen');
     isGamePaused = false;
@@ -354,6 +363,7 @@ function backToGame() {
     // Canvas und Menübutton wieder anzeigen
     $('canvas').classList.remove('hidden');
     showEl('game-menu-button');
+    updateMobileControlsVisibility();
     // Spiel fortsetzen
     if (world && typeof world.resumeGame === 'function') {
         world.resumeGame();
@@ -371,6 +381,7 @@ function pauseAndReturnToMenu() {
         }
     }
     resetKeyboardState();
+    hideMobileControls();
 
     // Optionen-Panel öffnen (wie bei Klick auf „Optionen“)
     showOptionsScreen();
@@ -385,6 +396,25 @@ function bindUI() {
     window.addEventListener('orientationchange', updateOrientationLock);
     window.addEventListener('resize', updateBackIconVisibility);
     window.addEventListener('orientationchange', updateBackIconVisibility);
+    window.addEventListener('resize', updateMobileControlsVisibility);
+    window.addEventListener('orientationchange', updateMobileControlsVisibility);
+    document.addEventListener('fullscreenchange', updateMobileControlsVisibility);
+    document.addEventListener('fullscreenchange', updateHtmlFullscreenButton);
+
+    // HTML-Vollbild-Button für Touch-Geräte
+    const htmlFsBtn = $('html-fullscreen-button');
+    if (htmlFsBtn) {
+        htmlFsBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const container = $('canvas')?.closest('.game-panel');
+            if (!container) return;
+            if (!document.fullscreenElement) {
+                container.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        });
+    }
 
     // Zentrale Klicksteuerung für alle Elemente mit data-action
     document.addEventListener('click', (event) => {
@@ -425,6 +455,8 @@ function bindUI() {
     if (sfxSlider) {
         sfxSlider.addEventListener('input', (event) => updateSFXVolume(event.target.value));
     }
+
+    bindMobileControls();
 }
 
 function changeLanguage(lang, button) {
@@ -454,8 +486,8 @@ function updateMusicVolume(value) {
     window.gameSettings.musicVolume = volume;
     
     // Direkt anwenden, falls das Spiel bereits läuft
-    if (window.world && window.world.audioManager) {
-        window.world.audioManager.setMusicVolume(volume);
+    if (world && world.audioManager) {
+        world.audioManager.setMusicVolume(volume);
     }
 }
 
@@ -468,8 +500,8 @@ function updateSFXVolume(value) {
     window.gameSettings.sfxVolume = volume;
     
     // Direkt anwenden, falls das Spiel bereits läuft
-    if (window.world && window.world.audioManager) {
-        window.world.audioManager.setSFXVolume(volume);
+    if (world && world.audioManager) {
+        world.audioManager.setSFXVolume(volume);
     }
 }
 
@@ -516,7 +548,7 @@ function getCanvasPointerPosition(clientX, clientY) {
 
 // Verarbeitet Klicks und Touch-Eingaben auf dem Canvas
 function handleCanvasPointer(clientX, clientY) {
-    if (!canvas || !fullscreenButton || !world) {
+    if (!canvas) {
         return;
     }
 
@@ -525,9 +557,7 @@ function handleCanvasPointer(clientX, clientY) {
         return;
     }
 
-    fullscreenButton.handleClick(position.x, position.y);
-
-    if (world.restartButton) {
+    if (world && world.restartButton) {
         world.restartButton.handleClick(position.x, position.y);
     }
 }
@@ -541,6 +571,8 @@ function resetKeyboardState() {
     keyboard.D = false;
     keyboard.F = false;
     keyboard.SPACE = false;
+
+    activeMobilePointers.clear();
 }
 
 // Prüft, ob ein Smartphone im Hochformat verwendet wird
@@ -565,6 +597,7 @@ function updateOrientationLock() {
             wasPausedByOrientation = true;
         }
         resetKeyboardState();
+        hideMobileControls();
         return;
     }
 
@@ -581,6 +614,7 @@ function updateOrientationLock() {
     }
 
     wasPausedByOrientation = false;
+    updateMobileControlsVisibility();
 }
 
 // Prüft, ob gerade ein responsiver Breakpoint aktiv ist
@@ -606,4 +640,89 @@ function updateBackIconVisibility() {
     const shouldShowInSubmenu = !isInMainOptionsMenu;
 
     backIconButton.classList.toggle('is-visible', shouldShowInResponsiveMainMenu || shouldShowInSubmenu);
+}
+
+function isTouchGameplayDevice() {
+    return navigator.maxTouchPoints > 0 || window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+}
+
+function updateMobileControlsVisibility() {
+    const controls = $('mobile-controls');
+    const htmlFullscreenButton = $('html-fullscreen-button');
+    if (!controls || !canvas) {
+        return;
+    }
+    const isGameVisible = !canvas.classList.contains('hidden');
+    const isStartHidden = $('start-screen').classList.contains('is-hidden');
+    const isOptionsHidden = $('options-screen').classList.contains('is-hidden');
+    const baseGameplayVisible = !isPortraitPhoneLayout() && isGameVisible && isStartHidden && isOptionsHidden;
+    const shouldShowControls = isTouchGameplayDevice() && baseGameplayVisible;
+    const shouldShowFullscreenButton = baseGameplayVisible;
+
+    if (shouldShowControls) {
+        showMobileControls();
+    } else {
+        hideMobileControls();
+    }
+
+    if (htmlFullscreenButton) {
+        htmlFullscreenButton.style.display = shouldShowFullscreenButton ? 'flex' : 'none';
+    }
+}
+
+// Aktualisiert das Icon des HTML-Vollbild-Buttons je nach Modus
+function updateHtmlFullscreenButton() {
+    const btn = $('html-fullscreen-button');
+    if (!btn) return;
+    btn.textContent = document.fullscreenElement ? '✕' : '⛶';
+    btn.title = document.fullscreenElement ? 'Vollbild verlassen' : 'Vollbild';
+}
+
+function bindMobileControls() {
+    const controls = $('mobile-controls');
+    if (!controls) {
+        return;
+    }
+
+    const getButtonFromEvent = (event) => event.target.closest('[data-key]');
+
+    controls.addEventListener('pointerdown', (event) => {
+        const button = getButtonFromEvent(event);
+        if (!button) {
+            return;
+        }
+
+        event.preventDefault();
+        const key = button.dataset.key;
+        if (!Object.prototype.hasOwnProperty.call(keyboard, key)) {
+            return;
+        }
+
+        keyboard[key] = true;
+        activeMobilePointers.set(event.pointerId, key);
+
+        if (button.setPointerCapture) {
+            button.setPointerCapture(event.pointerId);
+        }
+    });
+
+    const releasePointerKey = (event) => {
+        const key = activeMobilePointers.get(event.pointerId);
+        if (!key) {
+            return;
+        }
+
+        keyboard[key] = false;
+        activeMobilePointers.delete(event.pointerId);
+    };
+
+    controls.addEventListener('pointerup', releasePointerKey);
+    controls.addEventListener('pointercancel', releasePointerKey);
+
+    window.addEventListener('blur', resetKeyboardState);
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            resetKeyboardState();
+        }
+    });
 }

@@ -23,8 +23,7 @@
     <script src="js/models/coin-bar.class.js"></script>
     <script src="js/models/boss-bar.class.js"></script>
     <script src="js/models/audio-manager.class.js"></script>
-    <script src="js/models/fullscreen-button.class.js"></script>
-    <script src="js/models/restart-button.class.js"></script>
+        <script src="js/models/restart-button.class.js"></script>
     <script src="js/models/win-screen.class.js"></script>
     <script src="js/models/game-over-screen.class.js"></script>
     <script src="js/models/start-screen.class.js"></script>
@@ -59,6 +58,27 @@
         <button id="game-menu-button" class="game-menu-button is-hidden" data-action="game-menu">
             <span>⏸ MENU</span>
         </button>
+
+        <!-- HTML Vollbild-Button (Touch-Geräte) -->
+        <button id="html-fullscreen-button" class="html-fullscreen-button" aria-label="Vollbild">⛶</button>
+
+        <!-- Mobile Steuerung -->
+        <div id="mobile-controls" class="mobile-controls is-hidden">
+            <div class="dpad">
+                <button class="dpad-button" data-key="UP" aria-label="Hoch">▲</button>
+                <div class="dpad-horizontal">
+                    <button class="dpad-button dpad-left" data-key="LEFT" aria-label="Links">◀</button>
+                    <button class="dpad-button dpad-right" data-key="RIGHT" aria-label="Rechts">▶</button>
+                </div>
+                <button class="dpad-button dpad-down" data-key="DOWN" aria-label="Runter">▼</button>
+            </div>
+
+            <div class="action-buttons">
+                <button class="action-button" data-key="F" aria-label="Normale Blase">F</button>
+                <button class="action-button" data-key="D" aria-label="Giftblase">D</button>
+                <button class="action-button" data-key="SPACE" aria-label="Flossenschlag">⟡</button>
+            </div>
+        </div>
     </div>
 
     <!-- Start Screen -->
