@@ -32,10 +32,6 @@ class StartScreen {
     handleClick(x, y) {
         if (!this.isVisible) return false;
         
-        console.log('Start Screen Click:', x, y);
-        console.log('Start Button:', this.startButtonX, this.startButtonY, this.startButtonWidth, this.startButtonHeight);
-        console.log('Options Button:', this.optionsButtonX, this.optionsButtonY, this.optionsButtonWidth, this.optionsButtonHeight);
-        
         // Start Button klicken
         if (x >= this.startButtonX && x <= this.startButtonX + this.startButtonWidth &&
             y >= this.startButtonY && y <= this.startButtonY + this.startButtonHeight) {
@@ -49,7 +45,6 @@ class StartScreen {
         // Options Button klicken
         if (x >= this.optionsButtonX && x <= this.optionsButtonX + this.optionsButtonWidth &&
             y >= this.optionsButtonY && y <= this.optionsButtonY + this.optionsButtonHeight) {
-            console.log('Options button clicked!');
             if (window.optionsScreen) {
                 window.optionsScreen.show();
             }

@@ -95,7 +95,9 @@ class RestartButton {
             return false;
         }
         if (this.isButtonHovered(x, y)) {
-            location.reload();
+            if (typeof window.restartGame === 'function') {
+                window.restartGame();
+            }
             return true;
         }
         return false;

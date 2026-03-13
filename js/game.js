@@ -1,6 +1,15 @@
 let canvas;
 let world;
 let character = new MovableObject();
+const nativeSetInterval = window.setInterval.bind(window);
+const nativeClearInterval = window.clearInterval.bind(window);
+const nativeSetTimeout = window.setTimeout.bind(window);
+const nativeClearTimeout = window.clearTimeout.bind(window);
+const nativeRequestAnimationFrame = window.requestAnimationFrame.bind(window);
+const nativeCancelAnimationFrame = window.cancelAnimationFrame.bind(window);
+const trackedIntervals = new Set();
+const trackedTimeouts = new Set();
+const trackedAnimationFrames = new Set();
 let keyboard = {
     LEFT: false,
     RIGHT: false,
@@ -35,10 +44,12 @@ window.keyboard = keyboard;
 window.mousePos = { x: 0, y: 0 };
 
 const savedLanguage = localStorage.getItem('sharkieLanguage') || 'de';
+const savedMuted = localStorage.getItem('sharkieMuted') === 'true';
 window.gameSettings = {
     musicVolume: 0.3,
     sfxVolume: 0.5,
-    language: savedLanguage
+    language: savedLanguage,
+    muted: savedMuted
 };
 
 const TRANSLATIONS = {
@@ -63,6 +74,8 @@ const TRANSLATIONS = {
         help_tip: 'Sammle Münzen • Weiche Feinden aus • Besiege den Boss!',
         audio_music: 'Hintergrundmusik',
         audio_sfx: 'Sound-Effekte',
+        audio_mute: '🔇 STUMM SCHALTEN',
+        audio_unmute: '🔊 TON AKTIVIEREN',
         back: 'Zurück'
     },
     en: {
@@ -86,6 +99,8 @@ const TRANSLATIONS = {
         help_tip: 'Collect coins • Dodge enemies • Defeat the boss!',
         audio_music: 'Background music',
         audio_sfx: 'Sound effects',
+        audio_mute: '🔇 MUTE ALL',
+        audio_unmute: '🔊 UNMUTE',
         back: 'Back'
     }
 };
@@ -94,8 +109,94 @@ const TRANSLATIONS = {
 const ORIGINAL_WIDTH = 800;
 const ORIGINAL_HEIGHT = 540;
 
+window.setInterval = (handler, timeout, ...args) => {
+    const intervalId = nativeSetInterval(handler, timeout, ...args);
+    trackedIntervals.add(intervalId);
+    return intervalId;
+};
+
+window.clearInterval = (intervalId) => {
+    trackedIntervals.delete(intervalId);
+    nativeClearInterval(intervalId);
+};
+
+window.setTimeout = (handler, timeout, ...args) => {
+    const timeoutId = nativeSetTimeout(() => {
+        trackedTimeouts.delete(timeoutId);
+        if (typeof handler === 'function') {
+            handler(...args);
+            return;
+        }
+        Function(handler)();
+    }, timeout);
+    trackedTimeouts.add(timeoutId);
+    return timeoutId;
+};
+
+window.clearTimeout = (timeoutId) => {
+    trackedTimeouts.delete(timeoutId);
+    nativeClearTimeout(timeoutId);
+};
+
+window.requestAnimationFrame = (callback) => {
+    const frameId = nativeRequestAnimationFrame((timestamp) => {
+        trackedAnimationFrames.delete(frameId);
+        callback(timestamp);
+    });
+    trackedAnimationFrames.add(frameId);
+    return frameId;
+};
+
+window.cancelAnimationFrame = (frameId) => {
+    trackedAnimationFrames.delete(frameId);
+    nativeCancelAnimationFrame(frameId);
+};
+
 function getLanguageStrings(lang) {
     return TRANSLATIONS[lang] || TRANSLATIONS.de;
+}
+
+function clearTrackedGameLoops() {
+    trackedIntervals.forEach((intervalId) => nativeClearInterval(intervalId));
+    trackedIntervals.clear();
+
+    trackedTimeouts.forEach((timeoutId) => nativeClearTimeout(timeoutId));
+    trackedTimeouts.clear();
+
+    trackedAnimationFrames.forEach((frameId) => nativeCancelAnimationFrame(frameId));
+    trackedAnimationFrames.clear();
+}
+
+function resetCanvasState() {
+    if (!canvas) {
+        canvas = $('canvas');
+    }
+    if (!canvas) {
+        return;
+    }
+
+    canvas.width = ORIGINAL_WIDTH;
+    canvas.height = ORIGINAL_HEIGHT;
+
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+}
+
+function teardownCurrentGame() {
+    if (world && typeof world.pauseGame === 'function') {
+        world.pauseGame();
+    }
+
+    clearTrackedGameLoops();
+    resetKeyboardState();
+    resetCanvasState();
+
+    world = null;
+    window.world = null;
+    isGamePaused = false;
 }
 
 function setActiveLanguageButton(lang) {
@@ -141,14 +242,10 @@ function updateCanvasResolution(isFullscreen) {
         
         // Context skalieren, damit Spiel-Koordinaten gleich bleiben
         ctx.scale(multiplier, multiplier);
-        
-        console.log(`Canvas-Auflösung erhöht: ${canvas.width}x${canvas.height} (${multiplier}x)`);
     } else {
         // Zurück zur Original-Auflösung
         canvas.width = ORIGINAL_WIDTH;
         canvas.height = ORIGINAL_HEIGHT;
-        
-        console.log(`Canvas-Auflösung zurückgesetzt: ${canvas.width}x${canvas.height}`);
     }
     
     // Glatte Darstellung
@@ -185,17 +282,22 @@ function showStartScreen() {
     
     bindUI();
     applyLanguage(window.gameSettings.language || 'de');
+    updateMuteButtonLabel();
     updateOrientationLock();
 
     // startGame global verfügbar machen
     window.startGame = init;
+    window.restartGame = restartGame;
 }
 
 function init() {
+    teardownCurrentGame();
+
     if (!canvas) {
         canvas = $("canvas");
     }
     world = new World(canvas);
+    window.world = world;
     
     // Wende gespeicherte Audio-Einstellungen an
     if (window.gameSettings) {
@@ -205,6 +307,9 @@ function init() {
         if (window.gameSettings.sfxVolume !== undefined && world.audioManager) {
             world.audioManager.setSFXVolume(window.gameSettings.sfxVolume);
         }
+        if (world.audioManager) {
+            world.audioManager.setMuted(!!window.gameSettings.muted);
+        }
     }
     
     // Restart-Button initialisieren
@@ -212,7 +317,6 @@ function init() {
         world.restartButton.setCanvasContext(canvas.getContext('2d'));
     }
     
-    console.log('My Charakter is', world.character);
 }
 
 document.addEventListener('keydown', (e) => {
@@ -267,505 +371,8 @@ document.addEventListener('touchstart', (e) => {
 document.addEventListener('fullscreenchange', () => {
     const isFullscreen = !!document.fullscreenElement;
     updateCanvasResolution(isFullscreen);
-    console.log('Fullscreen changed:', isFullscreen);
 });
 
 
-function startGameFromHTML() {
-    if (isPortraitPhoneLayout()) {
-        updateOrientationLock();
-        return;
-    }
-
-    // Startbildschirm ausblenden
-    hideEl('start-screen');
-    // Canvas anzeigen
-    $('canvas').classList.remove('hidden');
-    // Menübutton anzeigen
-    showEl('game-menu-button');
-    // Spiel starten
-    init();
-    updateMobileControlsVisibility();
-}
-
-function showOptionsScreen() {
-    // Ingame-Menübutton ausblenden, solange Optionen geöffnet sind
-    hideEl('game-menu-button');
-    // Startbildschirm ausblenden
-    hideEl('start-screen');
-    // Optionen-Bildschirm anzeigen
-    showEl('options-screen');
-    // Hauptmenü anzeigen
-    showOptionsSubmenu('menu');
-    // Untere Buttons je nach Spielstatus umschalten
-    updateBackButtons();
-    hideMobileControls();
-}
-
-function updateBackButtons() {
-    const backToStartButton = $('back-to-start-button');
-    const returnToTitleButton = $('return-to-title-button');
-
-    if (isGamePaused) {
-        hideEl('back-to-start-button');
-        showEl('return-to-title-button');
-        if (backToStartButton) {
-            backToStartButton.dataset.i18n = 'to_title';
-            backToStartButton.textContent = getLanguageStrings(window.gameSettings.language || 'de').to_title;
-        }
-        if (returnToTitleButton) {
-            returnToTitleButton.textContent = getLanguageStrings(window.gameSettings.language || 'de').to_title;
-        }
-        if (isResponsiveLayout()) {
-            hideEl('back-to-game-button');
-        } else {
-            showEl('back-to-game-button');
-        }
-    } else {
-        // "Zurück zum Start" aus dem Hauptmenü anzeigen
-        showEl('back-to-start-button');
-        hideEl('return-to-title-button');
-        if (backToStartButton) {
-            backToStartButton.dataset.i18n = 'back_start';
-            backToStartButton.textContent = getLanguageStrings(window.gameSettings.language || 'de').back_start;
-        }
-        hideEl('back-to-game-button');
-    }
-
-    updateBackIconVisibility();
-}
-
-function showOptionsSubmenu(submenu) {
-    // Alle Untermenüs ausblenden
-    hideEl('options-menu');
-    hideEl('options-language');
-    hideEl('options-help');
-    hideEl('options-audio');
-    hideEl('options-impressum');
-    
-    // Gewähltes Untermenü einblenden
-    if (submenu === 'menu') {
-        showEl('options-menu');
-    } else if (submenu === 'language') {
-        showEl('options-language');
-    } else if (submenu === 'help') {
-        showEl('options-help');
-    } else if (submenu === 'audio') {
-        showEl('options-audio');
-    } else if (submenu === 'impressum') {
-        showEl('options-impressum');
-    }
-
-    updateBackIconVisibility();
-}
-
-function backToOptionsMenu() {
-    showOptionsSubmenu('menu');
-}
-
-function hideOptionsScreen() {
-    hideEl('options-screen');
-    $('canvas').classList.add('hidden');
-    hideEl('game-menu-button');
-    hideMobileControls();
-    $('options-screen').querySelector('.back-icon-button')?.classList.remove('is-visible');
-    showEl('start-screen');
-    isGamePaused = false;
-}
-
-function returnToTitle() {
-    if (document.fullscreenElement) {
-        document.exitFullscreen().catch(() => {});
-    }
-
-    // Vollstaendiger Reset verhindert doppelte World-Intervalle aus alten Spielstaenden.
-    window.location.reload();
-}
-
-function backToGame() {
-    // Optionen-Bildschirm ausblenden
-    hideEl('options-screen');
-    $('options-screen').querySelector('.back-icon-button')?.classList.remove('is-visible');
-    // Canvas und Menübutton wieder anzeigen
-    $('canvas').classList.remove('hidden');
-    showEl('game-menu-button');
-    updateMobileControlsVisibility();
-    // Spiel fortsetzen
-    if (world && typeof world.resumeGame === 'function') {
-        world.resumeGame();
-    }
-    isGamePaused = false;
-}
-
-function pauseAndReturnToMenu() {
-    // Markieren, dass das Spiel pausiert ist
-    isGamePaused = true;
-    // Spiel-Loop/Audio pausieren und Eingaben zurücksetzen
-    if (world) {
-        if (typeof world.pauseGame === 'function') {
-            world.pauseGame();
-        }
-    }
-    resetKeyboardState();
-    hideMobileControls();
-
-    // Optionen-Panel öffnen (wie bei Klick auf „Optionen“)
-    showOptionsScreen();
-}
-
-function bindUI() {
-    if (uiBound) return;
-    uiBound = true;
-
-    // Reagiert auf Größen- und Ausrichtungsänderungen des Geräts
-    window.addEventListener('resize', updateOrientationLock);
-    window.addEventListener('orientationchange', updateOrientationLock);
-    window.addEventListener('resize', updateBackIconVisibility);
-    window.addEventListener('orientationchange', updateBackIconVisibility);
-    window.addEventListener('resize', updateMobileControlsVisibility);
-    window.addEventListener('orientationchange', updateMobileControlsVisibility);
-    document.addEventListener('fullscreenchange', updateMobileControlsVisibility);
-    document.addEventListener('fullscreenchange', updateHtmlFullscreenButton);
-
-    // HTML-Vollbild-Button für Touch-Geräte
-    const htmlFsBtn = $('html-fullscreen-button');
-    if (htmlFsBtn) {
-        // Verhindert, dass Spieltasten den fokussierten Vollbild-Button erneut ausloesen.
-        htmlFsBtn.addEventListener('keydown', (e) => {
-            const isSpace = e.code === 'Space' || e.key === ' ';
-            const isEnter = e.key === 'Enter';
-            if (!isSpace && !isEnter) return;
-
-            e.preventDefault();
-            e.stopPropagation();
-            htmlFsBtn.blur();
-        });
-
-        htmlFsBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            htmlFsBtn.blur();
-
-            const container = document.body || $('canvas')?.closest('.game-panel');
-            if (!container) return;
-            if (!document.fullscreenElement) {
-                container.requestFullscreen();
-            } else {
-                document.exitFullscreen();
-            }
-        });
-    }
-
-    // Zentrale Klicksteuerung für alle Elemente mit data-action
-    document.addEventListener('click', (event) => {
-        const button = event.target.closest('[data-action]');
-        if (!button) return;
-
-        const action = button.dataset.action;
-        if (action === 'start-game') {
-            startGameFromHTML();
-        } else if (action === 'open-options') {
-            showOptionsScreen();
-        } else if (action === 'open-submenu') {
-            showOptionsSubmenu(button.dataset.target);
-        } else if (action === 'back-options') {
-            const isInMainOptionsMenu = !$('options-menu').classList.contains('is-hidden');
-            if (!isInMainOptionsMenu) {
-                backToOptionsMenu();
-            } else if (isGamePaused) {
-                backToGame();
-            } else {
-                hideOptionsScreen();
-            }
-        } else if (action === 'back-start') {
-            if (isGamePaused) {
-                returnToTitle();
-            } else {
-                hideOptionsScreen();
-            }
-        } else if (action === 'back-game') {
-            backToGame();
-        } else if (action === 'game-menu') {
-            pauseAndReturnToMenu();
-        } else if (action === 'set-language') {
-            changeLanguage(button.dataset.lang, button);
-        }
-    });
-
-    const musicSlider = $('music-slider');
-    if (musicSlider) {
-        musicSlider.addEventListener('input', (event) => updateMusicVolume(event.target.value));
-    }
-
-    const sfxSlider = $('sfx-slider');
-    if (sfxSlider) {
-        sfxSlider.addEventListener('input', (event) => updateSFXVolume(event.target.value));
-    }
-
-    bindMobileControls();
-}
-
-function changeLanguage(lang, button) {
-    if (!TRANSLATIONS[lang]) {
-        lang = 'de';
-    }
-
-    if (button) {
-        setActiveLanguageButton(lang);
-    }
-
-    console.log('Language changed to:', lang);
-
-    window.gameSettings = window.gameSettings || {};
-    window.gameSettings.language = lang;
-
-    localStorage.setItem('sharkieLanguage', lang);
-    applyLanguage(lang);
-}
-
-function updateMusicVolume(value) {
-    $('music-value').textContent = value + '%';
-    const volume = value / 100;
-    
-    // Global speichern
-    window.gameSettings = window.gameSettings || {};
-    window.gameSettings.musicVolume = volume;
-    
-    // Direkt anwenden, falls das Spiel bereits läuft
-    if (world && world.audioManager) {
-        world.audioManager.setMusicVolume(volume);
-    }
-}
-
-function updateSFXVolume(value) {
-    $('sfx-value').textContent = value + '%';
-    const volume = value / 100;
-    
-    // Global speichern
-    window.gameSettings = window.gameSettings || {};
-    window.gameSettings.sfxVolume = volume;
-    
-    // Direkt anwenden, falls das Spiel bereits läuft
-    if (world && world.audioManager) {
-        world.audioManager.setSFXVolume(volume);
-    }
-}
-
-// Rechnet Maus- oder Touch-Koordinaten in Spielkoordinaten um
-function getCanvasPointerPosition(clientX, clientY) {
-    if (!canvas) {
-        return null;
-    }
-
-    const rect = canvas.getBoundingClientRect();
-    const canvasRatio = ORIGINAL_WIDTH / ORIGINAL_HEIGHT;
-    const rectRatio = rect.width / rect.height;
-
-    let drawWidth = rect.width;
-    let drawHeight = rect.height;
-    let offsetX = 0;
-    let offsetY = 0;
-
-    if (rectRatio > canvasRatio) {
-        drawHeight = rect.height;
-        drawWidth = rect.height * canvasRatio;
-        offsetX = (rect.width - drawWidth) / 2;
-    } else {
-        drawWidth = rect.width;
-        drawHeight = rect.width / canvasRatio;
-        offsetY = (rect.height - drawHeight) / 2;
-    }
-
-    const relativeX = clientX - rect.left - offsetX;
-    const relativeY = clientY - rect.top - offsetY;
-
-    if (relativeX < 0 || relativeY < 0 || relativeX > drawWidth || relativeY > drawHeight) {
-        return null;
-    }
-
-    const x = (relativeX / drawWidth) * ORIGINAL_WIDTH;
-    const y = (relativeY / drawHeight) * ORIGINAL_HEIGHT;
-
-    return {
-        x,
-        y
-    };
-}
-
-// Verarbeitet Klicks und Touch-Eingaben auf dem Canvas
-function handleCanvasPointer(clientX, clientY) {
-    if (!canvas) {
-        return;
-    }
-
-    const position = getCanvasPointerPosition(clientX, clientY);
-    if (!position) {
-        return;
-    }
-
-    if (world && world.restartButton) {
-        world.restartButton.handleClick(position.x, position.y);
-    }
-}
-
-// Setzt alle aktuell gedrückten Tasten zurück
-function resetKeyboardState() {
-    keyboard.LEFT = false;
-    keyboard.RIGHT = false;
-    keyboard.UP = false;
-    keyboard.DOWN = false;
-    keyboard.D = false;
-    keyboard.F = false;
-    keyboard.SPACE = false;
-
-    activeMobilePointers.clear();
-}
-
-// Prüft, ob ein Smartphone im Hochformat verwendet wird
-function isPortraitPhoneLayout() {
-    return window.matchMedia('(max-width: 768px) and (orientation: portrait) and (hover: none) and (pointer: coarse)').matches;
-}
-
-// Sperrt das Spiel im Smartphone-Hochformat und pausiert es bei Bedarf
-function updateOrientationLock() {
-    const isLocked = isPortraitPhoneLayout();
-    document.body.classList.toggle('portrait-lock', isLocked);
-
-    if (!canvas) {
-        canvas = $('canvas');
-    }
-
-    if (isLocked) {
-        if (world && !isGamePaused && !canvas.classList.contains('hidden')) {
-            if (typeof world.pauseGame === 'function') {
-                world.pauseGame();
-            }
-            wasPausedByOrientation = true;
-        }
-        resetKeyboardState();
-        hideMobileControls();
-        return;
-    }
-
-    if (
-        wasPausedByOrientation &&
-        world &&
-        !isGamePaused &&
-        $('options-screen').classList.contains('is-hidden') &&
-        canvas &&
-        !canvas.classList.contains('hidden') &&
-        typeof world.resumeGame === 'function'
-    ) {
-        world.resumeGame();
-    }
-
-    wasPausedByOrientation = false;
-    updateMobileControlsVisibility();
-}
-
-// Prüft, ob gerade ein responsiver Breakpoint aktiv ist
-function isResponsiveLayout() {
-    return window.matchMedia('(max-width: 1024px)').matches;
-}
-
-// Blendet das Zurück-Symbol abhängig vom aktuellen Menüstatus ein oder aus
-function updateBackIconVisibility() {
-    const optionsScreen = $('options-screen');
-    const backIconButton = optionsScreen?.querySelector('.back-icon-button');
-    if (!optionsScreen || !backIconButton) {
-        return;
-    }
-
-    if (optionsScreen.classList.contains('is-hidden')) {
-        backIconButton.classList.remove('is-visible');
-        return;
-    }
-
-    // Haelt das Zurueck-Symbol oben rechts in allen Optionsansichten verfuegbar.
-    backIconButton.classList.add('is-visible');
-}
-
-function isTouchGameplayDevice() {
-    return navigator.maxTouchPoints > 0 || window.matchMedia('(hover: none) and (pointer: coarse)').matches;
-}
-
-function updateMobileControlsVisibility() {
-    const controls = $('mobile-controls');
-    const htmlFullscreenButton = $('html-fullscreen-button');
-    if (!controls || !canvas) {
-        return;
-    }
-    const isGameVisible = !canvas.classList.contains('hidden');
-    const isStartHidden = $('start-screen').classList.contains('is-hidden');
-    const isOptionsHidden = $('options-screen').classList.contains('is-hidden');
-    const baseGameplayVisible = !isPortraitPhoneLayout() && isGameVisible && isStartHidden && isOptionsHidden;
-    const shouldShowControls = isTouchGameplayDevice() && baseGameplayVisible;
-    const shouldShowFullscreenButton = baseGameplayVisible;
-
-    if (shouldShowControls) {
-        showMobileControls();
-    } else {
-        hideMobileControls();
-    }
-
-    if (htmlFullscreenButton) {
-        htmlFullscreenButton.style.display = shouldShowFullscreenButton ? 'flex' : 'none';
-    }
-}
-
-// Aktualisiert das Icon des HTML-Vollbild-Buttons je nach Modus
-function updateHtmlFullscreenButton() {
-    const btn = $('html-fullscreen-button');
-    if (!btn) return;
-    btn.textContent = document.fullscreenElement ? '✕' : '⛶';
-    btn.title = document.fullscreenElement ? 'Vollbild verlassen' : 'Vollbild';
-}
-
-function bindMobileControls() {
-    const controls = $('mobile-controls');
-    if (!controls) {
-        return;
-    }
-
-    const getButtonFromEvent = (event) => event.target.closest('[data-key]');
-
-    controls.addEventListener('pointerdown', (event) => {
-        const button = getButtonFromEvent(event);
-        if (!button) {
-            return;
-        }
-
-        event.preventDefault();
-        const key = button.dataset.key;
-        if (!Object.prototype.hasOwnProperty.call(keyboard, key)) {
-            return;
-        }
-
-        keyboard[key] = true;
-        activeMobilePointers.set(event.pointerId, key);
-
-        if (button.setPointerCapture) {
-            button.setPointerCapture(event.pointerId);
-        }
-    });
-
-    const releasePointerKey = (event) => {
-        const key = activeMobilePointers.get(event.pointerId);
-        if (!key) {
-            return;
-        }
-
-        keyboard[key] = false;
-        activeMobilePointers.delete(event.pointerId);
-    };
-
-    controls.addEventListener('pointerup', releasePointerKey);
-    controls.addEventListener('pointercancel', releasePointerKey);
-
-    window.addEventListener('blur', resetKeyboardState);
-    document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-            resetKeyboardState();
-        }
-    });
-}
+// UI- und Input-Funktionen wurden aus Übersichtsgründen ausgelagert:
+// `js/game-ui.js` und `js/game-controls.js`.

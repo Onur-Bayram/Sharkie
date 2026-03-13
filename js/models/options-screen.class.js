@@ -123,7 +123,6 @@ class OptionsScreen {
             // Sprach-Button anklicken
             if (x >= this.languageButtonX && x <= this.languageButtonX + this.languageButtonWidth &&
                 y >= this.languageButtonY && y <= this.languageButtonY + this.languageButtonHeight) {
-                console.log('Sprachen Button geklickt');
                 this.currentMode = 'language';
                 return true;
             }
@@ -131,7 +130,6 @@ class OptionsScreen {
             // Hilfe-Button anklicken
             if (x >= this.helpButtonX && x <= this.helpButtonX + this.helpButtonWidth &&
                 y >= this.helpButtonY && y <= this.helpButtonY + this.helpButtonHeight) {
-                console.log('Hilfe Button geklickt');
                 this.currentMode = 'help';
                 return true;
             }
@@ -139,7 +137,6 @@ class OptionsScreen {
             // Audio-Button anklicken
             if (x >= this.audioButtonX && x <= this.audioButtonX + this.audioButtonWidth &&
                 y >= this.audioButtonY && y <= this.audioButtonY + this.audioButtonHeight) {
-                console.log('Audio Button geklickt');
                 this.currentMode = 'audio';
                 return true;
             }
@@ -147,7 +144,6 @@ class OptionsScreen {
             // Impressum-Button anklicken
             if (x >= this.impressumButtonX && x <= this.impressumButtonX + this.impressumButtonWidth &&
                 y >= this.impressumButtonY && y <= this.impressumButtonY + this.impressumButtonHeight) {
-                console.log('Impressum Button geklickt');
                 this.currentMode = 'impressum';
                 return true;
             }
