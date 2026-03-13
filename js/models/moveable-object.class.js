@@ -8,17 +8,25 @@ imageCache = {};
 currentImage = 0;
 speed = 0.15;
 
+static sharedImageCache = {};
+
+getSharedImage(path) {
+    if (!MovableObject.sharedImageCache[path]) {
+        const img = new Image();
+        img.src = encodeURI(path);
+        MovableObject.sharedImageCache[path] = img;
+    }
+    return MovableObject.sharedImageCache[path];
+}
+
 
 loadImage(path) {
-    this.img = new Image();
-    this.img.src = encodeURI(path);
+    this.img = this.getSharedImage(path);
 }
 
 loadImages(arr) {
     arr.forEach(path => {
-        let img = new Image();
-        img.src = encodeURI(path);
-        this.imageCache[path] = img;
+        this.imageCache[path] = this.getSharedImage(path);
     });
 }
 

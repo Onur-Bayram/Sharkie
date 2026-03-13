@@ -235,7 +235,7 @@ function updateCanvasResolution(isFullscreen) {
     if (isFullscreen) {
         // Hochauflösendes Canvas für Vollbild (2x oder 3x)
         const scale = window.devicePixelRatio || 2;
-        const multiplier = Math.min(scale, 3); // Max 3x für Performance
+        const multiplier = Math.min(scale, 2); // Max 2x für stabilere Performance
         
         canvas.width = ORIGINAL_WIDTH * multiplier;
         canvas.height = ORIGINAL_HEIGHT * multiplier;
