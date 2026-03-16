@@ -1,6 +1,11 @@
 Object.assign(World.prototype, {
+/**
+ * Führt alle Kollisionsprüfungen des aktuellen Frames aus und aktualisiert
+ * dabei Boss-, Sammel- und Kampflogik.
+ *
+ * @returns {void}
+ */
 checkCollisions() {
-    // Boss Sichtbarkeit
     if (this.finalBoss) {
         const hadStartedIntro = this.finalBoss.hasStartedIntro;
         this.finalBoss.checkVisibility(this.cameraX, this.GAME_WIDTH);
@@ -9,8 +14,6 @@ checkCollisions() {
             this.audioManager.playBossIntroSound();
             this.bossIntroSoundPlayed = true;
         }
-
-        // Aktualisiere BossBar wenn Boss sichtbar wird
         if (this.finalBoss.isActive) {
             this.bossBar.setPercentage(this.finalBoss.hp, this.finalBoss.maxHp);
         }
@@ -36,7 +39,6 @@ checkCollisions() {
             }
         }
     });
-    // Boss Kollision
     if (this.finalBoss && !this.finalBoss.isDead && !this.character.isDead && this.isCollidingBoss(this.character, this.finalBoss)) {
         const currentTime = Date.now();
         if (!this.character.isHurt || (currentTime - this.character.lastHitTime > 600)) {
@@ -44,13 +46,10 @@ checkCollisions() {
             this.statusBar.setPercentage(this.character.energy);
         }
     }
-
-    // Überprüfe ob Boss besiegt wurde
     if (this.finalBoss && this.finalBoss.isDead && this.finalBoss.deadAnimationFinished && !this.character.isDead) {
         if (this.winScreen) this.winScreen.show(this.audioManager);
         if (this.restartButton) this.restartButton.show();
     }
-    // animierte Giftflaschen in Sichtweite sind
     this.animatedPoisonBottles.forEach((bottle) => {
         bottle.checkVisibility(this.character.x);
     });
@@ -60,23 +59,23 @@ checkCollisions() {
     this.checkFinSlapCollisions();
 },
 
+/**
+ * Verarbeitet das Einsammeln von Giftflaschen und Münzen.
+ *
+ * @returns {void}
+ */
 checkPoisonCollection() {
-    // Statische Bodenflaschen
     for (let i = this.poisonBottles.length - 1; i >= 0; i--) {
         const bottle = this.poisonBottles[i];
-        if (!bottle.collected && this.character.isColliding(bottle)) {
-            bottle.collected = true;
-            this.character.poison = Math.min(this.character.poison + 30, 100);
+        if (!bottle.collected && this.character.isCollidingCollect(bottle)) {
             this.poisonBar.setPercentage(this.character.poison);
             this.audioManager.playPotionSound();
             this.poisonBottles.splice(i, 1);
         }
     }
-
-    // Animierte fallende Flaschen
     for (let i = this.animatedPoisonBottles.length - 1; i >= 0; i--) {
         const bottle = this.animatedPoisonBottles[i];
-        if (!bottle.collected && this.character.isColliding(bottle)) {
+        if (!bottle.collected && this.character.isCollidingCollect(bottle)) {
             bottle.collected = true;
             this.character.poison = Math.min(this.character.poison + 50, 100);
             this.poisonBar.setPercentage(this.character.poison);
@@ -84,11 +83,9 @@ checkPoisonCollection() {
             this.animatedPoisonBottles.splice(i, 1);
         }
     }
-
-    // Coins sammeln
     for (let i = this.coins.length - 1; i >= 0; i--) {
         const coin = this.coins[i];
-        if (!coin.collected && this.character.isColliding(coin)) {
+        if (!coin.collected && this.character.isCollidingCollect(coin)) {
             coin.collected = true;
             this.collectedCoins++;
             this.coinBar.setPercentage(this.collectedCoins, this.totalCoins);
@@ -98,6 +95,11 @@ checkPoisonCollection() {
     }
 },
 
+/**
+ * Entfernt Gegner und Quallen, deren Todesanimation bereits abgeschlossen ist.
+ *
+ * @returns {void}
+ */
 cleanupDeadEnemies() {
     for (let i = this.enemies.length - 1; i >= 0; i--) {
         const enemy = this.enemies[i];
@@ -113,17 +115,18 @@ cleanupDeadEnemies() {
     }
 },
 
+/**
+ * Prüft Kollisionen zwischen Blasen und möglichen Zielen.
+ *
+ * @returns {void}
+ */
 checkBubbleCollisions() {
-    // Blase Animationen (sowohl F als auch D)
     for (let i = this.bubbleAnimations.length - 1; i >= 0; i--) {
         const bubble = this.bubbleAnimations[i];
         let bubbleHit = false;
 
         if (bubble.isPoison) {
-            // GRÜNE Blase (D) - macht Schaden auf ALLE Gegner
             const damage = 100;
-
-            // Kollision mit Feinden (Pufferfish)
             for (let j = this.enemies.length - 1; j >= 0; j--) {
                 const enemy = this.enemies[j];
                 if (enemy.isDead) {
@@ -142,8 +145,6 @@ checkBubbleCollisions() {
                     break;
                 }
             }
-
-            // Kollision mit Quallen
             if (!bubbleHit) {
                 for (let j = this.jellyfishes.length - 1; j >= 0; j--) {
                     const jellyfish = this.jellyfishes[j];
@@ -164,18 +165,13 @@ checkBubbleCollisions() {
                     }
                 }
             }
-
-            //  Kollision mit Boss
             if (!bubbleHit && this.finalBoss && !this.finalBoss.isDead && this.isCollidingBubble(bubble, this.finalBoss)) {
                 this.finalBoss.hit(damage);
                 this.bossBar.setPercentage(this.finalBoss.hp, this.finalBoss.maxHp);
                 bubbleHit = true;
             }
         } else {
-            // WEISSE Blase (F)  macht Schaden NUR auf Quallen (Jellyfishes)
             const damage = 50;
-
-            //  Kollision NUR mit Quallen
             for (let j = this.jellyfishes.length - 1; j >= 0; j--) {
                 const jellyfish = this.jellyfishes[j];
                 if (jellyfish.isDead) {
@@ -195,21 +191,21 @@ checkBubbleCollisions() {
                 }
             }
         }
-
-        // Entferne Bubble wenn sie etwas getroffen hat oder außerhalb des Bildschirms ist
         if (bubbleHit || bubble.x < -100 || bubble.x > this.mapWidth + 100) {
             this.bubbleAnimations.splice(i, 1);
         }
     }
 },
 
+/**
+ * Prüft Kollisionen zwischen Fin-Slap-Angriffen und möglichen Zielen.
+ *
+ * @returns {void}
+ */
 checkFinSlapCollisions() {
-    // Fin Slap treffen ALLE Gegner
     for (let i = this.finSlaps.length - 1; i >= 0; i--) {
         const finSlap = this.finSlaps[i];
         let finSlapHit = false;
-
-        //  Kollision mit Pufferfish
         for (let j = this.enemies.length - 1; j >= 0; j--) {
             const enemy = this.enemies[j];
             if (enemy.isDead) {
@@ -228,8 +224,6 @@ checkFinSlapCollisions() {
                 break;
             }
         }
-
-        // Kollision mit Quallen
         if (!finSlapHit) {
             for (let j = this.jellyfishes.length - 1; j >= 0; j--) {
                 const jellyfish = this.jellyfishes[j];
@@ -250,21 +244,24 @@ checkFinSlapCollisions() {
                 }
             }
         }
-
-        // Kollision mit Boss
         if (!finSlapHit && this.finalBoss && !this.finalBoss.isDead && this.isCollidingFinSlap(finSlap, this.finalBoss)) {
             this.finalBoss.hit(finSlap.damage);
             this.bossBar.setPercentage(this.finalBoss.hp, this.finalBoss.maxHp);
             finSlapHit = true;
         }
-
-        // Entferne Fin Slap wenn die Animation vorbei ist
         if (!finSlap.isAlive()) {
             this.finSlaps.splice(i, 1);
         }
     }
 },
 
+/**
+ * Prüft die Kollision zwischen einem Fin-Slap und einem Objekt mit Hitbox-Abstand.
+ *
+ * @param {MovableObject} finSlap Fin-Slap-Angriff.
+ * @param {MovableObject} obj Zielobjekt.
+ * @returns {boolean}
+ */
 isCollidingFinSlap(finSlap, obj) {
     const offset = 20;
     return finSlap.x + offset < obj.x + obj.width - offset &&
@@ -273,6 +270,13 @@ isCollidingFinSlap(finSlap, obj) {
            finSlap.y + finSlap.height - offset > obj.y + offset;
 },
 
+/**
+ * Prüft die Kollision zwischen einer Blase und einem Objekt mit Hitbox-Abstand.
+ *
+ * @param {MovableObject} bubble Blasenprojektil.
+ * @param {MovableObject} obj Zielobjekt.
+ * @returns {boolean}
+ */
 isCollidingBubble(bubble, obj) {
     const offset = 10;
     return bubble.x + offset < obj.x + obj.width - offset &&

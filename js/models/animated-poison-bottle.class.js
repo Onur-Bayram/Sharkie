@@ -1,3 +1,7 @@
+/**
+ * Animierte (fallende) Giftflasche – wird erst sichtbar wenn der Charakter in der Nähe ist,
+ * dann fällt sie langsam nach unten und kann eingesammelt werden.
+ */
 class AnimatedPoisonBottle extends MovableObject {
     
     IMAGES_ANIMATED = [
@@ -17,6 +21,11 @@ class AnimatedPoisonBottle extends MovableObject {
     isVisible = false;
     visibilityRange = 300; 
 
+    /**
+     * Erstellt eine animierte Giftflasche mit optionalem Start-Y-Wert.
+     * @param {number} x X-Position.
+     * @param {number} [startY=-100] Y-Startposition (standard außerhalb des Sichtfeldes).
+     */
     constructor(x, startY = -100) {
         super();
         
@@ -31,6 +40,10 @@ class AnimatedPoisonBottle extends MovableObject {
         this.fall();
     }
 
+    /**
+     * Startet die Animations-Schleife für die Dreh-Animation der Flasche.
+     * @returns {void}
+     */
     animate() {
         setInterval(() => {
             let path = this.IMAGES_ANIMATED[this.currentImage % this.IMAGES_ANIMATED.length];
@@ -39,17 +52,24 @@ class AnimatedPoisonBottle extends MovableObject {
         }, 100);
     }
 
+    /**
+     * Startet die Fall-Schleife – bewegt die Flasche nach unten wenn sichtbar und nicht eingesammelt.
+     * @returns {void}
+     */
     fall() {
         setInterval(() => {
-            // nur fallen lassen, wenn sichtbar, unter maxY und nicht gesammelt
             if (this.isVisible && this.y < this.maxY && !this.collected) {
                 this.y += this.fallSpeed;
             }
         }, 1000 / 60);
     }
 
+    /**
+     * Aktiviert die Sichtbarkeit wenn der Charakter sich innerhalb der Sichtweite befindet.
+     * @param {number} characterX X-Position des Charakters.
+     * @returns {void}
+     */
     checkVisibility(characterX) {
-        // sichtbarkeit der pflasche basierend auf der position des characters
         this.isVisible = Math.abs(this.x - characterX) < this.visibilityRange;
     }
 }

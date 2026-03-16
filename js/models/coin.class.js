@@ -1,3 +1,6 @@
+/**
+ * Sammelbare Münze mit Rotations-Animation.
+ */
 class Coin extends MovableObject {
     IMAGES = [
         '4. Marcadores/1. Coins/1.png',
@@ -9,6 +12,11 @@ class Coin extends MovableObject {
     collected = false;
     currentImage = 0;
 
+    /**
+     * Erstellt eine Münze an der angegebenen Position und startet die Animation.
+     * @param {number} x X-Position.
+     * @param {number} y Y-Position.
+     */
     constructor(x, y) {
         super();
         this.x = x;
@@ -20,6 +28,10 @@ class Coin extends MovableObject {
         this.animate();
     }
 
+    /**
+     * Startet die Animations-Schleife für die Münz-Rotation (solange nicht eingesammelt).
+     * @returns {void}
+     */
     animate() {
         setInterval(() => {
             if (!this.collected) {

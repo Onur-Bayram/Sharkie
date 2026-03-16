@@ -1,5 +1,16 @@
+/**
+ * Blase als Projektil – fliegt in eine Richtung und pulsiert visuell.
+ * Kann normal (blau) oder giftig (lila) sein.
+ */
 class BubbleAnimation extends MovableObject {
     
+    /**
+     * Erstellt eine Blase und startet Bewegungs- und Puls-Animation.
+     * @param {number} x X-Startposition.
+     * @param {number} y Y-Startposition.
+     * @param {1|-1} direction Flugrichtung (1 = rechts, -1 = links).
+     * @param {boolean} [isPoison=false] Ob es sich um eine Giftblase handelt.
+     */
     constructor(x, y, direction, isPoison = false) {
         super();
         
@@ -22,15 +33,22 @@ class BubbleAnimation extends MovableObject {
         this.animate();
     }
 
+    /**
+     * Startet die Bewegungsschleife – verschiebt die Blase in Flugrichtung.
+     * @returns {void}
+     */
     throw() {
         setInterval(() => {
             this.x += this.speed * this.direction;
         }, 1000 / 60);
     }
 
+    /**
+     * Startet die Puls-Animations-Schleife (wechselt pulseScale zwischen 0.95 und 1.2).
+     * @returns {void}
+     */
     animate() {
         setInterval(() => {
-            // Pulsing Animation für die Blase
             this.pulseScale += this.pulseSpeed;
             if (this.pulseScale > 1.2 || this.pulseScale < 0.95) {
                 this.pulseSpeed *= -1;
@@ -38,6 +56,12 @@ class BubbleAnimation extends MovableObject {
         }, 50);
     }
 
+    /**
+     * Zeichnet die Blase auf den Canvas mit Pulsier-Skalierung und Kamera-Offset.
+     * @param {CanvasRenderingContext2D} ctx Zeichenkontext.
+     * @param {number} cameraX Aktueller Kamera-X-Offset.
+     * @returns {void}
+     */
     draw(ctx, cameraX) {
         if (this.img && this.img.complete && this.img.naturalHeight !== 0) {
             ctx.save();

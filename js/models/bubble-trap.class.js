@@ -1,3 +1,6 @@
+/**
+ * Blasenfallen-Projektil – spielt zunächst eine kurze Animation ab, dann fliegt es.
+ */
 class BubbleTrap extends MovableObject {
     
     IMAGES_BUBBLE = [
@@ -11,6 +14,12 @@ class BubbleTrap extends MovableObject {
         '1.Sharkie/4.Attack/Bubble trap/op1 (with bubble formation)/8.png'
     ];
 
+    /**
+     * Erstellt eine Blasenfalle und startet die Animation.
+     * @param {number} x X-Startposition.
+     * @param {number} y Y-Startposition.
+     * @param {1|-1} direction Flugrichtung (1 = rechts, -1 = links).
+     */
     constructor(x, y, direction) {
         super();
         this.loadImage(this.IMAGES_BUBBLE[0]);
@@ -26,16 +35,15 @@ class BubbleTrap extends MovableObject {
         this.animate();
     }
 
+    /**
+     * Startet die Bewegung mit kurzem Verzögerungstimer (800ms Animations-Vorlauf).
+     * @returns {void}
+     */
     throw() {
-        // Starte die Animation ab Frame 0
         this.currentImage = 0;
-        
-        // Nach 800ms (animiert ~8 Frames á 100ms) fang an zu schießen
         setTimeout(() => {
             this.isMoving = true;
         }, 800);
-
-        // Movement Loop
         this.moveInterval = setInterval(() => {
             if (this.isMoving) {
                 this.x += this.speed * this.direction;
@@ -43,6 +51,10 @@ class BubbleTrap extends MovableObject {
         }, 1000 / 60);
     }
 
+    /**
+     * Startet die Animations-Schleife für das Aufbauen der Blase.
+     * @returns {void}
+     */
     animate() {
         this.animateInterval = setInterval(() => {
             if (this.currentImage < this.IMAGES_BUBBLE.length) {
@@ -53,6 +65,10 @@ class BubbleTrap extends MovableObject {
         }, 100);
     }
 
+    /**
+     * Stoppt Bewegungs- und Animationsintervalle (z.B. nach Kollision).
+     * @returns {void}
+     */
     stopMoving() {
         clearInterval(this.moveInterval);
         clearInterval(this.animateInterval);

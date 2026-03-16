@@ -104,8 +104,6 @@ const TRANSLATIONS = {
         back: 'Back'
     }
 };
-
-// Original Canvas-Größe
 const ORIGINAL_WIDTH = 800;
 const ORIGINAL_HEIGHT = 540;
 
@@ -152,10 +150,21 @@ window.cancelAnimationFrame = (frameId) => {
     nativeCancelAnimationFrame(frameId);
 };
 
+/**
+ * Liefert die Übersetzungen für die gewünschte Sprache oder Deutsch als Fallback.
+ *
+ * @param {string} lang Sprachcode.
+ * @returns {Record<string, string>}
+ */
 function getLanguageStrings(lang) {
     return TRANSLATIONS[lang] || TRANSLATIONS.de;
 }
 
+/**
+ * Beendet alle registrierten Intervalle, Timeouts und Animation-Frames des Spiels.
+ *
+ * @returns {void}
+ */
 function clearTrackedGameLoops() {
     trackedIntervals.forEach((intervalId) => nativeClearInterval(intervalId));
     trackedIntervals.clear();
@@ -167,6 +176,11 @@ function clearTrackedGameLoops() {
     trackedAnimationFrames.clear();
 }
 
+/**
+ * Setzt Canvas-Größe, Transformation und Rendering-Zustand auf die Standardwerte zurück.
+ *
+ * @returns {void}
+ */
 function resetCanvasState() {
     if (!canvas) {
         canvas = $('canvas');
@@ -185,6 +199,11 @@ function resetCanvasState() {
     ctx.imageSmoothingQuality = 'high';
 }
 
+/**
+ * Räumt die aktuelle Spielinstanz auf und setzt globale Zustände zurück.
+ *
+ * @returns {void}
+ */
 function teardownCurrentGame() {
     if (world && typeof world.pauseGame === 'function') {
         world.pauseGame();
@@ -199,12 +218,24 @@ function teardownCurrentGame() {
     isGamePaused = false;
 }
 
+/**
+ * Markiert den aktiven Sprach-Button in der Oberfläche.
+ *
+ * @param {string} lang Sprachcode des aktiven Buttons.
+ * @returns {void}
+ */
 function setActiveLanguageButton(lang) {
     document.querySelectorAll('.lang-button').forEach((btn) => {
         btn.classList.toggle('active', btn.dataset.lang === lang);
     });
 }
 
+/**
+ * Wendet die gewählte Sprache auf Texte und Tooltips der Oberfläche an.
+ *
+ * @param {string} lang Sprachcode.
+ * @returns {void}
+ */
 function applyLanguage(lang) {
     const strings = getLanguageStrings(lang);
 
@@ -226,47 +257,42 @@ function applyLanguage(lang) {
     setActiveLanguageButton(lang);
 }
 
-// Funktion zum Anpassen der Canvas-Auflösung
+/**
+ * Passt die Canvas-Auflösung an den Vollbildmodus an.
+ *
+ * @param {boolean} isFullscreen Gibt an, ob das Spiel im Vollbild läuft.
+ * @returns {void}
+ */
 function updateCanvasResolution(isFullscreen) {
     if (!canvas) return;
     
     const ctx = canvas.getContext('2d');
     
     if (isFullscreen) {
-        // Hochauflösendes Canvas für Vollbild (2x oder 3x)
         const scale = window.devicePixelRatio || 2;
-        const multiplier = Math.min(scale, 2); // Max 2x für stabilere Performance
-        
+        const multiplier = Math.min(scale, 2);
+
         canvas.width = ORIGINAL_WIDTH * multiplier;
         canvas.height = ORIGINAL_HEIGHT * multiplier;
-        
-        // Context skalieren, damit Spiel-Koordinaten gleich bleiben
         ctx.scale(multiplier, multiplier);
     } else {
-        // Zurück zur Original-Auflösung
         canvas.width = ORIGINAL_WIDTH;
         canvas.height = ORIGINAL_HEIGHT;
     }
-    
-    // Glatte Darstellung
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
 }
 
+/**
+ * Zeigt den Startbildschirm an und synchronisiert die UI mit den gespeicherten Einstellungen.
+ *
+ * @returns {void}
+ */
 function showStartScreen() {
     canvas = $("canvas");
-    
-    // Canvas-basierte Ansichten für Start und Optionen hier nicht mehr verwenden
-    // HTML-Startbildschirm und HTML-Optionsbildschirm werden stattdessen verwendet
-    // Startbildschirm wird über die Oberfläche gesteuert
-    // Optionsbildschirm wird über die Oberfläche gesteuert
-    
-    // HTML-Startbildschirm anzeigen
     showEl('start-screen');
     hideEl('options-screen');
     hideMobileControls();
-    
-    // Audio-Slider mit gespeicherten Werten initialisieren
     const musicSlider = $('music-slider');
     const sfxSlider = $('sfx-slider');
     if (window.gameSettings) {
@@ -284,12 +310,15 @@ function showStartScreen() {
     applyLanguage(window.gameSettings.language || 'de');
     updateMuteButtonLabel();
     updateOrientationLock();
-
-    // startGame global verfügbar machen
     window.startGame = init;
     window.restartGame = restartGame;
 }
 
+/**
+ * Initialisiert eine neue Spielwelt auf dem aktuellen Canvas.
+ *
+ * @returns {void}
+ */
 function init() {
     teardownCurrentGame();
 
@@ -298,8 +327,6 @@ function init() {
     }
     world = new World(canvas);
     window.world = world;
-    
-    // Wende gespeicherte Audio-Einstellungen an
     if (window.gameSettings) {
         if (window.gameSettings.musicVolume !== undefined && world.audioManager) {
             world.audioManager.setMusicVolume(window.gameSettings.musicVolume);
@@ -311,8 +338,6 @@ function init() {
             world.audioManager.setMuted(!!window.gameSettings.muted);
         }
     }
-    
-    // Restart-Button initialisieren
     if (world.restartButton) {
         world.restartButton.setCanvasContext(canvas.getContext('2d'));
     }
@@ -354,25 +379,17 @@ document.addEventListener('mousemove', (e) => {
 });
 
 document.addEventListener('click', (e) => {
-    // Mobile-Controls nie als Canvas-Klick behandeln
     if (e.target.closest('#mobile-controls')) return;
     handleCanvasPointer(e.clientX, e.clientY);
 });
 
 document.addEventListener('touchstart', (e) => {
     if (!e.touches || e.touches.length === 0) return;
-    // Mobile-Controls nie als Canvas-Touch behandeln
     if (e.target.closest('#mobile-controls')) return;
     const touch = e.touches[0];
     handleCanvasPointer(touch.clientX, touch.clientY);
 }, { passive: true });
-
-// Reagiert auf Wechsel zwischen Vollbild- und Fenstermodus
 document.addEventListener('fullscreenchange', () => {
     const isFullscreen = !!document.fullscreenElement;
     updateCanvasResolution(isFullscreen);
 });
-
-
-// UI- und Input-Funktionen wurden aus Übersichtsgründen ausgelagert:
-// `js/game-ui.js` und `js/game-controls.js`.

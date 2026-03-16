@@ -1,3 +1,7 @@
+/**
+ * Kugelfisch-Gegner – wechselt zwischen Schwimmen, Übergang und aufgeblähtem Zustand.
+ * Kann durch Blasen oder Flossenschlag getötet werden; beim Flossenschlag wird ein Knockback ausgelöst.
+ */
 class Pufferfish extends MovableObject{
 
     IMAGES_SWIM = [];
@@ -14,6 +18,11 @@ class Pufferfish extends MovableObject{
     knockbackVY = 0;
     knockbackGravity = 0.30;
 
+    /**
+     * Erstellt einen Kugelfisch mit zufälliger Farbvariante und Position.
+     * @param {number|null} [x=null] X-Startposition (zufällig wenn null).
+     * @param {number|null} [y=null] Y-Startposition (zufällig wenn null).
+     */
     constructor(x = null, y = null){
         super();
         
@@ -68,6 +77,10 @@ class Pufferfish extends MovableObject{
         this.animate();
     }
 
+    /**
+     * Startet Animations-, Bewegungs- und Blasenzyklus-Schleifen.
+     * @returns {void}
+     */
     animate() {
         setInterval(() => {
             const images = this.getCurrentImages();
@@ -102,8 +115,6 @@ class Pufferfish extends MovableObject{
             }
 
             this.moveLeft();
-            
-            // Smooth vertikale Bewegung zu Ziel-Y
             if (Math.abs(this.y - this.targetY) > 1) {
                 if (this.y < this.targetY) {
                     this.y += this.verticalSpeed;
@@ -112,8 +123,6 @@ class Pufferfish extends MovableObject{
                 }
             }
         }, 1000 / 60);
-        
-        // Neues Ziel-Y setzen
         setInterval(() => {
             if (!this.isDead) {
                 this.targetY = 50 + Math.random() * 400;
@@ -123,6 +132,10 @@ class Pufferfish extends MovableObject{
         this.scheduleBubbleCycle();
     }
 
+    /**
+     * Plant einen regelmäßigen Blasenaufbläh-Zyklus mit zufälligem Intervall.
+     * @returns {void}
+     */
     scheduleBubbleCycle() {
         const cycleDelay = 4000 + Math.random() * 2000;
         setInterval(() => {
@@ -140,16 +153,28 @@ class Pufferfish extends MovableObject{
         }, cycleDelay);
     }
 
+    /**
+     * Startet den Übergangs-Zustand zum aufgeblähten Schwimmen.
+     * @returns {void}
+     */
     startTransitionToBubble() {
         this.state = 'transitionToBubble';
         this.currentImage = 0;
     }
 
+    /**
+     * Startet den Übergangs-Zustand zurück zum normalen Schwimmen.
+     * @returns {void}
+     */
     startTransitionToSwim() {
         this.state = 'transitionToSwim';
         this.currentImage = 0;
     }
 
+    /**
+     * Schließt den aktuellen Übergangszustand ab und wechselt zum Zielzustand.
+     * @returns {void}
+     */
     finishTransition() {
         if (this.state === 'transitionToBubble') {
             this.state = 'bubble';
@@ -159,10 +184,18 @@ class Pufferfish extends MovableObject{
         this.currentImage = 0;
     }
 
+    /**
+     * Prüft ob sich der Kugelfisch gerade in einem Übergangszustand befindet.
+     * @returns {boolean}
+     */
     isTransitionState() {
         return this.state === 'transitionToBubble' || this.state === 'transitionToSwim';
     }
 
+    /**
+     * Gibt die aktuell passende Bildsequenz je nach Zustand zurück.
+     * @returns {string[]}
+     */
     getCurrentImages() {
         if (this.isDead) {
             if (this.deadCause === 'finSlap' && this.IMAGES_DEAD_FINSLAP.length > 0) {
@@ -179,6 +212,10 @@ class Pufferfish extends MovableObject{
         return this.IMAGES_SWIM;
     }
 
+    /**
+     * Gibt die Sterbebilder für den aktuellen Farbtyp zurück (normaler Tod).
+     * @returns {string[]}
+     */
     getDeadImages() {
         if (this.colorVariant === 1) {
             return [
@@ -201,6 +238,10 @@ class Pufferfish extends MovableObject{
         ];
     }
 
+    /**
+     * Gibt die Sterbebilder für den Flossenschlag-Tod zurück.
+     * @returns {string[]}
+     */
     getDeadImagesFinSlap() {
         if (this.colorVariant === 1) {
             return [
@@ -223,6 +264,12 @@ class Pufferfish extends MovableObject{
         ];
     }
 
+    /**
+     * Leitet den Tod des Kugelfisches ein; bei Flossenschlag wird Knockback aktiviert.
+     * @param {'default'|'finSlap'} [cause='default'] Todesursache.
+     * @param {number} [direction=1] Richtung für den Knockback (1 = rechts, -1 = links).
+     * @returns {void}
+     */
     die(cause = 'default', direction = 1) {
         if (this.isDead) {
             return;
@@ -238,6 +285,10 @@ class Pufferfish extends MovableObject{
         this.deadAnimationFinished = false;
     }
 
+    /**
+     * Wendet den Knockback-Vektor an und simuliert Schwerkraft nach einem Flossenschlag.
+     * @returns {void}
+     */
     applyFinSlapKnockback() {
         this.x += this.knockbackVX;
         this.y += this.knockbackVY;

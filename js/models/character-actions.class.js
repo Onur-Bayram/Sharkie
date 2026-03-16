@@ -1,14 +1,26 @@
 Object.assign(Character.prototype, {
+    /**
+     * Prüft ob eine normale Blase geworfen werden darf (Cooldown und kein laufender Angriff).
+     * @returns {boolean}
+     */
     canThrowNormalBubble() {
         const currentTime = Date.now();
         return !this.isDead && currentTime - this.lastThrowTime > 1200 && !this.isAttacking;
     },
 
+    /**
+     * Prüft ob eine Giftblase geworfen werden darf (Cooldown, Giftvorrat ≥30 und kein laufender Angriff).
+     * @returns {boolean}
+     */
     canThrowPoisonBubble() {
         const currentTime = Date.now();
         return !this.isDead && this.poison >= 30 && (currentTime - this.lastThrowTime > 1200) && !this.isAttacking;
     },
 
+    /**
+     * Wirft eine normale Blase und startet die Angriffsanimation.
+     * @returns {BubbleAnimation|null} Erstelle Animation oder null bei Cooldown.
+     */
     throwNormalBubble() {
         if (this.canThrowNormalBubble()) {
             this.lastThrowTime = Date.now();
@@ -17,8 +29,6 @@ Object.assign(Character.prototype, {
 
             const direction = this.otherDirection ? -1 : 1;
             const offsetX = this.otherDirection ? 0 : this.width;
-
-            // Schiesse die Blase nach 800ms ab (nach der Animation).
             let bubbleAnimation = null;
             setTimeout(() => {
                 bubbleAnimation = new BubbleAnimation(this.x + offsetX, this.y + 50, direction, false);
@@ -29,8 +39,6 @@ Object.assign(Character.prototype, {
                     }
                 }
             }, 800);
-
-            // Beende die Attack-Animation nach 800ms.
             setTimeout(() => {
                 this.isAttacking = false;
                 this.currentImage = 0;
@@ -41,6 +49,10 @@ Object.assign(Character.prototype, {
         return null;
     },
 
+    /**
+     * Wirft eine Giftblase (kostet 30 Giftpunkte) und startet die Angriffsanimation.
+     * @returns {BubbleAnimation|null} Erstelle Animation oder null bei Cooldown.
+     */
     throwPoisonBubble() {
         if (this.canThrowPoisonBubble()) {
             this.lastThrowTime = Date.now();
@@ -53,8 +65,6 @@ Object.assign(Character.prototype, {
 
             const direction = this.otherDirection ? -1 : 1;
             const offsetX = this.otherDirection ? 0 : this.width;
-
-            // Schiesse die Blase nach 800ms ab (nach der Animation).
             let bubbleAnimation = null;
             setTimeout(() => {
                 bubbleAnimation = new BubbleAnimation(this.x + offsetX, this.y + 50, direction, true);
@@ -65,8 +75,6 @@ Object.assign(Character.prototype, {
                     }
                 }
             }, 800);
-
-            // Beende die Attack-Animation nach 800ms.
             setTimeout(() => {
                 this.isAttacking = false;
                 this.currentImage = 0;
@@ -77,11 +85,19 @@ Object.assign(Character.prototype, {
         return null;
     },
 
+    /**
+     * Prüft ob ein Flossenschlag ausgeführt werden darf.
+     * @returns {boolean}
+     */
     canThrowFinSlap() {
         const currentTime = Date.now();
         return !this.isDead && currentTime - this.lastThrowTime > 1200 && !this.isAttacking && !this.isFinSlapping;
     },
 
+    /**
+     * Führt einen Flossenschlag aus und erstellt das FinSlap-Projektil.
+     * @returns {FinSlap|null} Das erstellte Projektil oder null bei Cooldown.
+     */
     throwFinSlap() {
         if (this.canThrowFinSlap()) {
             this.lastThrowTime = Date.now();
@@ -90,8 +106,6 @@ Object.assign(Character.prototype, {
 
             const direction = this.otherDirection ? -1 : 1;
             const offsetX = this.otherDirection ? 0 : 120;
-
-            // Erstelle Fin-Slap-Attacke nach 300ms (Mittelpunkt der Animation).
             let finSlap = null;
             setTimeout(() => {
                 finSlap = new FinSlap(this.x + offsetX, this.y + 50, direction);
@@ -102,8 +116,6 @@ Object.assign(Character.prototype, {
                     }
                 }
             }, 300);
-
-            // Beende die Fin-Slap-Animation nach 600ms.
             setTimeout(() => {
                 this.isFinSlapping = false;
                 this.currentImage = 0;
@@ -114,12 +126,20 @@ Object.assign(Character.prototype, {
         return null;
     },
 
+    /**
+     * Gibt die passenden Sterbebilder abhängig vom letzten Schadenstyp zurück.
+     * @returns {string[]}
+     */
     getDeathImages() {
         return this.lastDamageType === 'electric'
             ? this.IMAGES_DEAD_ELECTRIC
             : this.IMAGES_DEAD_POISON;
     },
 
+    /**
+     * Leitet den Tod des Charakters ein, zeigt den Game-Over-Bildschirm und spielt den Fail-Sound ab.
+     * @returns {void}
+     */
     die() {
         if (this.isDead) {
             return;
@@ -130,8 +150,6 @@ Object.assign(Character.prototype, {
         this.isFinSlapping = false;
         this.currentImage = 0;
         this.deadAnimationFinished = false;
-
-        // Blendet den Game-Over-Zustand ein und spielt den Fail-Sound.
         if (this.world && this.world.gameOverScreen) {
             this.world.gameOverScreen.show(this.world.audioManager);
         }

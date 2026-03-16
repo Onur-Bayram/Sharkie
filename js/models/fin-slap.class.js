@@ -1,3 +1,6 @@
+/**
+ * Flossenschlag-Projektil – kurze Nahkampfanimation, läuft einmalig durch den Bildvorrat.
+ */
 class FinSlap extends MovableObject {
     IMAGES = [
         '1.Sharkie/4.Attack/Fin slap/1.png',
@@ -14,6 +17,12 @@ class FinSlap extends MovableObject {
     currentImage = 0;
     createdTime = Date.now();
 
+    /**
+     * Erstellt den Flossenschlag an der angegebenen Position mit Richtungsangabe.
+     * @param {number} x X-Position.
+     * @param {number} y Y-Position.
+     * @param {1|-1} [direction=1] Angriffsrichtung (1 = rechts, -1 = links).
+     */
     constructor(x, y, direction = 1) {
         super();
         this.x = x;
@@ -25,11 +34,15 @@ class FinSlap extends MovableObject {
         this.loadImage(this.IMAGES[0]);
     }
 
+    /**
+     * Zeichnet den Flossenschlag auf den Canvas, gespiegelt bei linker Richtung.
+     * @param {CanvasRenderingContext2D} ctx Zeichenkontext.
+     * @param {number} cameraX Aktueller Kamera-X-Offset.
+     * @returns {void}
+     */
     draw(ctx, cameraX) {
         let drawX = this.x - cameraX;
         let drawY = this.y;
-
-        // Horizontal spiegeln wenn nach links bewegt
         if (this.direction === -1) {
             ctx.save();
             ctx.scale(-1, 1);
@@ -40,6 +53,10 @@ class FinSlap extends MovableObject {
         }
     }
 
+    /**
+     * Setzt das nächste Bild in der Sequenz (wird einmalig pro Frame aufgerufen).
+     * @returns {void}
+     */
     animate() {
         if (this.currentImage < this.IMAGES.length) {
             let path = this.IMAGES[this.currentImage];
@@ -48,6 +65,10 @@ class FinSlap extends MovableObject {
         }
     }
 
+    /**
+     * Gibt zurück ob der Flossenschlag noch aktiv ist (noch nicht alle Bilder durchgelaufen).
+     * @returns {boolean}
+     */
     isAlive() {
         return this.currentImage < this.IMAGES.length;
     }

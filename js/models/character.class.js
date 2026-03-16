@@ -1,3 +1,7 @@
+/**
+ * Spielcharakter Sharkie – erbt von MovableObject.
+ * Verwaltet Animationszustände (Schwimmen, Angriff, Verletzt, Tot), Energie, Giftstatus und Tastatursteuerung.
+ */
 class Character extends MovableObject{
 
     otherDirection = false;
@@ -135,6 +139,9 @@ class Character extends MovableObject{
         '1.Sharkie/4.Attack/Fin slap/8.png'
     ];
     
+    /**
+     * Erstellt den Charakter, lädt alle Animations-Bildserien und startet Animations- und Tastaturschleife.
+     */
     constructor() {
         super();
         this.loadImage('1.Sharkie/1.IDLE/1.png');
@@ -155,6 +162,10 @@ class Character extends MovableObject{
         this.handleKeyboard();
     }
 
+    /**
+     * Startet die Animations-Schleife und wählt je nach Zustand die passende Bildsequenz aus.
+     * @returns {void}
+     */
     animate() {
         setInterval(() => {
             if (this.isDead) {
@@ -190,14 +201,11 @@ class Character extends MovableObject{
                 this.img = this.imageCache[path];
                 this.currentImage++;
             } else if (this.isLongIdle) {
-                // Schlafanimation - durchlaufe zuerst bis Frame 10, dann loope die Sleep-Frames (I11, I12, I13)
                 if (this.currentImage < this.IMAGES_LONG_IDLE.length) {
-                    // Spielabspiel bis zur Sleep-Animation
                     let path = this.IMAGES_LONG_IDLE[this.currentImage];
                     this.img = this.imageCache[path];
                     this.currentImage++;
                 } else {
-                    // Loope die Sleep-Frames (I11, I12, I13)
                     const sleepIndex = (this.currentImage - this.IMAGES_LONG_IDLE.length) % this.IMAGES_SLEEP_LOOP.length;
                     let path = this.IMAGES_SLEEP_LOOP[sleepIndex];
                     this.img = this.imageCache[path];
@@ -215,6 +223,12 @@ class Character extends MovableObject{
         }, 100);
     }
 
+    /**
+     * Verarbeitet Trefferschaden, setzt den Hurt-Zustand und ruft bei 0 HP `die()` auf.
+     * @param {'electric'|'poison'|string} damageType Art des Schadens.
+     * @param {number} [damage=10] Schadensmenge.
+     * @returns {void}
+     */
     hit(damageType, damage = 10) {
         if (this.isDead) {
             return;
@@ -227,8 +241,6 @@ class Character extends MovableObject{
             this.lastDamageType = damageType;
         }
         this.isHurt = true;
-        
-        // Sound abspielen je nach Schadenstyp
         if (this.world && this.world.audioManager) {
             if (this.lastDamageType === 'electric') {
                 this.world.audioManager.playElectricSound();
@@ -257,6 +269,10 @@ class Character extends MovableObject{
         }, 500);
     }
 
+    /**
+     * Verarbeitet Tastatureingaben in einer 60-fps-Schleife und steuert Bewegung und Animationszustand.
+     * @returns {void}
+     */
     handleKeyboard() {
         setInterval(() => {
             if (this.isDead) {
@@ -290,17 +306,12 @@ class Character extends MovableObject{
             if (window.keyboard && window.keyboard.SPACE) {
                 moved = true;
             }
-
-            // Merke den bisherigen Swim-Status
             const wasSwimming = this.isSwimming;
-            
-            // Setze Swim-Animation wenn sich der Hai bewegt 
             this.isSwimming = moved && !this.isAttacking && !this.isFinSlapping && !this.isHurt;
 
             if (moved) {
                 this.lastActivity = Date.now();
                 this.isLongIdle = false;
-                // zurücksetzen wenn wir gerade ZU Schwimmen wechseln
                 if (this.isSwimming && !wasSwimming) {
                     this.currentImage = 0;
                 }
@@ -312,8 +323,6 @@ class Character extends MovableObject{
                     this.isLongIdle = false;
                 }
             }
-            
-            // Begrenzung der Hai darf nicht aus dem Bild schwimmen
             const mapWidth = this.world ? this.world.mapWidth : 960;
             const canvasHeight = this.world ? this.world.canvas.height : 540;
             const maxX = Math.max(0, mapWidth - this.width);
@@ -333,7 +342,4 @@ class Character extends MovableObject{
         }, 1000 / 60);
     }
 
-    jump() {
-
-    }
 }

@@ -1,3 +1,7 @@
+/**
+ * Haupt-Spielwelt – initialisiert alle Spielobjekte, verwaltet Zustandsvariablen
+ * und startet den Render- und Kollisions-Loop.
+ */
 class World {
 
  cameraX = 0;
@@ -68,8 +72,12 @@ canvas;
 ctx; 
 
     
-constructor(canvas) {
-    this.canvas = canvas;
+    /**
+     * Erstellt die Spielwelt auf dem übergebenen Canvas und startet den Spielloop.
+     * @param {HTMLCanvasElement} canvas Das Ziel-Canvas-Element.
+     */
+    constructor(canvas) {
+        this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
     this.character.world = this;
     this.backgroundObjects = [...this.backgroundObjectsLight, ...this.backgroundObjectsDark];
@@ -95,7 +103,11 @@ constructor(canvas) {
     this.draw();
 }
 
-createEnemies() {
+    /**
+     * Erstellt zufällig verteilte Pufferfisch-Gegner auf der Karte.
+     * @returns {Pufferfish[]}
+     */
+    createEnemies() {
     const enemies = [];
     const count = 10;
     const minX = 200;
@@ -112,7 +124,11 @@ createEnemies() {
     return enemies;
 }
 
-createJellyfishes() {
+    /**
+     * Erstellt zufällig verteilte Quallen auf der Karte.
+     * @returns {Jellyfish[]}
+     */
+    createJellyfishes() {
     const jellyfishes = [];
     const count = 12;
     const minX = 200;
@@ -129,7 +145,11 @@ createJellyfishes() {
     return jellyfishes;
 }
 
-createPoisonBottles() {
+    /**
+     * Erstellt statische Giftflaschen auf der Karte.
+     * @returns {PoisonBottle[]}
+     */
+    createPoisonBottles() {
     const bottles = [];
     const count = 12;
     const minX = 200;
@@ -146,7 +166,11 @@ createPoisonBottles() {
     return bottles;
 }
 
-createAnimatedPoisonBottles() {
+    /**
+     * Erstellt animierte (fallende) Giftflaschen auf der Karte.
+     * @returns {AnimatedPoisonBottle[]}
+     */
+    createAnimatedPoisonBottles() {
     const bottles = [];
     const count = 5;
     const minX = 500;
@@ -160,7 +184,11 @@ createAnimatedPoisonBottles() {
     return bottles;
 }
 
-createCoins() {
+    /**
+     * Erstellt zufällig verteilte Münzen auf der Karte.
+     * @returns {Coin[]}
+     */
+    createCoins() {
     const coins = [];
     const count = 10;
     const minX = 200;
@@ -177,8 +205,12 @@ createCoins() {
     return coins;
 }
 
-handleThrow() {
-    setInterval(() => {
+    /**
+     * Startet den Wur-Intervall für Tasten F (normale Blase), D (Giftblase) und Leertaste (Flossenschlag).
+     * @returns {void}
+     */
+    handleThrow() {
+        setInterval(() => {
         if (this.isPaused) {
             return;
         }

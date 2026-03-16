@@ -1,3 +1,6 @@
+/**
+ * Giftblasen-Projektil mit Startanimation und verzögerter Vorwärtsbewegung.
+ */
 class PoisonBubbleProjectile extends MovableObject {
     
     IMAGES_BUBBLE = [
@@ -11,6 +14,11 @@ class PoisonBubbleProjectile extends MovableObject {
         '1.Sharkie/4.Attack/Bubble trap/op1 (with bubble formation)/8.png'
     ];
 
+    /**
+     * @param {number} x Startposition auf der X-Achse in der Spielwelt.
+     * @param {number} y Startposition auf der Y-Achse in der Spielwelt.
+     * @param {number} direction Horizontale Richtung (1 oder -1).
+     */
     constructor(x, y, direction) {
         super();
         this.loadImage(this.IMAGES_BUBBLE[0]);
@@ -26,16 +34,16 @@ class PoisonBubbleProjectile extends MovableObject {
         this.animate();
     }
 
+    /**
+     * Startet die Wurfsequenz und die Bewegungs-Schleife.
+     *
+     * @returns {void}
+     */
     throw() {
-        // Starte die Animation ab Frame 0
         this.currentImage = 0;
-        
-        //  fang an zu schießen
         setTimeout(() => {
             this.isMoving = true;
         }, 800);
-
-        // Movement Loop
         this.moveInterval = setInterval(() => {
             if (this.isMoving) {
                 this.x += this.speed * this.direction;
@@ -43,6 +51,11 @@ class PoisonBubbleProjectile extends MovableObject {
         }, 1000 / 60);
     }
 
+    /**
+     * Spielt die Animationsframes der Blasenbildung ab.
+     *
+     * @returns {void}
+     */
     animate() {
         this.animateInterval = setInterval(() => {
             if (this.currentImage < this.IMAGES_BUBBLE.length) {
@@ -53,6 +66,11 @@ class PoisonBubbleProjectile extends MovableObject {
         }, 100);
     }
 
+    /**
+     * Stoppt die Timer für Bewegung und Animation.
+     *
+     * @returns {void}
+     */
     stopMoving() {
         clearInterval(this.moveInterval);
         clearInterval(this.animateInterval);

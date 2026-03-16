@@ -1,3 +1,6 @@
+/**
+ * Startbildschirm – zeigt Hintergrund, Start- und Options-Button auf dem Canvas.
+ */
 class StartScreen {
     isVisible = true;
     
@@ -22,6 +25,10 @@ class StartScreen {
         this.loadImages();
     }
     
+    /**
+     * Lädt alle Bilder für Hintergrund, Sharkie und Buttons.
+     * @returns {void}
+     */
     loadImages() {
         this.startButtonImg.src = '6.Botones/Start/1.png';
         this.optionsButtonImg.src = '6.Botones/Start/option_button_pressed.png';
@@ -29,10 +36,14 @@ class StartScreen {
         this.backgroundImg.src = '3. Background/Mesa de trabajo 1.png';
     }
     
+    /**
+     * Verarbeitet einen Klick und prüft ob der Start- oder Options-Button getroffen wurde.
+     * @param {number} x X-Koordinate im Spielkoordinatensystem.
+     * @param {number} y Y-Koordinate im Spielkoordinatensystem.
+     * @returns {boolean} true wenn ein Button geklickt wurde.
+     */
     handleClick(x, y) {
         if (!this.isVisible) return false;
-        
-        // Start Button klicken
         if (x >= this.startButtonX && x <= this.startButtonX + this.startButtonWidth &&
             y >= this.startButtonY && y <= this.startButtonY + this.startButtonHeight) {
             this.hide();
@@ -41,8 +52,6 @@ class StartScreen {
             }
             return true;
         }
-        
-        // Options Button klicken
         if (x >= this.optionsButtonX && x <= this.optionsButtonX + this.optionsButtonWidth &&
             y >= this.optionsButtonY && y <= this.optionsButtonY + this.optionsButtonHeight) {
             if (window.optionsScreen) {
@@ -54,22 +63,22 @@ class StartScreen {
         return false;
     }
     
+    /**
+     * Zeichnet den Startbildschirm mit Hintergrund und Buttons auf den Canvas.
+     * @param {CanvasRenderingContext2D} ctx Zeichenkontext.
+     * @returns {void}
+     */
     draw(ctx) {
         if (!this.isVisible) return;
         
         const canvasWidth = 800;
         const canvasHeight = 540;
-        
-        // Hintergrund Bild
         if (this.backgroundImg.complete) {
             ctx.drawImage(this.backgroundImg, 0, 0, canvasWidth, canvasHeight);
         } else {
-            // fallback
             ctx.fillStyle = '#1a6fa9';
             ctx.fillRect(0, 0, canvasWidth, canvasHeight);
         }
-        
-        // Start Button (höher positioniert)
         if (this.startButtonImg.complete) {
             this.startButtonWidth = 280;
             this.startButtonHeight = 80;
@@ -78,8 +87,6 @@ class StartScreen {
             
             ctx.drawImage(this.startButtonImg, this.startButtonX, this.startButtonY, this.startButtonWidth, this.startButtonHeight);
         }
-        
-        // Options Button (unter dem Start Button)
         this.optionsButtonWidth = 280;
         this.optionsButtonHeight = 80;
         this.optionsButtonX = (canvasWidth - this.optionsButtonWidth) / 2;
@@ -90,10 +97,18 @@ class StartScreen {
         }
     }
     
+    /**
+     * Macht den Startbildschirm sichtbar.
+     * @returns {void}
+     */
     show() {
         this.isVisible = true;
     }
     
+    /**
+     * Versteckt den Startbildschirm.
+     * @returns {void}
+     */
     hide() {
         this.isVisible = false;
     }

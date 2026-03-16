@@ -1,3 +1,6 @@
+/**
+ * Münz-Sammelanzeige als Bildleiste (6 Zustände proportional zu gesammelten Münzen).
+ */
 class CoinBar {
     IMAGES = [
         '4. Marcadores/green/Coin/0_  copia 4.png',
@@ -17,11 +20,19 @@ class CoinBar {
     coinCount = 0;
     maxCoins = 0;
 
+    /**
+     * Erstellt die Münzleiste und lädt alle Bilder.
+     */
     constructor() {
         this.loadImages(this.IMAGES);
         this.loadImage(this.IMAGES[0]);
     }
 
+    /**
+     * Lädt ein einzelnes Bild und setzt es als aktuelles Bild.
+     * @param {string} path Bildpfad.
+     * @returns {void}
+     */
     loadImage(path) {
         if (!this.imageCache[path]) {
             this.imageCache[path] = new Image();
@@ -30,6 +41,11 @@ class CoinBar {
         this.img = this.imageCache[path];
     }
 
+    /**
+     * Lädt alle Bilder in den internen Cache.
+     * @param {string[]} array Array von Bildpfaden.
+     * @returns {void}
+     */
     loadImages(array) {
         array.forEach((path) => {
             let img = new Image();
@@ -38,6 +54,12 @@ class CoinBar {
         });
     }
 
+    /**
+     * Aktualisiert den Anzeigestatus basierend auf gesammelten Münzen.
+     * @param {number} coinCount Anzahl gesammelter Münzen.
+     * @param {number} [maxCoins=100] Gesamtzahl der Münzen.
+     * @returns {void}
+     */
     setPercentage(coinCount, maxCoins = 100) {
         this.coinCount = coinCount;
         this.maxCoins = maxCoins;

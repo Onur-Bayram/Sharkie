@@ -1,3 +1,6 @@
+/**
+ * Game-Over-Bildschirm – blendet nach dem Tod des Spielers mit Einblend-Animation ein.
+ */
 class GameOverScreen {
     gameOverImages = [];
     currentImage = 0;
@@ -13,6 +16,10 @@ class GameOverScreen {
         this.loadImages();
     }
 
+    /**
+     * Lädt alle Game-Over-Animationsbilder in den internen Array.
+     * @returns {void}
+     */
     loadImages() {
         const imagePaths = [
             '6.Botones/Tittles/Game Over/Recurso 9.png',
@@ -29,35 +36,30 @@ class GameOverScreen {
         });
     }
 
+    /**
+     * Zeichnet den Game-Over-Bildschirm mit Einblend-Effekt auf den Canvas.
+     * @param {CanvasRenderingContext2D} ctx Zeichenkontext.
+     * @returns {void}
+     */
     draw(ctx) {
         if (!this.isVisible) {
             return;
         }
-
-        // Einblende-Effekt
         if (this.opacity < 1) {
             this.opacity += this.fadeInSpeed;
             if (this.opacity > 1) this.opacity = 1;
         }
 
         ctx.save();
-        
-        // Vollständig schwarzer Hintergrund mit Fade
         ctx.globalAlpha = this.opacity;
         ctx.fillStyle = 'black';
         ctx.fillRect(0, 0, 800, 540);
-
-        // Bild für das Spielende mit Einblende-Effekt und leichtem Leuchten
         const currentImg = this.gameOverImages[this.currentImage];
         if (currentImg && currentImg.complete) {
             const x = (800 - this.gameOverWidth) / 2;
             const y = (540 - this.gameOverHeight) / 2 - 80;
-            
-            // Bessere Bildqualität beim Skalieren
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
-            
-            // Leichter Glow-Effekt
             ctx.shadowColor = 'rgba(255, 255, 255, 0.3)';
             ctx.shadowBlur = 10;
             
@@ -67,6 +69,11 @@ class GameOverScreen {
         ctx.restore();
     }
 
+    /**
+     * Zeigt den Game-Over-Bildschirm an und spielt den Fail-Sound ab.
+     * @param {AudioManager} audioManager Audio-Manager für den Fail-Sound.
+     * @returns {void}
+     */
     show(audioManager) {
         if (!this.isVisible && !this.soundPlayed) {
             this.opacity = 0;
@@ -79,6 +86,10 @@ class GameOverScreen {
         this.startAnimation();
     }
 
+    /**
+     * Startet die Animations-Schleife für das Durchblenden der Bilder.
+     * @returns {void}
+     */
     startAnimation() {
         if (this.animationInterval) {
             return; 
@@ -93,6 +104,10 @@ class GameOverScreen {
         }, 150); //MS pro Bild
     }
 
+    /**
+     * Stoppt die Bildwechsel-Animation.
+     * @returns {void}
+     */
     stopAnimation() {
         if (this.animationInterval) {
             clearInterval(this.animationInterval);
@@ -100,6 +115,10 @@ class GameOverScreen {
         }
     }
 
+    /**
+     * Versteckt den Game-Over-Bildschirm und setzt alle Zustände zurück.
+     * @returns {void}
+     */
     hide() {
         this.isVisible = false;
         this.soundPlayed = false;

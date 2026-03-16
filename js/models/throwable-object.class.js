@@ -1,3 +1,6 @@
+/**
+ * Basiswurfobjekt – wird in Bewegungsrichtung geschossen und animiert (Giftflaschen-Bilder).
+ */
 class ThrowableObject extends MovableObject {
     
     IMAGES_BUBBLE = [
@@ -11,6 +14,12 @@ class ThrowableObject extends MovableObject {
         '4. Marcadores/Posión/Animada/8.png'
     ];
 
+    /**
+     * Erstellt ein Wurfobjekt und startet Animation und Bewegung.
+     * @param {number} x X-Startposition.
+     * @param {number} y Y-Startposition.
+     * @param {1|-1} direction Flugrichtung (1 = rechts, -1 = links).
+     */
     constructor(x, y, direction) {
         super();
         this.loadImage(this.IMAGES_BUBBLE[0]);
@@ -25,12 +34,20 @@ class ThrowableObject extends MovableObject {
         this.throw();
     }
 
+    /**
+     * Startet die Bewegungsschleife in Flugrichtung.
+     * @returns {void}
+     */
     throw() {
         setInterval(() => {
             this.x += this.speed * this.direction;
         }, 1000 / 60);
     }
 
+    /**
+     * Startet die Animations-Schleife für die Bildsequenz.
+     * @returns {void}
+     */
     animate() {
         setInterval(() => {
             let path = this.IMAGES_BUBBLE[this.currentImage % this.IMAGES_BUBBLE.length];

@@ -1,4 +1,11 @@
-// Rechnet Maus- oder Touch-Koordinaten in Spielkoordinaten um
+/**
+ * Wandelt Maus- oder Touch-Koordinaten aus dem Viewport in Spielkoordinaten
+ * des Canvas um und berücksichtigt dabei mögliche Ränder.
+ *
+ * @param {number} clientX X-Koordinate des Pointers im Viewport.
+ * @param {number} clientY Y-Koordinate des Pointers im Viewport.
+ * @returns {{x: number, y: number} | null} Canvas-Position oder null außerhalb der Spielfläche.
+ */
 function getCanvasPointerPosition(clientX, clientY) {
     if (!canvas) {
         return null;
@@ -39,7 +46,14 @@ function getCanvasPointerPosition(clientX, clientY) {
     };
 }
 
-// Verarbeitet Klicks und Touch-Eingaben auf dem Canvas
+/**
+ * Verarbeitet eine Pointer-Interaktion auf dem Canvas und leitet Treffer auf
+ * den Neustart-Button weiter.
+ *
+ * @param {number} clientX X-Koordinate des Pointers im Viewport.
+ * @param {number} clientY Y-Koordinate des Pointers im Viewport.
+ * @returns {void}
+ */
 function handleCanvasPointer(clientX, clientY) {
     if (!canvas) {
         return;
@@ -55,7 +69,11 @@ function handleCanvasPointer(clientX, clientY) {
     }
 }
 
-// Setzt alle aktuell gedrückten Tasten zurück
+/**
+ * Setzt alle Tastaturzustände und aktiven mobilen Pointer-Eingaben zurück.
+ *
+ * @returns {void}
+ */
 function resetKeyboardState() {
     keyboard.LEFT = false;
     keyboard.RIGHT = false;
@@ -68,12 +86,22 @@ function resetKeyboardState() {
     activeMobilePointers.clear();
 }
 
-// Prüft, ob ein Smartphone im Hochformat verwendet wird
+/**
+ * Prüft, ob das aktuelle Gerät ein Smartphone im Hochformat ist, bei dem
+ * das Spiel gesperrt werden soll.
+ *
+ * @returns {boolean}
+ */
 function isPortraitPhoneLayout() {
     return window.matchMedia('(max-width: 768px) and (orientation: portrait) and (hover: none) and (pointer: coarse)').matches;
 }
 
-// Sperrt das Spiel im Smartphone-Hochformat und pausiert es bei Bedarf
+/**
+ * Wendet das Verhalten für die Ausrichtungssperre an und pausiert oder
+ * setzt das Spiel bei Bedarf fort.
+ *
+ * @returns {void}
+ */
 function updateOrientationLock() {
     const isLocked = isPortraitPhoneLayout();
     document.body.classList.toggle('portrait-lock', isLocked);
@@ -110,12 +138,21 @@ function updateOrientationLock() {
     updateMobileControlsVisibility();
 }
 
-// Prüft, ob gerade ein responsiver Breakpoint aktiv ist
+/**
+ * Prüft, ob aktuell ein responsiver Breakpoint aktiv ist.
+ *
+ * @returns {boolean}
+ */
 function isResponsiveLayout() {
     return window.matchMedia('(max-width: 1024px)').matches;
 }
 
-// Blendet das Zurück-Symbol abhängig vom aktuellen Menüstatus ein oder aus
+/**
+ * Blendet das Zurück-Symbol der Optionen abhängig vom aktuellen Zustand ein
+ * oder aus.
+ *
+ * @returns {void}
+ */
 function updateBackIconVisibility() {
     const optionsScreen = $('options-screen');
     const backIconButton = optionsScreen?.querySelector('.back-icon-button');
@@ -127,15 +164,24 @@ function updateBackIconVisibility() {
         backIconButton.classList.remove('is-visible');
         return;
     }
-
-    // Haelt das Zurueck-Symbol oben rechts in allen Optionsansichten verfuegbar.
     backIconButton.classList.add('is-visible');
 }
 
+/**
+ * Erkennt, ob das aktuelle Gerät hauptsächlich per Touch bedient wird.
+ *
+ * @returns {boolean}
+ */
 function isTouchGameplayDevice() {
     return navigator.maxTouchPoints > 0 || window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 }
 
+/**
+ * Aktualisiert die Sichtbarkeit der mobilen Steuerung und des Vollbild-Buttons
+ * anhand des aktuellen UI- und Gerätezustands.
+ *
+ * @returns {void}
+ */
 function updateMobileControlsVisibility() {
     const controls = $('mobile-controls');
     const htmlFullscreenButton = $('html-fullscreen-button');
@@ -160,7 +206,11 @@ function updateMobileControlsVisibility() {
     }
 }
 
-// Aktualisiert das Icon des HTML-Vollbild-Buttons je nach Modus
+/**
+ * Aktualisiert das Symbol und den Tooltip des HTML-Vollbild-Buttons.
+ *
+ * @returns {void}
+ */
 function updateHtmlFullscreenButton() {
     const btn = $('html-fullscreen-button');
     if (!btn) return;
@@ -168,6 +218,12 @@ function updateHtmlFullscreenButton() {
     btn.title = document.fullscreenElement ? 'Vollbild verlassen' : 'Vollbild';
 }
 
+/**
+ * Bindet die Pointer-basierten Mobile-Controls und synchronisiert sie mit
+ * dem Tastaturzustand.
+ *
+ * @returns {void}
+ */
 function bindMobileControls() {
     const controls = $('mobile-controls');
     if (!controls) {
@@ -208,6 +264,10 @@ function bindMobileControls() {
 
     controls.addEventListener('pointerup', releasePointerKey);
     controls.addEventListener('pointercancel', releasePointerKey);
+
+    controls.addEventListener('contextmenu', (event) => {
+        event.preventDefault();
+    });
 
     window.addEventListener('blur', resetKeyboardState);
     document.addEventListener('visibilitychange', () => {

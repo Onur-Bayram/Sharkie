@@ -1,4 +1,7 @@
-﻿class FinalBoss extends MovableObject {
+/**
+ * Endgegner mit Intro-, Schwimm-, Angriffs-, Schaden- und Todeszuständen.
+ */
+class FinalBoss extends MovableObject {
 
     IMAGES_FLOATING = [
         "2.Enemy/3 Final Enemy/2.floating/1.png",
@@ -75,6 +78,10 @@
     activityRadius = 900;
     attackRadius = 900;
 
+    /**
+     * @param {number} x Startposition auf der X-Achse.
+     * @param {number} y Startposition auf der Y-Achse.
+     */
     constructor(x, y) {
         super();
         this.loadImage(this.IMAGES_INTRODUCE[0]);
@@ -96,13 +103,16 @@
         this.animate();
     }
 
+    /**
+     * Startet die Animations- und Bewegungs-Schleifen des Bosses.
+     *
+     * @returns {void}
+     */
     animate() {
         setInterval(() => {
             if (!this.isActive) {
                 return;
             }
-
-            // Starte die Intro-Animation erst, wenn der Boss wirklich im Bild ist.
             if (this.state === 'introduce' && !this.hasStartedIntro) {
                 return;
             }
@@ -117,8 +127,6 @@
             let path = images[this.currentImage % images.length];
             this.img = this.imageCache[path];
             this.currentImage++;
-
-            // State-Übergänge
             if (this.state === 'introduce' && this.currentImage >= this.IMAGES_INTRODUCE.length) {
                 this.introduced = true;
                 this.state = 'floating';
@@ -142,8 +150,6 @@
                 this.currentImage = this.IMAGES_DEAD.length - 1;
             }
         }, 150);
-
-        // Floating-Bewegung - intelligentes Verfolgen und zufällige Schwimmstile
         setInterval(() => {
             if (!this.isActive || !this.introduced || this.isDead) {
                 return;
@@ -152,6 +158,11 @@
         }, 1000 / 60);
     }
 
+    /**
+     * Liefert die Bildsequenz passend zum aktuellen Boss-Zustand.
+     *
+     * @returns {string[]}
+     */
     getCurrentImages() {
         if (this.isDead) {
             return this.IMAGES_DEAD;
@@ -168,42 +179,41 @@
         return this.IMAGES_FLOATING;
     }
 
+    /**
+     * Aktualisiert Schwimmstil und Bewegung des Bosses.
+     *
+     * @returns {void}
+     */
     updateFloatingBehavior() {
-        // Boss ist während Attacke/Hurt nicht mobil
         if (this.isAttacking || this.isHurt) {
             return;
         }
-
-        // Wechsel Schwimmstil alle 3 Sekunden (mehr aggressive)
         const currentTime = Date.now();
         if (currentTime - this.lastStyleChangeTime > this.styleChangeDuration) {
             const styles = ['aggressive', 'aggressive', 'aggressive', 'normal', 'circle'];
             this.swimStyle = styles[Math.floor(Math.random() * styles.length)];
             this.lastStyleChangeTime = currentTime;
         }
-
-        // Bewegung basierend auf Stil anwenden
         if (this.swimStyle === 'aggressive') {
-            // Nähert sich schnell
             this.floatingSpeed = 5.5;
         } else if (this.swimStyle === 'defensive') {
-            // Weicht aus und hält Abstand
             this.floatingSpeed = 3.5;
         } else if (this.swimStyle === 'circle') {
-            // Schwimmt in Kreisen um den Character
             this.floatingSpeed = 4.8;
         } else {
-            // normal
             this.floatingSpeed = 3.8;
         }
 
         this.applyMovement();
     }
 
+    /**
+     * Bewegt den Boss abhängig vom aktuellen Schwimmstil und der Character-Position.
+     *
+     * @returns {void}
+     */
     applyMovement() {
-        // einfache zufällige Bewegung wenn kein Character verfügbar
         if (!this.character) {
-            // Fallback: sanfte vertikale Bewegung
             if (Math.random() > 0.5) {
                 this.y += this.floatingSpeed * 2.5;
             } else {
@@ -214,29 +224,23 @@
 
         const charX = this.character.x;
         const charY = this.character.y;
-        
-        // Berechne Distanz zum Character
         const distX = charX - this.x;
         const distY = charY - this.y;
         const distance = Math.sqrt(distX * distX + distY * distY);
 
         if (this.swimStyle === 'aggressive') {
-            // Verfolge den Character direkt
             if (distance > 50) {
                 this.x += (distX / distance) * this.floatingSpeed;
                 this.y += (distY / distance) * this.floatingSpeed;
             }
         } else if (this.swimStyle === 'defensive') {
-            // Halte Abstand, weiche aus
             if (distance < 800) {
                 this.x -= (distX / distance) * this.floatingSpeed;
                 this.y -= (distY / distance) * this.floatingSpeed;
             } else {
-                // Wenn zu weit weg, näher kommen
                 this.x += (distX / distance) * this.floatingSpeed * 1.7;
             }
         } else if (this.swimStyle === 'circle') {
-            // Kreise um den Character
             const angle = Math.atan2(distY, distX);
             const desiredDistance = 600;
             
@@ -251,19 +255,14 @@
                 this.y += (targetDistY / targetDist) * this.floatingSpeed;
             }
         } else {
-            // normal - Hybrid aus aggressive und defensive
             if (distance > 400) {
-                // Zu weit weg, näher kommen
                 this.x += (distX / distance) * this.floatingSpeed * 1.8;
                 this.y += (distY / distance) * this.floatingSpeed * 1.8;
             } else if (distance < 300) {
-                // Zu nah, Abstand halten
                 this.x -= (distX / distance) * this.floatingSpeed * 1.6;
                 this.y -= (distY / distance) * this.floatingSpeed * 1.6;
             }
         }
-
-        // Grenzüber-Prävention
         const mapBounds = 6720;
         if (this.x < 4800) this.x = 4800;
         if (this.x > mapBounds - this.width) this.x = mapBounds - this.width;
@@ -271,8 +270,13 @@
         if (this.y > 540 - this.height) this.y = 540 - this.height;
     }
 
+    /**
+     * Prüft, ob der Boss nah genug für einen Angriff ist.
+     *
+     * @param {Character} character Spielerfigur.
+     * @returns {void}
+     */
     checkProximityAttack(character) {
-        // Speichere Character-Referenz für applyMovement
         this.character = character;
         
         if (this.isDead || !this.isActive || !this.introduced || this.isAttacking || this.isHurt) {
@@ -288,6 +292,11 @@
         }
     }
 
+    /**
+     * Versetzt den Boss in den Angriffs-Zustand.
+     *
+     * @returns {void}
+     */
     attack() {
         this.isAttacking = true;
         this.state = 'attacking';
@@ -295,6 +304,12 @@
         this.lastAttackTime = Date.now();
     }
 
+    /**
+     * Fügt dem Boss Schaden zu und wechselt bei Bedarf in Hurt- oder Dead-Zustand.
+     *
+     * @param {number} damage Schadenswert.
+     * @returns {void}
+     */
     hit(damage) {
         if (this.isDead) {
             return;
@@ -312,6 +327,11 @@
         }
     }
 
+    /**
+     * Startet die Todesanimation des Bosses.
+     *
+     * @returns {void}
+     */
     die() {
         if (this.isDead) {
             return;
@@ -322,6 +342,13 @@
         this.deadAnimationFinished = false;
     }
 
+    /**
+     * Aktualisiert Sichtbarkeit und Aktivität des Bosses relativ zur Kamera.
+     *
+     * @param {number} cameraX Aktuelle X-Position der Kamera.
+     * @param {number} [canvasWidth=960] Breite des sichtbaren Bereichs.
+     * @returns {void}
+     */
     checkVisibility(cameraX, canvasWidth = 960) {
         const bossRightEdge = this.x + this.width;
         const cameraRight = cameraX + canvasWidth;

@@ -1,3 +1,6 @@
+/**
+ * Lebensanzeige des Spielers als Bildleiste (6 Zustände von 0% bis 100%).
+ */
 class StatusBar extends MovableObject {
     percentage = 100;
 
@@ -10,6 +13,9 @@ class StatusBar extends MovableObject {
         '4. Marcadores/green/Life/100_  copia 2.png'
     ];
 
+    /**
+     * Erstellt die Statusleiste und positioniert sie oben links.
+     */
     constructor() {
         super();
         this.loadImages(this.IMAGES);
@@ -20,6 +26,11 @@ class StatusBar extends MovableObject {
         this.setPercentage(100);
     }
 
+    /**
+     * Setzt den angezeigten Prozentwert und wählt das passende Bild.
+     * @param {number} percentage Lebensenergie in Prozent (0–100).
+     * @returns {void}
+     */
     setPercentage(percentage) {
         this.percentage = percentage;
         let index = Math.ceil((percentage / 100) * (this.IMAGES.length - 1));

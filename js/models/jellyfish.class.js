@@ -1,3 +1,7 @@
+/**
+ * Quallen-Gegner – wird zufällig als 'regular' (gelb/lila) oder 'dangerous' (grün/pink) erzeugt.
+ * Gefährliche Quallen verursachen elektrischen Schaden.
+ */
 class Jellyfish extends MovableObject {
     
     IMAGES_SWIM = [];
@@ -9,10 +13,13 @@ class Jellyfish extends MovableObject {
     type = 'regular'; // 'regular' oder 'dangerous'
     color = 'yellow'; // 'yellow', 'lila', 'green', 'pink'
 
+    /**
+     * Erstellt eine Qualle mit zufälligem Typ, Farbe und Position.
+     * @param {number|null} [x=null] X-Startposition (zufällig wenn null).
+     * @param {number|null} [y=null] Y-Startposition (zufällig wenn null).
+     */
     constructor(x = null, y = null) {
         super();
-        
-        // Zufälliger Typ und Farbe
         this.type = Math.random() > 0.7 ? 'dangerous' : 'regular';
         
         if (this.type === 'regular') {
@@ -44,6 +51,10 @@ class Jellyfish extends MovableObject {
         this.animate();
     }
 
+    /**
+     * Lädt die Swim-Bildpfade abhängig von Typ und Farbe.
+     * @returns {void}
+     */
     loadSwimImages() {
         const folder = this.type === 'regular' ? 'Regular damage' : 'Súper dangerous';
         const colorCode = this.getColorCode();
@@ -56,6 +67,10 @@ class Jellyfish extends MovableObject {
         ];
     }
 
+    /**
+     * Lädt die Sterbe-Bildpfade abhängig von Farbe und Farbordner.
+     * @returns {void}
+     */
     loadDeadImages() {
         const colorFolder = this.getColorFolder();
         const colorCode = this.getDeadColorCode();
@@ -68,6 +83,10 @@ class Jellyfish extends MovableObject {
         ];
     }
 
+    /**
+     * Gibt den Dateiname-Farbcode für die Swim-Animation zurück.
+     * @returns {string}
+     */
     getColorCode() {
         switch (this.color) {
             case 'yellow':
@@ -83,6 +102,10 @@ class Jellyfish extends MovableObject {
         }
     }
 
+    /**
+     * Gibt den Ordnernamen für die Sterbebilder zurück (Ordner-Groß-/Kleinschreibung beachten).
+     * @returns {string}
+     */
     getColorFolder() {
         switch (this.color) {
             case 'yellow':
@@ -98,6 +121,10 @@ class Jellyfish extends MovableObject {
         }
     }
 
+    /**
+     * Gibt das Dateipräfix für die Sterbebilder zurück.
+     * @returns {string}
+     */
     getDeadColorCode() {
         switch (this.color) {
             case 'yellow':
@@ -113,6 +140,10 @@ class Jellyfish extends MovableObject {
         }
     }
 
+    /**
+     * Startet Animations- und Bewegungsschleifen (Schwimmen links und vertikales Pendeln).
+     * @returns {void}
+     */
     animate() {
         setInterval(() => {
             const images = this.getCurrentImages();
@@ -139,8 +170,6 @@ class Jellyfish extends MovableObject {
             }
 
             this.moveLeft();
-            
-            // Smooth vertikale Bewegung zu Ziel-Y
             if (Math.abs(this.y - this.targetY) > 1) {
                 if (this.y < this.targetY) {
                     this.y += this.verticalSpeed;
@@ -149,8 +178,6 @@ class Jellyfish extends MovableObject {
                 }
             }
         }, 1000 / 60);
-        
-        // Neues Ziel-Y setzen
         setInterval(() => {
             if (!this.isDead) {
                 this.targetY = 50 + Math.random() * 400;
@@ -158,6 +185,10 @@ class Jellyfish extends MovableObject {
         }, 3000);
     }
 
+    /**
+     * Gibt die aktuell passende Bildsequenz zurück (schwimmen oder tot).
+     * @returns {string[]}
+     */
     getCurrentImages() {
         if (this.isDead) {
             return this.IMAGES_DEAD;
@@ -165,6 +196,10 @@ class Jellyfish extends MovableObject {
         return this.IMAGES_SWIM;
     }
 
+    /**
+     * Leitet den Tod der Qualle ein und setzt den Animationszustand zurück.
+     * @returns {void}
+     */
     die() {
         if (this.isDead) {
             return;

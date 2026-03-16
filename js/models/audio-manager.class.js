@@ -1,3 +1,7 @@
+/**
+ * Verwaltet alle Audio-Ressourcen des Spiels – Hintergrundmusik, Soundeffekte,
+ * Lautstärke-Einstellungen und Stummschaltung.
+ */
 class AudioManager {
     bgMusic = new Audio();
     coinSound = new Audio();
@@ -21,6 +25,10 @@ class AudioManager {
         this.loadAudio();
     }
     
+    /**
+     * Lädt alle Audio-Dateipfade und setzt initiale Lautstärken.
+     * @returns {void}
+     */
     loadAudio() {
         this.bgMusic.src = 'audio/Super Mario 64 Soundtrack - Dire, Dire Docks.mp3';
         this.bgMusic.loop = true;
@@ -60,32 +68,59 @@ class AudioManager {
         this.bossIntroSound.volume = this.sfxVolume;
     }
     
+    /**
+     * Startet die Hintergrundmusik (wenn nicht stummgeschaltet und Musik aktiviert).
+     * @returns {void}
+     */
     play() {
         if (this.isMuted || !this.isBackgroundMusicEnabled || this.isPlaying) return;
         this.bgMusic.play();
         this.isPlaying = true;
     }
     
+    /**
+     * Pausiert die Hintergrundmusik.
+     * @returns {void}
+     */
     pause() {
         this.bgMusic.pause();
         this.isPlaying = false;
     }
     
+    /**
+     * Stoppt die Hintergrundmusik und setzt die Abspielposition auf den Anfang zurück.
+     * @returns {void}
+     */
     stop() {
         this.bgMusic.pause();
         this.bgMusic.currentTime = 0;
         this.isPlaying = false;
     }
     
+    /**
+     * Alias für `setMusicVolume` – setzt die Musik-Lautstärke.
+     * @param {number} volume Lautstärke (0–1).
+     * @returns {void}
+     */
     setVolume(volume) {
         this.setMusicVolume(volume);
     }
 
+    /**
+     * Setzt die Musik-Lautstärke und wendet sie sofort an.
+     * @param {number} volume Lautstärke (0–1).
+     * @returns {void}
+     */
     setMusicVolume(volume) {
         this.musicVolume = Math.max(0, Math.min(1, volume));
         this.bgMusic.volume = this.isMuted ? 0 : this.musicVolume;
     }
 
+    /**
+     * Aktiviert oder deaktiviert die Stummschaltung für alle Sounds.
+     * @param {boolean} muted true = stummschalten.
+     * @returns {void}
+     */
     setMuted(muted) {
         this.isMuted = !!muted;
 
@@ -101,6 +136,11 @@ class AudioManager {
         }
     }
 
+    /**
+     * Aktiviert oder deaktiviert die Hintergrundmusik separat von der Stummschaltung.
+     * @param {boolean} enabled true = Musik aktivieren.
+     * @returns {void}
+     */
     setBackgroundMusicEnabled(enabled) {
         this.isBackgroundMusicEnabled = !!enabled;
 
@@ -112,6 +152,11 @@ class AudioManager {
         this.play();
     }
 
+    /**
+     * Setzt die Lautstärke aller Soundeffekte.
+     * @param {number} volume Lautstärke (0–1).
+     * @returns {void}
+     */
     setSFXVolume(volume) {
         this.sfxVolume = Math.max(0, Math.min(1, volume));
         this.coinSound.volume = this.sfxVolume;
@@ -127,6 +172,10 @@ class AudioManager {
         this.darkZoneVoiceSound.volume = this.sfxVolume;
     }
 
+    /**
+     * Spielt den Münz-Sound ab (geklont, damit überlappend möglich).
+     * @returns {void}
+     */
     playCoinSound() {
         if (this.isMuted) return;
         const coin = this.coinSound.cloneNode();
@@ -134,6 +183,10 @@ class AudioManager {
         coin.play();
     }
 
+    /**
+     * Spielt den Fail-Sound beim Tod des Spielers ab.
+     * @returns {void}
+     */
     playFailSound() {
         if (this.isMuted) return;
         const fail = this.failSound.cloneNode();
@@ -141,6 +194,10 @@ class AudioManager {
         fail.play();
     }
 
+    /**
+     * Spielt den Trank-Sound beim Einsammeln einer Giftflasche ab.
+     * @returns {void}
+     */
     playPotionSound() {
         if (this.isMuted) return;
         const potion = this.potionSound.cloneNode();
@@ -148,6 +205,10 @@ class AudioManager {
         potion.play();
     }
 
+    /**
+     * Spielt den Victory-Sound beim Besiegen des Bosses ab.
+     * @returns {void}
+     */
     playVictorySound() {
         if (this.isMuted) return;
         const victory = this.victorySound.cloneNode();
@@ -155,6 +216,10 @@ class AudioManager {
         victory.play();
     }
 
+    /**
+     * Spielt den Flossenschlag-Sound ab.
+     * @returns {void}
+     */
     playFinSlapSound() {
         if (this.isMuted) return;
         const fin = this.finSlapSound.cloneNode();
@@ -162,6 +227,10 @@ class AudioManager {
         fin.play();
     }
 
+    /**
+     * Spielt den Elektro-Schock-Sound ab (Treffer durch elektrische Qualle).
+     * @returns {void}
+     */
     playElectricSound() {
         if (this.isMuted) return;
         const elec = this.electricSound.cloneNode();
@@ -169,6 +238,10 @@ class AudioManager {
         elec.play();
     }
 
+    /**
+     * Spielt den Treffer-Sound bei normalen Giftangriffen ab.
+     * @returns {void}
+     */
     playHurtSound() {
         if (this.isMuted) return;
         const hurt = this.hurtSound.cloneNode();
@@ -176,6 +249,10 @@ class AudioManager {
         hurt.play();
     }
 
+    /**
+     * Spielt den Sound beim Abfeuern einer normalen Blase ab.
+     * @returns {void}
+     */
     playBubbleShootSound() {
         if (this.isMuted) return;
         const bubble = this.bubbleShootSound.cloneNode();
@@ -183,6 +260,10 @@ class AudioManager {
         bubble.play();
     }
 
+    /**
+     * Spielt den Sound beim Abfeuern einer Giftblase ab.
+     * @returns {void}
+     */
     playPoisonShootSound() {
         if (this.isMuted) return;
         const poison = this.poisonShootSound.cloneNode();
@@ -190,6 +271,10 @@ class AudioManager {
         poison.play();
     }
 
+    /**
+     * Spielt die Sprachausgabe beim Betreten der dunklen Bosszone ab.
+     * @returns {void}
+     */
     playDarkZoneVoiceSound() {
         if (this.isMuted) return;
         const voice = this.darkZoneVoiceSound.cloneNode();
@@ -197,6 +282,10 @@ class AudioManager {
         voice.play();
     }
 
+    /**
+     * Spielt den Boss-Intro-Sound beim ersten Erscheinen des Bosses ab.
+     * @returns {void}
+     */
     playBossIntroSound() {
         if (this.isMuted) return;
         const intro = this.bossIntroSound.cloneNode();

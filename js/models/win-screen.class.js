@@ -1,3 +1,6 @@
+/**
+ * Sieg-Bildschirm – wird nach dem Tod des Bosses mit Einblend-Effekt angezeigt.
+ */
 class WinScreen {
     youWinImg = null;
     isVisible = false;
@@ -13,35 +16,29 @@ class WinScreen {
         this.youWinImg.src = encodeURI('6.Botones/Tittles/You win/Mesa de trabajo 1.png');
     }
 
+    /**
+     * Zeichnet den Sieg-Bildschirm mit Goldschein-Effekt auf den Canvas.
+     * @param {CanvasRenderingContext2D} ctx Zeichenkontext.
+     * @returns {void}
+     */
     draw(ctx) {
-        // nicht zeichnen wenn nicht sichtbar
         if (!this.isVisible) {
             return;
         }
-
-        // Fade-In Effekt
         if (this.opacity < 1) {
             this.opacity += this.fadeInSpeed;
             if (this.opacity > 1) this.opacity = 1;
         }
 
         ctx.save();
-        
-        // Vollständig schwarzer Hintergrund mit Fade
         ctx.globalAlpha = this.opacity;
         ctx.fillStyle = 'black';
         ctx.fillRect(0, 0, 800, 540);
-
-        // YOU WIN Bild mit Glow
         if (this.youWinImg && this.youWinImg.complete) {
             const x = (800 - this.youWinWidth) / 2;
             const y = (540 - this.youWinHeight) / 2 - 40;
-            
-            // Bessere Bildqualität
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
-            
-            // Glow-Effekt
             ctx.shadowColor = '#FFD700';
             ctx.shadowBlur = 30;
             
@@ -51,6 +48,11 @@ class WinScreen {
         ctx.restore();
     }
 
+    /**
+     * Zeigt den Sieg-Bildschirm an und spielt den Victory-Sound ab.
+     * @param {AudioManager} audioManager Audio-Manager für den Victory-Sound.
+     * @returns {void}
+     */
     show(audioManager) {
         if (!this.isVisible && !this.soundPlayed) {
             this.opacity = 0;
@@ -62,6 +64,10 @@ class WinScreen {
         this.isVisible = true;
     }
 
+    /**
+     * Versteckt den Sieg-Bildschirm und setzt alle Zustände zurück.
+     * @returns {void}
+     */
     hide() {
         this.isVisible = false;
         this.soundPlayed = false;

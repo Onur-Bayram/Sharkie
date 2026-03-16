@@ -1,34 +1,37 @@
+/**
+ * Startet ein neues Spiel aus dem HTML-Startbildschirm heraus.
+ * Bricht ab wenn das Gerät im Hochformat-Telefon-Layout ist.
+ * @returns {void}
+ */
 function startGameFromHTML() {
     if (isPortraitPhoneLayout()) {
         updateOrientationLock();
         return;
     }
-
-    // Startbildschirm ausblenden
     hideEl('start-screen');
-    // Canvas anzeigen
     $('canvas').classList.remove('hidden');
-    // Menübutton anzeigen
     showEl('game-menu-button');
-    // Spiel starten
     init();
     updateMobileControlsVisibility();
 }
 
+/**
+ * Zeigt den Options-Bildschirm an und blendet den Spielbereich aus.
+ * @returns {void}
+ */
 function showOptionsScreen() {
-    // Ingame-Menübutton ausblenden, solange Optionen geöffnet sind
     hideEl('game-menu-button');
-    // Startbildschirm ausblenden
     hideEl('start-screen');
-    // Optionen-Bildschirm anzeigen
     showEl('options-screen');
-    // Hauptmenü anzeigen
     showOptionsSubmenu('menu');
-    // Untere Buttons je nach Spielstatus umschalten
     updateBackButtons();
     hideMobileControls();
 }
 
+/**
+ * Aktualisiert die Zurück-Buttons je nachdem ob das Spiel pausiert ist oder nicht.
+ * @returns {void}
+ */
 function updateBackButtons() {
     const backToStartButton = $('back-to-start-button');
     const returnToTitleButton = $('return-to-title-button');
@@ -49,7 +52,6 @@ function updateBackButtons() {
             showEl('back-to-game-button');
         }
     } else {
-        // "Zurück zum Start" aus dem Hauptmenü anzeigen
         showEl('back-to-start-button');
         hideEl('return-to-title-button');
         if (backToStartButton) {
@@ -62,15 +64,17 @@ function updateBackButtons() {
     updateBackIconVisibility();
 }
 
+/**
+ * Wechselt zum angegebenen Options-Untermenü und versteckt alle anderen.
+ * @param {'menu'|'language'|'help'|'audio'|'impressum'} submenu Zu zeigendes Untermenü.
+ * @returns {void}
+ */
 function showOptionsSubmenu(submenu) {
-    // Alle Untermenüs ausblenden
     hideEl('options-menu');
     hideEl('options-language');
     hideEl('options-help');
     hideEl('options-audio');
     hideEl('options-impressum');
-
-    // Gewähltes Untermenü einblenden
     if (submenu === 'menu') {
         showEl('options-menu');
     } else if (submenu === 'language') {
@@ -86,10 +90,18 @@ function showOptionsSubmenu(submenu) {
     updateBackIconVisibility();
 }
 
+/**
+ * Kehrt zum Options-Hauptmenü zurück.
+ * @returns {void}
+ */
 function backToOptionsMenu() {
     showOptionsSubmenu('menu');
 }
 
+/**
+ * Schließt den Options-Bildschirm ohne laufendes Spiel und zeigt den Startbildschirm.
+ * @returns {void}
+ */
 function hideOptionsScreen() {
     hideEl('options-screen');
     $('canvas').classList.add('hidden');
@@ -100,6 +112,10 @@ function hideOptionsScreen() {
     isGamePaused = false;
 }
 
+/**
+ * Beendet das laufende Spiel und kehrt zum Startbildschirm zurück (verlässt auch Vollbild).
+ * @returns {void}
+ */
 function returnToTitle() {
     if (document.fullscreenElement) {
         document.exitFullscreen().catch(() => {});
@@ -114,6 +130,10 @@ function returnToTitle() {
     updateMobileControlsVisibility();
 }
 
+/**
+ * Startet das Spiel neu ohne zum Startbildschirm zurückzukehren.
+ * @returns {void}
+ */
 function restartGame() {
     teardownCurrentGame();
     hideEl('start-screen');
@@ -125,25 +145,28 @@ function restartGame() {
     updateMobileControlsVisibility();
 }
 
+/**
+ * Blendet den Options-Bildschirm aus und setzt das laufende Spiel fort.
+ * @returns {void}
+ */
 function backToGame() {
-    // Optionen-Bildschirm ausblenden
     hideEl('options-screen');
     $('options-screen').querySelector('.back-icon-button')?.classList.remove('is-visible');
-    // Canvas und Menübutton wieder anzeigen
     $('canvas').classList.remove('hidden');
     showEl('game-menu-button');
     updateMobileControlsVisibility();
-    // Spiel fortsetzen
     if (world && typeof world.resumeGame === 'function') {
         world.resumeGame();
     }
     isGamePaused = false;
 }
 
+/**
+ * Pausiert das Spiel und öffnet den Options-Bildschirm (in-game Pause-Menü).
+ * @returns {void}
+ */
 function pauseAndReturnToMenu() {
-    // Markieren, dass das Spiel pausiert ist
     isGamePaused = true;
-    // Spiel-Loop/Audio pausieren und Eingaben zurücksetzen
     if (world) {
         if (typeof world.pauseGame === 'function') {
             world.pauseGame();
@@ -151,16 +174,17 @@ function pauseAndReturnToMenu() {
     }
     resetKeyboardState();
     hideMobileControls();
-
-    // Optionen-Panel öffnen (wie bei Klick auf „Optionen“)
     showOptionsScreen();
 }
 
+/**
+ * Bindet alle globalen UI-Event-Listener (Resize, Orientierung, Fullscreen, Klicks, Slider).
+ * Wird nur einmal ausgeführt (Guard via `uiBound`).
+ * @returns {void}
+ */
 function bindUI() {
     if (uiBound) return;
     uiBound = true;
-
-    // Reagiert auf Größen- und Ausrichtungsänderungen des Geräts
     window.addEventListener('resize', updateOrientationLock);
     window.addEventListener('orientationchange', updateOrientationLock);
     window.addEventListener('resize', updateBackIconVisibility);
@@ -169,11 +193,8 @@ function bindUI() {
     window.addEventListener('orientationchange', updateMobileControlsVisibility);
     document.addEventListener('fullscreenchange', updateMobileControlsVisibility);
     document.addEventListener('fullscreenchange', updateHtmlFullscreenButton);
-
-    // HTML-Vollbild-Button für Touch-Geräte
     const htmlFsBtn = $('html-fullscreen-button');
     if (htmlFsBtn) {
-        // Verhindert, dass Spieltasten den fokussierten Vollbild-Button erneut ausloesen.
         htmlFsBtn.addEventListener('keydown', (e) => {
             const isSpace = e.code === 'Space' || e.key === ' ';
             const isEnter = e.key === 'Enter';
@@ -189,7 +210,7 @@ function bindUI() {
             e.stopPropagation();
             htmlFsBtn.blur();
 
-            const container = document.body || $('canvas')?.closest('.game-panel');
+            const container = $('canvas')?.closest('.game-panel') || document.body;
             if (!container) return;
             if (!document.fullscreenElement) {
                 container.requestFullscreen();
@@ -198,8 +219,6 @@ function bindUI() {
             }
         });
     }
-
-    // Zentrale Klicksteuerung für alle Elemente mit data-action
     document.addEventListener('click', (event) => {
         const button = event.target.closest('[data-action]');
         if (!button) return;
@@ -250,6 +269,12 @@ function bindUI() {
     bindMobileControls();
 }
 
+/**
+ * Wechselt die Spielsprache, speichert sie im localStorage und wendet alle Übersetzungen an.
+ * @param {string} lang Sprachcode (z.B. 'de', 'en', 'es').
+ * @param {HTMLElement|null} button Der angeklickte Sprachbutton (oder null).
+ * @returns {void}
+ */
 function changeLanguage(lang, button) {
     if (!TRANSLATIONS[lang]) {
         lang = 'de';
@@ -267,6 +292,10 @@ function changeLanguage(lang, button) {
     updateMuteButtonLabel();
 }
 
+/**
+ * Aktualisiert die Beschriftung des Stummschaltungs-Buttons je nach aktuellem Zustand.
+ * @returns {void}
+ */
 function updateMuteButtonLabel() {
     const muteButton = $('mute-toggle-button');
     if (!muteButton) {
@@ -279,6 +308,10 @@ function updateMuteButtonLabel() {
     muteButton.textContent = getLanguageStrings(window.gameSettings.language || 'de')[i18nKey];
 }
 
+/**
+ * Schaltet den Ton des Spiels um (stumm / laut) und persistiert den Zustand.
+ * @returns {void}
+ */
 function toggleMute() {
     window.gameSettings = window.gameSettings || {};
     window.gameSettings.muted = !window.gameSettings.muted;
@@ -291,29 +324,31 @@ function toggleMute() {
     updateMuteButtonLabel();
 }
 
+/**
+ * Setzt die Musik-Lautstärke über den HTML-Slider und aktualisiert den AudioManager.
+ * @param {string|number} value Lautstärkewert in Prozent (0–100).
+ * @returns {void}
+ */
 function updateMusicVolume(value) {
     $('music-value').textContent = value + '%';
     const volume = value / 100;
-
-    // Global speichern
     window.gameSettings = window.gameSettings || {};
     window.gameSettings.musicVolume = volume;
-
-    // Direkt anwenden, falls das Spiel bereits läuft
     if (world && world.audioManager) {
         world.audioManager.setMusicVolume(volume);
     }
 }
 
+/**
+ * Setzt die Soundeffekt-Lautstärke über den HTML-Slider und aktualisiert den AudioManager.
+ * @param {string|number} value Lautstärkewert in Prozent (0–100).
+ * @returns {void}
+ */
 function updateSFXVolume(value) {
     $('sfx-value').textContent = value + '%';
     const volume = value / 100;
-
-    // Global speichern
     window.gameSettings = window.gameSettings || {};
     window.gameSettings.sfxVolume = volume;
-
-    // Direkt anwenden, falls das Spiel bereits läuft
     if (world && world.audioManager) {
         world.audioManager.setSFXVolume(volume);
     }
