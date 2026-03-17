@@ -5,7 +5,6 @@ class PoisonBottle extends MovableObject {
     
     width = 50;
     height = 50;
-    collected = false;
 
     /**
      * Erstellt eine Giftflasche an der angegebenen Position.

@@ -7,7 +7,6 @@ class RestartButton {
     buttonWidth = 200;
     buttonHeight = 66;
     isVisible = false;
-    ctx = null;
     buttonImage = null;
     hoverScale = 1.0;
     floatOffset = 0;
@@ -17,15 +16,6 @@ class RestartButton {
     constructor() {
         this.loadImage();
         this.updatePosition();
-    }
-
-    /**
-     * Setzt den Zeichenkontext (optional, nicht aktiv benötigt).
-     * @param {CanvasRenderingContext2D} ctx Zeichenkontext.
-     * @returns {void}
-     */
-    setCanvasContext(ctx) {
-        this.ctx = ctx;
     }
 
     /**

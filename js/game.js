@@ -338,10 +338,6 @@ function init() {
             world.audioManager.setMuted(!!window.gameSettings.muted);
         }
     }
-    if (world.restartButton) {
-        world.restartButton.setCanvasContext(canvas.getContext('2d'));
-    }
-    
 }
 
 document.addEventListener('keydown', (e) => {

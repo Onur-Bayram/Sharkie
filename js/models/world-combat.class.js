@@ -67,7 +67,7 @@ checkCollisions() {
 checkPoisonCollection() {
     for (let i = this.poisonBottles.length - 1; i >= 0; i--) {
         const bottle = this.poisonBottles[i];
-        if (!bottle.collected && this.character.isCollidingCollect(bottle)) {
+        if (this.character.isCollidingCollect(bottle)) {
             this.poisonBar.setPercentage(this.character.poison);
             this.audioManager.playPotionSound();
             this.poisonBottles.splice(i, 1);

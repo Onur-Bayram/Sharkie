@@ -315,6 +315,11 @@ class FinalBoss extends MovableObject {
             return;
         }
 
+        // Intro darf nicht durch Hurt unterbrochen werden, sonst bleibt der Boss unbeweglich.
+        if (!this.introduced || this.state === 'introduce') {
+            return;
+        }
+
         this.hp -= damage;
         
         if (this.hp <= 0) {

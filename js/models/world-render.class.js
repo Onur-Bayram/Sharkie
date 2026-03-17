@@ -154,10 +154,14 @@ resumeGame() {
  * @returns {boolean}
  */
 isCollidingBoss(character, boss) {
-    const offset = 80;
-    return character.x + offset < boss.x + boss.width - offset &&
-           character.x + character.width - offset > boss.x + offset &&
-           character.y + offset < boss.y + boss.height - offset &&
-           character.y + character.height - offset > boss.y + offset;
+    const characterInset = 36;
+    const bossSideInset = 32;
+    const bossTopInset = 185;
+    const bossBottomInset = 32;
+
+    return character.x + characterInset < boss.x + boss.width - bossSideInset &&
+           character.x + character.width - characterInset > boss.x + bossSideInset &&
+           character.y + characterInset < boss.y + boss.height - bossBottomInset &&
+           character.y + character.height - characterInset > boss.y + bossTopInset;
 }
 });

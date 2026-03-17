@@ -98,15 +98,6 @@ class AudioManager {
     }
     
     /**
-     * Alias für `setMusicVolume` – setzt die Musik-Lautstärke.
-     * @param {number} volume Lautstärke (0–1).
-     * @returns {void}
-     */
-    setVolume(volume) {
-        this.setMusicVolume(volume);
-    }
-
-    /**
      * Setzt die Musik-Lautstärke und wendet sie sofort an.
      * @param {number} volume Lautstärke (0–1).
      * @returns {void}

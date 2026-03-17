@@ -110,16 +110,17 @@ isCollidingCollect(obj) {
 }
 
 /**
- * Prüft eine strengere Kollision für Münzen.
- * Die Überlappung muss deutlich sichtbar sein, bevor gesammelt wird.
+ * Prüft eine präzise Kontakt-Kollision für Münzen.
+ * Gesammelt wird nur bei echter sichtbarer Berührung.
  * @param {MovableObject} obj Zu prüfende Münze.
  * @returns {boolean}
  */
 isCollidingCoin(obj) {
-    const characterBackInsetX = 56;
-    const characterFrontInsetX = 40;
-    const characterInsetY = 34;
-    const coinInset = 4;
+    const characterBackInsetX = 68;
+    const characterFrontInsetX = 56;
+    const characterInsetY = 44;
+    const coinInset = 6;
+    const minContactPixels = 8;
 
     const isFacingLeft = !!this.otherDirection;
     const characterLeftInset = isFacingLeft ? characterFrontInsetX : characterBackInsetX;
@@ -136,15 +137,8 @@ isCollidingCoin(obj) {
 
     const overlapWidth = right - left;
     const overlapHeight = bottom - top;
-    const overlapArea = overlapWidth * overlapHeight;
-    const coinWidth = obj.width - coinInset * 2;
-    const coinHeight = obj.height - coinInset * 2;
-    const coinArea = coinWidth * coinHeight;
 
-    // Kombination aus Fläche + Achsen-Überlappung: präzise, aber im Spielgefühl nicht zu streng.
-    return overlapArea >= coinArea * 0.22 &&
-           overlapWidth >= coinWidth * 0.30 &&
-           overlapHeight >= coinHeight * 0.30;
+    return overlapWidth >= minContactPixels && overlapHeight >= minContactPixels;
 }
 
 }
