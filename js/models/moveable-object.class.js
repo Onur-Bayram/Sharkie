@@ -28,7 +28,6 @@ getSharedImage(path) {
     return MovableObject.sharedImageCache[path];
 }
 
-
 /**
  * Setzt das aktuelle Hauptbild des Objekts.
  * @param {string} path Relativer Bildpfad.
@@ -110,5 +109,43 @@ isCollidingCollect(obj) {
            this.y + this.height - offsetY > obj.y + objInset;
 }
 
- }
+/**
+ * Prüft eine strengere Kollision für Münzen.
+ * Die Überlappung muss deutlich sichtbar sein, bevor gesammelt wird.
+ * @param {MovableObject} obj Zu prüfende Münze.
+ * @returns {boolean}
+ */
+isCollidingCoin(obj) {
+    const characterBackInsetX = 56;
+    const characterFrontInsetX = 40;
+    const characterInsetY = 34;
+    const coinInset = 4;
+
+    const isFacingLeft = !!this.otherDirection;
+    const characterLeftInset = isFacingLeft ? characterFrontInsetX : characterBackInsetX;
+    const characterRightInset = isFacingLeft ? characterBackInsetX : characterFrontInsetX;
+
+    const left = Math.max(this.x + characterLeftInset, obj.x + coinInset);
+    const right = Math.min(this.x + this.width - characterRightInset, obj.x + obj.width - coinInset);
+    const top = Math.max(this.y + characterInsetY, obj.y + coinInset);
+    const bottom = Math.min(this.y + this.height - characterInsetY, obj.y + obj.height - coinInset);
+
+    if (right <= left || bottom <= top) {
+        return false;
+    }
+
+    const overlapWidth = right - left;
+    const overlapHeight = bottom - top;
+    const overlapArea = overlapWidth * overlapHeight;
+    const coinWidth = obj.width - coinInset * 2;
+    const coinHeight = obj.height - coinInset * 2;
+    const coinArea = coinWidth * coinHeight;
+
+    // Kombination aus Fläche + Achsen-Überlappung: präzise, aber im Spielgefühl nicht zu streng.
+    return overlapArea >= coinArea * 0.22 &&
+           overlapWidth >= coinWidth * 0.30 &&
+           overlapHeight >= coinHeight * 0.30;
+}
+
+}
 

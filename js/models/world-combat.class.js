@@ -85,7 +85,7 @@ checkPoisonCollection() {
     }
     for (let i = this.coins.length - 1; i >= 0; i--) {
         const coin = this.coins[i];
-        if (!coin.collected && this.character.isCollidingCollect(coin)) {
+        if (!coin.collected && this.character.isCollidingCoin(coin)) {
             coin.collected = true;
             this.collectedCoins++;
             this.coinBar.setPercentage(this.collectedCoins, this.totalCoins);
