@@ -69,6 +69,8 @@ class FinalBoss extends MovableObject {
     lastAttackTime = 0;
     deadAnimationFinished = false;
     state = 'introduce'; // introduce, floating, attacking, hurt, dead
+    stateStartedAt = 0;
+    hurtUntil = 0;
     floatingSpeed = 0.5;
     floatingTargetX = 0;
     floatingTargetY = 0;
@@ -107,6 +109,7 @@ class FinalBoss extends MovableObject {
         this.floatingTargetX = x;
         this.floatingTargetY = y;
         this.lastStyleChangeTime = Date.now();
+        this.stateStartedAt = Date.now();
     }
 
     /**
@@ -128,9 +131,10 @@ class FinalBoss extends MovableObject {
     }
 
     canAnimateNow() {
-        if (!this.isActive) return false;
         if (this.state === 'introduce' && !this.hasStartedIntro) return false;
-        return true;
+        // Let transient states finish even if the boss is briefly outside the active range.
+        if (this.isDead || this.state === 'hurt' || this.state === 'attacking') return true;
+        return this.isActive;
     }
 
     renderDeadLastFrame(images) {
@@ -157,6 +161,7 @@ class FinalBoss extends MovableObject {
         this.introduced = true;
         this.state = 'floating';
         this.currentImage = 0;
+        this.stateStartedAt = Date.now();
     }
 
     finishAttackIfNeeded() {
@@ -164,6 +169,7 @@ class FinalBoss extends MovableObject {
         this.isAttacking = false;
         this.state = 'floating';
         this.currentImage = 0;
+        this.stateStartedAt = Date.now();
     }
 
     finishHurtIfNeeded() {
@@ -171,6 +177,7 @@ class FinalBoss extends MovableObject {
         this.isHurt = false;
         this.state = 'floating';
         this.currentImage = 0;
+        this.stateStartedAt = Date.now();
     }
 
     finishDeathIfNeeded() {
@@ -180,8 +187,48 @@ class FinalBoss extends MovableObject {
     }
 
     updateMovementFrame() {
+        this.recoverStuckTransientState();
         if (!this.isActive || !this.introduced || this.isDead) return;
         this.updateFloatingBehavior();
+    }
+
+    recoverStuckTransientState() {
+        const now = Date.now();
+
+        if (this.state === 'hurt' && now >= this.hurtUntil) {
+            this.isHurt = false;
+            this.state = 'floating';
+            this.currentImage = 0;
+            this.stateStartedAt = now;
+        }
+
+        if (this.state === 'hurt' && now - this.stateStartedAt > 1200) {
+            this.isHurt = false;
+            this.state = 'floating';
+            this.currentImage = 0;
+            this.stateStartedAt = now;
+        }
+
+        if (this.state === 'attacking' && now - this.stateStartedAt > 1800) {
+            this.isAttacking = false;
+            this.state = 'floating';
+            this.currentImage = 0;
+            this.stateStartedAt = now;
+        }
+
+        // Keep booleans aligned with the canonical state to avoid stale lockups.
+        this.isHurt = this.state === 'hurt';
+        this.isAttacking = this.state === 'attacking';
+
+        if (!Number.isFinite(this.x) || !Number.isFinite(this.y)) {
+            this.x = 6000;
+            this.y = 80;
+            this.state = 'floating';
+            this.isHurt = false;
+            this.isAttacking = false;
+            this.currentImage = 0;
+            this.stateStartedAt = now;
+        }
     }
 
     /**
@@ -238,7 +285,7 @@ class FinalBoss extends MovableObject {
      * @returns {void}
      */
     applyMovement() {
-        if (!this.character) {
+        if (!this.character || !Number.isFinite(this.character.x) || !Number.isFinite(this.character.y)) {
             this.applyIdleDriftMovement();
             return;
         }
@@ -255,7 +302,7 @@ class FinalBoss extends MovableObject {
     getCharacterVector() {
         const distX = this.character.x - this.x;
         const distY = this.character.y - this.y;
-        const distance = Math.sqrt(distX * distX + distY * distY);
+        const distance = Math.max(Math.sqrt(distX * distX + distY * distY), 0.001);
         return { distX, distY, distance };
     }
 
@@ -267,7 +314,10 @@ class FinalBoss extends MovableObject {
     }
 
     applyAggressiveMovement(vector) {
-        if (vector.distance <= 50) return;
+        if (vector.distance <= 50) {
+            this.x -= this.floatingSpeed * 0.8;
+            return;
+        }
         this.x += (vector.distX / vector.distance) * this.floatingSpeed;
         this.y += (vector.distY / vector.distance) * this.floatingSpeed;
     }
@@ -307,7 +357,10 @@ class FinalBoss extends MovableObject {
         if (vector.distance < 300) {
             this.x -= (vector.distX / vector.distance) * this.floatingSpeed * 1.6;
             this.y -= (vector.distY / vector.distance) * this.floatingSpeed * 1.6;
+            return;
         }
+        // In the 300-400 range, keep slight horizontal motion so the boss never appears frozen.
+        this.x += this.floatingSpeed * 0.65 * (this.character.x > this.x ? 1 : -1);
     }
 
     clampPositionToBossArea() {
@@ -349,7 +402,8 @@ class FinalBoss extends MovableObject {
         this.isAttacking = true;
         this.state = 'attacking';
         this.currentImage = 0;
-        this.lastAttackTime = Date.now();
+        this.stateStartedAt = Date.now();
+        this.lastAttackTime = this.stateStartedAt;
     }
 
     /**
@@ -374,6 +428,8 @@ class FinalBoss extends MovableObject {
         this.isHurt = true;
         this.state = 'hurt';
         this.currentImage = 0;
+        this.stateStartedAt = Date.now();
+        this.hurtUntil = this.stateStartedAt + 550;
     }
 
     /**
@@ -389,6 +445,7 @@ class FinalBoss extends MovableObject {
         this.state = 'dead';
         this.currentImage = 0;
         this.deadAnimationFinished = false;
+        this.stateStartedAt = Date.now();
     }
 
     /**
