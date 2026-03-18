@@ -78,93 +78,75 @@ ctx;
      */
     constructor(canvas) {
         this.canvas = canvas;
-    this.ctx = canvas.getContext('2d');
-    this.character.world = this;
-    this.backgroundObjects = [...this.backgroundObjectsLight, ...this.backgroundObjectsDark];
-    this.lightLayers = this.backgroundObjectsLight.filter((bg, index) => index % 5 === 4);
-    this.enemies = this.createEnemies();
-    this.jellyfishes = this.createJellyfishes();
-    this.poisonBottles = this.createPoisonBottles();
-    this.animatedPoisonBottles = this.createAnimatedPoisonBottles();
-    this.coins = this.createCoins();
-    this.totalCoins = this.coins.length;
-    this.collectedCoins = 0;
-    this.coinBar.setPercentage(0, this.totalCoins);
-    this.finalBoss = new FinalBoss(this.mapWidth - 500, 80);
-    this.bossBar.setPercentage(this.finalBoss.hp, this.finalBoss.maxHp);
-    
-    this.handleThrow();
-    this.audioManager.play();
-    
-    this.winScreen.hide();
-    this.gameOverScreen.hide();
-    this.restartButton.hide();
-    
-    this.draw();
-}
+        this.ctx = canvas.getContext('2d');
+        this.initWorldObjects();
+        this.initWorldScreens();
+        this.startWorld();
+    }
+
+    initWorldObjects() {
+        this.character.world = this;
+        this.backgroundObjects = [...this.backgroundObjectsLight, ...this.backgroundObjectsDark];
+        this.lightLayers = this.backgroundObjectsLight.filter((bg, index) => index % 5 === 4);
+        this.enemies = this.createEnemies();
+        this.jellyfishes = this.createJellyfishes();
+        this.poisonBottles = this.createPoisonBottles();
+        this.animatedPoisonBottles = this.createAnimatedPoisonBottles();
+        this.coins = this.createCoins();
+        this.totalCoins = this.coins.length;
+        this.collectedCoins = 0;
+        this.coinBar.setPercentage(0, this.totalCoins);
+        this.finalBoss = new FinalBoss(this.mapWidth - 500, 80);
+        this.bossBar.setPercentage(this.finalBoss.hp, this.finalBoss.maxHp);
+    }
+
+    initWorldScreens() {
+        this.winScreen.hide();
+        this.gameOverScreen.hide();
+        this.restartButton.hide();
+    }
+
+    startWorld() {
+        this.handleThrow();
+        this.audioManager.play();
+        this.draw();
+    }
 
     /**
      * Creates randomly distributed pufferfish enemies on the map.
      * @returns {Pufferfish[]}
      */
     createEnemies() {
-    const enemies = [];
-    const count = 10;
-    const minX = 200;
-    const maxX = 4500; 
-    const minY = 80;
-    const maxY = Math.max(minY, this.canvas.height - 120);
-
-    for (let i = 0; i < count; i++) {
-        const x = minX + Math.random() * (maxX - minX);
-        const y = minY + Math.random() * (maxY - minY);
-        enemies.push(new Pufferfish(x, y));
+        return this.createRandomActors(10, 200, 4500, 80, this.canvas.height - 120,
+            (x, y) => new Pufferfish(x, y));
     }
-
-    return enemies;
-}
 
     /**
      * Creates randomly distributed jellyfish on the map.
      * @returns {Jellyfish[]}
      */
     createJellyfishes() {
-    const jellyfishes = [];
-    const count = 12;
-    const minX = 200;
-    const maxX = 4500;
-    const minY = 80;
-    const maxY = Math.max(minY, this.canvas.height - 120);
-
-    for (let i = 0; i < count; i++) {
-        const x = minX + Math.random() * (maxX - minX);
-        const y = minY + Math.random() * (maxY - minY);
-        jellyfishes.push(new Jellyfish(x, y));
+        return this.createRandomActors(12, 200, 4500, 80, this.canvas.height - 120,
+            (x, y) => new Jellyfish(x, y));
     }
 
-    return jellyfishes;
-}
+    createRandomActors(count, minX, maxX, minY, maxY, factory) {
+        const safeMaxY = Math.max(minY, maxY);
+        return Array.from({length: count}, () => {
+            const x = minX + Math.random() * (maxX - minX);
+            const y = minY + Math.random() * (safeMaxY - minY);
+            return factory(x, y);
+        });
+    }
 
     /**
      * Creates static poison bottles on the map.
      * @returns {PoisonBottle[]}
      */
     createPoisonBottles() {
-    const bottles = [];
-    const count = 12;
-    const minX = 200;
-    const maxX = 4500;
-    const minY = 400; 
-    const maxY = 450;
-
-    for (let i = 0; i < count; i++) {
-        const x = minX + Math.random() * (maxX - minX);
-        const y = minY + Math.random() * (maxY - minY);
-        bottles.push(new PoisonBottle(x, y));
+        return this.createRandomActors(12, 200, 4500, 400, 450,
+            (x, y) => new PoisonBottle(x, y));
     }
-
-    return bottles;
-}
 
     /**
      * Creates animated (falling) poison bottles on the map.
@@ -189,42 +171,26 @@ ctx;
      * @returns {Coin[]}
      */
     createCoins() {
-    const coins = [];
-    const count = 10;
-    const minX = 200;
-    const maxX = 4500;
-    const minY = 80;
-    const maxY = Math.max(minY, this.canvas.height - 120);
-
-    for (let i = 0; i < count; i++) {
-        const x = minX + Math.random() * (maxX - minX);
-        const y = minY + Math.random() * (maxY - minY);
-        coins.push(new Coin(x, y));
+        return this.createRandomActors(10, 200, 4500, 80, this.canvas.height - 120,
+            (x, y) => new Coin(x, y));
     }
-
-    return coins;
-}
 
     /**
      * Starts the throw interval for keys F (normal bubble), D (poison bubble) and spacebar (fin slap).
      * @returns {void}
      */
     handleThrow() {
-        setInterval(() => {
-        if (this.isPaused) {
-            return;
-        }
-        if (window.keyboard && window.keyboard.F) {
-            this.character.throwNormalBubble();
-        }
+        setInterval(() => this.tickThrowInput(), 100);
+    }
+
+    tickThrowInput() {
+        if (this.isPaused) return;
+        if (window.keyboard && window.keyboard.F) this.character.throwNormalBubble();
         if (window.keyboard && window.keyboard.D) {
             this.character.throwPoisonBubble();
             this.poisonBar.setPercentage(this.character.poison);
         }
-        if (window.keyboard && window.keyboard.SPACE) {
-            this.character.throwFinSlap();
-        }
-    }, 100);
-}
+        if (window.keyboard && window.keyboard.SPACE) this.character.throwFinSlap();
+    }
 
 }

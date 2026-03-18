@@ -22,30 +22,35 @@ class WinScreen {
      * @returns {void}
      */
     draw(ctx) {
-        if (!this.isVisible) {
-            return;
-        }
-        if (this.opacity < 1) {
-            this.opacity += this.fadeInSpeed;
-            if (this.opacity > 1) this.opacity = 1;
-        }
-
+        if (!this.isVisible) return;
+        this.advanceFadeIn();
         ctx.save();
         ctx.globalAlpha = this.opacity;
+        this.renderWinBackground(ctx);
+        this.renderWinImage(ctx);
+        ctx.restore();
+    }
+
+    advanceFadeIn() {
+        if (this.opacity < 1) {
+            this.opacity = Math.min(1, this.opacity + this.fadeInSpeed);
+        }
+    }
+
+    renderWinBackground(ctx) {
         ctx.fillStyle = 'black';
         ctx.fillRect(0, 0, 800, 540);
-        if (this.youWinImg && this.youWinImg.complete) {
-            const x = (800 - this.youWinWidth) / 2;
-            const y = (540 - this.youWinHeight) / 2 - 40;
-            ctx.imageSmoothingEnabled = true;
-            ctx.imageSmoothingQuality = 'high';
-            ctx.shadowColor = '#FFD700';
-            ctx.shadowBlur = 30;
-            
-            ctx.drawImage(this.youWinImg, x, y, this.youWinWidth, this.youWinHeight);
-        }
-        
-        ctx.restore();
+    }
+
+    renderWinImage(ctx) {
+        if (!this.youWinImg || !this.youWinImg.complete) return;
+        const x = (800 - this.youWinWidth) / 2;
+        const y = (540 - this.youWinHeight) / 2 - 40;
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.shadowColor = '#FFD700';
+        ctx.shadowBlur = 30;
+        ctx.drawImage(this.youWinImg, x, y, this.youWinWidth, this.youWinHeight);
     }
 
     /**

@@ -43,35 +43,42 @@ class RestartButton {
      */
     draw(ctx) {
         if (!this.isVisible) return;
+        this.updateFloatAndScale();
+        if (!this.buttonImage || !this.buttonImage.complete) return;
+        ctx.save();
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        this.applyButtonGlow(ctx);
+        this.renderButtonImage(ctx);
+        ctx.restore();
+    }
+
+    updateFloatAndScale() {
         this.animationTime += 0.05;
         this.floatOffset = Math.sin(this.animationTime) * 8;
         const targetScale = this.isHovered ? 1.1 : 1.0;
         this.hoverScale += (targetScale - this.hoverScale) * 0.15;
-        if (this.buttonImage && this.buttonImage.complete) {
-            ctx.save();
-            ctx.imageSmoothingEnabled = true;
-            ctx.imageSmoothingQuality = 'high';
-            if (this.isHovered) {
-                ctx.shadowColor = 'rgba(0, 255, 255, 0.6)';
-                ctx.shadowBlur = 20;
-            }
-            const centerX = this.buttonX + this.buttonWidth / 2;
-            const centerY = this.buttonY + this.buttonHeight / 2 + this.floatOffset;
-            
-            ctx.translate(centerX, centerY);
-            ctx.scale(this.hoverScale, this.hoverScale);
-            ctx.translate(-centerX, -centerY);
-            
-            ctx.drawImage(
-                this.buttonImage, 
-                this.buttonX, 
-                this.buttonY + this.floatOffset, 
-                this.buttonWidth, 
-                this.buttonHeight
-            );
-            
-            ctx.restore();
-        }
+    }
+
+    applyButtonGlow(ctx) {
+        if (!this.isHovered) return;
+        ctx.shadowColor = 'rgba(0, 255, 255, 0.6)';
+        ctx.shadowBlur = 20;
+    }
+
+    renderButtonImage(ctx) {
+        const centerX = this.buttonX + this.buttonWidth / 2;
+        const centerY = this.buttonY + this.buttonHeight / 2 + this.floatOffset;
+        ctx.translate(centerX, centerY);
+        ctx.scale(this.hoverScale, this.hoverScale);
+        ctx.translate(-centerX, -centerY);
+        ctx.drawImage(
+            this.buttonImage,
+            this.buttonX,
+            this.buttonY + this.floatOffset,
+            this.buttonWidth,
+            this.buttonHeight
+        );
     }
 
     /**

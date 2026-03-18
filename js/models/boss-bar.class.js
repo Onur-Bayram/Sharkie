@@ -28,24 +28,36 @@ class BossBar {
     draw(ctx) {
         const safeMax = Math.max(this.maxHp, 1);
         const percentage = Math.min(Math.max(this.currentHp / safeMax, 0), 1);
-        const borderWidth = 3;
-        const padding = borderWidth + 2; // Platz für Rahmen + extra Abstand
-        const innerWidth = this.width - (padding * 2);
-        const innerHeight = this.height - (padding * 2);
-        const barWidth = innerWidth * percentage;
+        this.drawBarBackground(ctx);
+        this.drawBarBorder(ctx);
+        this.drawBarFill(ctx, percentage);
+        this.drawBarText(ctx);
+    }
+
+    drawBarBackground(ctx) {
         ctx.fillStyle = '#333333';
         ctx.fillRect(this.x, this.y, this.width, this.height);
+    }
+
+    drawBarBorder(ctx) {
+        const borderWidth = 3;
         ctx.strokeStyle = '#FFFFFF';
         ctx.lineWidth = borderWidth;
-        ctx.strokeRect(this.x + borderWidth/2, this.y + borderWidth/2, this.width - borderWidth, this.height - borderWidth);
-        if (percentage > 0.5) {
-            ctx.fillStyle = '#00FF00'; // Grün
-        } else if (percentage > 0.25) {
-            ctx.fillStyle = '#FFFF00'; // Gelb
-        } else {
-            ctx.fillStyle = '#FF0000'; // Rot
-        }
-        ctx.fillRect(this.x + padding, this.y + padding, barWidth, innerHeight);
+        ctx.strokeRect(this.x + borderWidth / 2, this.y + borderWidth / 2, this.width - borderWidth, this.height - borderWidth);
+    }
+
+    drawBarFill(ctx, percentage) {
+        const borderWidth = 3;
+        const padding = borderWidth + 2;
+        const innerWidth = this.width - padding * 2;
+        const innerHeight = this.height - padding * 2;
+        if (percentage > 0.5) ctx.fillStyle = '#00FF00';
+        else if (percentage > 0.25) ctx.fillStyle = '#FFFF00';
+        else ctx.fillStyle = '#FF0000';
+        ctx.fillRect(this.x + padding, this.y + padding, innerWidth * percentage, innerHeight);
+    }
+
+    drawBarText(ctx) {
         ctx.fillStyle = '#FFFFFF';
         ctx.font = 'bold 16px Arial';
         ctx.textAlign = 'center';

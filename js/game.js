@@ -182,16 +182,22 @@ function clearTrackedGameLoops() {
  * @returns {void}
  */
 function resetCanvasState() {
-    if (!canvas) {
-        canvas = $('canvas');
-    }
-    if (!canvas) {
-        return;
-    }
+    if (!ensureCanvasElement()) return;
+    applyDefaultCanvasSize();
+    resetCanvasRenderingState();
+}
 
+function ensureCanvasElement() {
+    if (!canvas) canvas = $('canvas');
+    return !!canvas;
+}
+
+function applyDefaultCanvasSize() {
     canvas.width = ORIGINAL_WIDTH;
     canvas.height = ORIGINAL_HEIGHT;
+}
 
+function resetCanvasRenderingState() {
     const ctx = canvas.getContext('2d');
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -238,23 +244,24 @@ function setActiveLanguageButton(lang) {
  */
 function applyLanguage(lang) {
     const strings = getLanguageStrings(lang);
-
-    document.querySelectorAll('[data-i18n]').forEach((element) => {
-        const key = element.dataset.i18n;
-        if (strings[key]) {
-            element.textContent = strings[key];
-        }
-    });
-
-    document.querySelectorAll('[data-i18n-title]').forEach((element) => {
-        const key = element.dataset.i18nTitle;
-        if (strings[key]) {
-            element.setAttribute('title', strings[key]);
-        }
-    });
-
+    applyTextTranslations(strings);
+    applyTitleTranslations(strings);
     document.documentElement.lang = lang === 'en' ? 'en' : 'de';
     setActiveLanguageButton(lang);
+}
+
+function applyTextTranslations(strings) {
+    document.querySelectorAll('[data-i18n]').forEach((element) => {
+        const key = element.dataset.i18n;
+        if (strings[key]) element.textContent = strings[key];
+    });
+}
+
+function applyTitleTranslations(strings) {
+    document.querySelectorAll('[data-i18n-title]').forEach((element) => {
+        const key = element.dataset.i18nTitle;
+        if (strings[key]) element.setAttribute('title', strings[key]);
+    });
 }
 
 /**
@@ -265,22 +272,23 @@ function applyLanguage(lang) {
  */
 function updateCanvasResolution(isFullscreen) {
     if (!canvas) return;
-    
     const ctx = canvas.getContext('2d');
-    
-    if (isFullscreen) {
-        const scale = window.devicePixelRatio || 2;
-        const multiplier = Math.min(scale, 2);
-
-        canvas.width = ORIGINAL_WIDTH * multiplier;
-        canvas.height = ORIGINAL_HEIGHT * multiplier;
-        ctx.scale(multiplier, multiplier);
-    } else {
-        canvas.width = ORIGINAL_WIDTH;
-        canvas.height = ORIGINAL_HEIGHT;
-    }
+    setCanvasResolutionForMode(ctx, isFullscreen);
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
+}
+
+function setCanvasResolutionForMode(ctx, isFullscreen) {
+    if (!isFullscreen) {
+        canvas.width = ORIGINAL_WIDTH;
+        canvas.height = ORIGINAL_HEIGHT;
+        return;
+    }
+    const scale = window.devicePixelRatio || 2;
+    const multiplier = Math.min(scale, 2);
+    canvas.width = ORIGINAL_WIDTH * multiplier;
+    canvas.height = ORIGINAL_HEIGHT * multiplier;
+    ctx.scale(multiplier, multiplier);
 }
 
 /**
@@ -289,27 +297,35 @@ function updateCanvasResolution(isFullscreen) {
  * @returns {void}
  */
 function showStartScreen() {
-    canvas = $("canvas");
-    showEl('start-screen');
-    hideEl('options-screen');
-    hideMobileControls();
-    const musicSlider = $('music-slider');
-    const sfxSlider = $('sfx-slider');
-    if (window.gameSettings) {
-        if (window.gameSettings.musicVolume !== undefined) {
-            musicSlider.value = window.gameSettings.musicVolume * 100;
-            $('music-value').textContent = Math.round(window.gameSettings.musicVolume * 100) + '%';
-        }
-        if (window.gameSettings.sfxVolume !== undefined) {
-            sfxSlider.value = window.gameSettings.sfxVolume * 100;
-            $('sfx-value').textContent = Math.round(window.gameSettings.sfxVolume * 100) + '%';
-        }
-    }
-    
+    canvas = $('canvas');
+    showStartUiShell();
+    syncAudioSliderValues();
     bindUI();
     applyLanguage(window.gameSettings.language || 'de');
     updateMuteButtonLabel();
     updateOrientationLock();
+    registerGlobalGameActions();
+}
+
+function showStartUiShell() {
+    showEl('start-screen');
+    hideEl('options-screen');
+    hideMobileControls();
+}
+
+function syncAudioSliderValues() {
+    if (!window.gameSettings) return;
+    syncSingleSlider('music-slider', 'music-value', window.gameSettings.musicVolume);
+    syncSingleSlider('sfx-slider', 'sfx-value', window.gameSettings.sfxVolume);
+}
+
+function syncSingleSlider(sliderId, labelId, value) {
+    if (value === undefined) return;
+    $(sliderId).value = value * 100;
+    $(labelId).textContent = Math.round(value * 100) + '%';
+}
+
+function registerGlobalGameActions() {
     window.startGame = init;
     window.restartGame = restartGame;
 }
@@ -321,23 +337,21 @@ function showStartScreen() {
  */
 function init() {
     teardownCurrentGame();
-
-    if (!canvas) {
-        canvas = $("canvas");
-    }
+    ensureCanvasElement();
     world = new World(canvas);
     window.world = world;
-    if (window.gameSettings) {
-        if (window.gameSettings.musicVolume !== undefined && world.audioManager) {
-            world.audioManager.setMusicVolume(window.gameSettings.musicVolume);
-        }
-        if (window.gameSettings.sfxVolume !== undefined && world.audioManager) {
-            world.audioManager.setSFXVolume(window.gameSettings.sfxVolume);
-        }
-        if (world.audioManager) {
-            world.audioManager.setMuted(!!window.gameSettings.muted);
-        }
+    applySavedAudioSettings();
+}
+
+function applySavedAudioSettings() {
+    if (!window.gameSettings || !world.audioManager) return;
+    if (window.gameSettings.musicVolume !== undefined) {
+        world.audioManager.setMusicVolume(window.gameSettings.musicVolume);
     }
+    if (window.gameSettings.sfxVolume !== undefined) {
+        world.audioManager.setSFXVolume(window.gameSettings.sfxVolume);
+    }
+    world.audioManager.setMuted(!!window.gameSettings.muted);
 }
 
 document.addEventListener('keydown', (e) => {

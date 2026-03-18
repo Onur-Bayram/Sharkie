@@ -25,56 +25,44 @@ class Pufferfish extends MovableObject{
      */
     constructor(x = null, y = null){
         super();
-        
-    
+        this.randomizePufferColor();
+        this.loadPufferImages();
+        this.initPufferPosition(x, y);
+        this.initPufferPhysics();
+        this.animate();
+    }
+
+    randomizePufferColor() {
         this.colorVariant = Math.floor(Math.random() * 3) + 1;
-        
-      
-        this.IMAGES_SWIM = [
-            `2.Enemy/1.Puffer fish (3 color options)/1.Swim/${this.colorVariant}.swim1.png`,
-            `2.Enemy/1.Puffer fish (3 color options)/1.Swim/${this.colorVariant}.swim2.png`,
-            `2.Enemy/1.Puffer fish (3 color options)/1.Swim/${this.colorVariant}.swim3.png`,
-            `2.Enemy/1.Puffer fish (3 color options)/1.Swim/${this.colorVariant}.swim4.png`,
-            `2.Enemy/1.Puffer fish (3 color options)/1.Swim/${this.colorVariant}.swim5.png`
-        ];
+    }
 
-        this.IMAGES_TRANSITION = [
-            `2.Enemy/1.Puffer fish (3 color options)/2.transition/${this.colorVariant}.transition1.png`,
-            `2.Enemy/1.Puffer fish (3 color options)/2.transition/${this.colorVariant}.transition2.png`,
-            `2.Enemy/1.Puffer fish (3 color options)/2.transition/${this.colorVariant}.transition3.png`,
-            `2.Enemy/1.Puffer fish (3 color options)/2.transition/${this.colorVariant}.transition4.png`,
-            `2.Enemy/1.Puffer fish (3 color options)/2.transition/${this.colorVariant}.transition5.png`
-        ];
-
-        this.IMAGES_BUBBLESWIM = [
-            `2.Enemy/1.Puffer fish (3 color options)/3.Bubbleeswim/${this.colorVariant}.bubbleswim1.png`,
-            `2.Enemy/1.Puffer fish (3 color options)/3.Bubbleeswim/${this.colorVariant}.bubbleswim2.png`,
-            `2.Enemy/1.Puffer fish (3 color options)/3.Bubbleeswim/${this.colorVariant}.bubbleswim3.png`,
-            `2.Enemy/1.Puffer fish (3 color options)/3.Bubbleeswim/${this.colorVariant}.bubbleswim4.png`,
-            `2.Enemy/1.Puffer fish (3 color options)/3.Bubbleeswim/${this.colorVariant}.bubbleswim5.png`
-        ];
-
+    loadPufferImages() {
+        const v = this.colorVariant;
+        const base = '2.Enemy/1.Puffer fish (3 color options)';
+        this.IMAGES_SWIM = Array.from({length: 5}, (_, i) => `${base}/1.Swim/${v}.swim${i+1}.png`);
+        this.IMAGES_TRANSITION = Array.from({length: 5}, (_, i) => `${base}/2.transition/${v}.transition${i+1}.png`);
+        this.IMAGES_BUBBLESWIM = Array.from({length: 5}, (_, i) => `${base}/3.Bubbleeswim/${v}.bubbleswim${i+1}.png`);
         this.IMAGES_DEAD = this.getDeadImages();
         this.IMAGES_DEAD_FINSLAP = this.getDeadImagesFinSlap();
-        
         this.loadImage(this.IMAGES_SWIM[0]);
         this.loadImages(this.IMAGES_SWIM);
         this.loadImages(this.IMAGES_TRANSITION);
         this.loadImages(this.IMAGES_BUBBLESWIM);
         this.loadImages(this.IMAGES_DEAD);
         this.loadImages(this.IMAGES_DEAD_FINSLAP);
-        
+    }
+
+    initPufferPosition(x, y) {
         this.x = x !== null ? x : 200 + Math.random() * 300;
         this.y = y !== null ? y : 150 + Math.random() * 200;
         this.width = 80;
         this.height = 60;
-        
-    
+    }
+
+    initPufferPhysics() {
         this.speed = 0.15 + Math.random() * 0.2;
         this.verticalSpeed = 0.5 + Math.random() * 0.5;
         this.targetY = this.y;
-        
-        this.animate();
     }
 
     /**
@@ -82,54 +70,60 @@ class Pufferfish extends MovableObject{
      * @returns {void}
      */
     animate() {
-        setInterval(() => {
-            const images = this.getCurrentImages();
-
-            if (this.isDead && this.deadAnimationFinished) {
-                this.img = this.imageCache[images[images.length - 1]];
-                return;
-            }
-
-            let path = images[this.currentImage % images.length];
-            this.img = this.imageCache[path];
-            this.currentImage++;
-
-            if (this.isDead && this.currentImage >= images.length) {
-                this.deadAnimationFinished = true;
-                this.currentImage = images.length - 1;
-                return;
-            }
-
-            if (!this.isDead && this.isTransitionState() && this.currentImage >= images.length) {
-                this.finishTransition();
-            }
-        }, 150);
-        
-    
-        setInterval(() => {
-            if (this.isDead) {
-                if (this.deadCause === 'finSlap') {
-                    this.applyFinSlapKnockback();
-                }
-                return;
-            }
-
-            this.moveLeft();
-            if (Math.abs(this.y - this.targetY) > 1) {
-                if (this.y < this.targetY) {
-                    this.y += this.verticalSpeed;
-                } else {
-                    this.y -= this.verticalSpeed;
-                }
-            }
-        }, 1000 / 60);
-        setInterval(() => {
-            if (!this.isDead) {
-                this.targetY = 50 + Math.random() * 400;
-            }
-        }, 3000);
-
+        this.runPufferAnimationLoop();
+        this.runPufferMovementLoop();
+        this.runPufferTargetLoop();
         this.scheduleBubbleCycle();
+    }
+
+    runPufferAnimationLoop() {
+        setInterval(() => this.tickPufferAnimation(), 150);
+    }
+
+    tickPufferAnimation() {
+        const images = this.getCurrentImages();
+        if (this.showDeadLastPufferFrame(images)) return;
+        this.img = this.imageCache[images[this.currentImage % images.length]];
+        this.currentImage++;
+        this.checkPufferDeadOrTransition(images);
+    }
+
+    showDeadLastPufferFrame(images) {
+        if (!this.isDead || !this.deadAnimationFinished) return false;
+        this.img = this.imageCache[images[images.length - 1]];
+        return true;
+    }
+
+    checkPufferDeadOrTransition(images) {
+        if (this.isDead && this.currentImage >= images.length) {
+            this.deadAnimationFinished = true;
+            this.currentImage = images.length - 1;
+            return;
+        }
+        if (!this.isDead && this.isTransitionState() && this.currentImage >= images.length) {
+            this.finishTransition();
+        }
+    }
+
+    runPufferMovementLoop() {
+        setInterval(() => this.tickPufferMovement(), 1000 / 60);
+    }
+
+    tickPufferMovement() {
+        if (this.isDead) {
+            if (this.deadCause === 'finSlap') this.applyFinSlapKnockback();
+            return;
+        }
+        this.moveLeft();
+        if (Math.abs(this.y - this.targetY) > 1) {
+            this.y += this.y < this.targetY ? this.verticalSpeed : -this.verticalSpeed;
+        }
+    }
+
+    runPufferTargetLoop() {
+        setInterval(() => {
+            if (!this.isDead) this.targetY = 50 + Math.random() * 400;
+        }, 3000);
     }
 
     /**
@@ -138,19 +132,17 @@ class Pufferfish extends MovableObject{
      */
     scheduleBubbleCycle() {
         const cycleDelay = 4000 + Math.random() * 2000;
-        setInterval(() => {
-            if (this.isDead) {
-                return;
-            }
-            if (this.state === 'swim') {
-                this.startTransitionToBubble();
-                setTimeout(() => {
-                    if (this.state === 'bubble') {
-                        this.startTransitionToSwim();
-                    }
-                }, 2000);
-            }
-        }, cycleDelay);
+        setInterval(() => this.tickBubbleCycle(), cycleDelay);
+    }
+
+    tickBubbleCycle() {
+        if (this.isDead) return;
+        if (this.state === 'swim') {
+            this.startTransitionToBubble();
+            setTimeout(() => {
+                if (this.state === 'bubble') this.startTransitionToSwim();
+            }, 2000);
+        }
     }
 
     /**
@@ -217,25 +209,7 @@ class Pufferfish extends MovableObject{
      * @returns {string[]}
      */
     getDeadImages() {
-        if (this.colorVariant === 1) {
-            return [
-                '2.Enemy/1.Puffer fish (3 color options)/4.DIE/1.Dead 1 (can animate by going up).png',
-                '2.Enemy/1.Puffer fish (3 color options)/4.DIE/1.Dead 2 (can animate by going down to the floor after the Fin Slap attack).png',
-                '2.Enemy/1.Puffer fish (3 color options)/4.DIE/1.Dead 3 (can animate by going down to the floor after the Fin Slap attack).png'
-            ];
-        }
-        if (this.colorVariant === 2) {
-            return [
-                '2.Enemy/1.Puffer fish (3 color options)/4.DIE/2.png',
-                '2.Enemy/1.Puffer fish (3 color options)/4.DIE/2.2.png',
-                '2.Enemy/1.Puffer fish (3 color options)/4.DIE/2.3.png'
-            ];
-        }
-        return [
-            '2.Enemy/1.Puffer fish (3 color options)/4.DIE/3.png',
-            '2.Enemy/1.Puffer fish (3 color options)/4.DIE/3.2.png',
-            '2.Enemy/1.Puffer fish (3 color options)/4.DIE/3.3.png'
-        ];
+        return this.getPufferDeadImagesByVariant();
     }
 
     /**
@@ -243,25 +217,22 @@ class Pufferfish extends MovableObject{
      * @returns {string[]}
      */
     getDeadImagesFinSlap() {
+        return this.getPufferDeadImagesByVariant();
+    }
+
+    getPufferDeadImagesByVariant() {
+        const base = '2.Enemy/1.Puffer fish (3 color options)/4.DIE';
         if (this.colorVariant === 1) {
             return [
-                '2.Enemy/1.Puffer fish (3 color options)/4.DIE/1.Dead 1 (can animate by going up).png',
-                '2.Enemy/1.Puffer fish (3 color options)/4.DIE/1.Dead 2 (can animate by going down to the floor after the Fin Slap attack).png',
-                '2.Enemy/1.Puffer fish (3 color options)/4.DIE/1.Dead 3 (can animate by going down to the floor after the Fin Slap attack).png'
+                `${base}/1.Dead 1 (can animate by going up).png`,
+                `${base}/1.Dead 2 (can animate by going down to the floor after the Fin Slap attack).png`,
+                `${base}/1.Dead 3 (can animate by going down to the floor after the Fin Slap attack).png`
             ];
         }
         if (this.colorVariant === 2) {
-            return [
-                '2.Enemy/1.Puffer fish (3 color options)/4.DIE/2.png',
-                '2.Enemy/1.Puffer fish (3 color options)/4.DIE/2.2.png',
-                '2.Enemy/1.Puffer fish (3 color options)/4.DIE/2.3.png'
-            ];
+            return [`${base}/2.png`, `${base}/2.2.png`, `${base}/2.3.png`];
         }
-        return [
-            '2.Enemy/1.Puffer fish (3 color options)/4.DIE/3.png',
-            '2.Enemy/1.Puffer fish (3 color options)/4.DIE/3.2.png',
-            '2.Enemy/1.Puffer fish (3 color options)/4.DIE/3.3.png'
-        ];
+        return [`${base}/3.png`, `${base}/3.2.png`, `${base}/3.3.png`];
     }
 
     /**

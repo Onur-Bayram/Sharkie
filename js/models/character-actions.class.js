@@ -22,31 +22,41 @@ Object.assign(Character.prototype, {
      * @returns {BubbleAnimation|null} Created animation or null on cooldown.
      */
     throwNormalBubble() {
-        if (this.canThrowNormalBubble()) {
-            this.lastThrowTime = Date.now();
-            this.isAttacking = true;
-            this.currentImage = 0;
-
-            const direction = this.otherDirection ? -1 : 1;
-            const offsetX = this.otherDirection ? 0 : this.width;
-            let bubbleAnimation = null;
-            setTimeout(() => {
-                bubbleAnimation = new BubbleAnimation(this.x + offsetX, this.y + 50, direction, false);
-                if (this.world) {
-                    this.world.bubbleAnimations.push(bubbleAnimation);
-                    if (this.world.audioManager) {
-                        this.world.audioManager.playBubbleShootSound();
-                    }
-                }
-            }, 800);
-            setTimeout(() => {
-                this.isAttacking = false;
-                this.currentImage = 0;
-            }, 800);
-
-            return bubbleAnimation;
-        }
+        if (!this.canThrowNormalBubble()) return null;
+        this.lastThrowTime = Date.now();
+        this.startAttackState();
+        const direction = this.otherDirection ? -1 : 1;
+        const offsetX = this.otherDirection ? 0 : this.width;
+        this.scheduleNormalBubble(offsetX, direction);
+        this.scheduleAttackReset(800);
         return null;
+    },
+
+    scheduleNormalBubble(offsetX, direction) {
+        setTimeout(() => {
+            const bubble = new BubbleAnimation(this.x + offsetX, this.y + 50, direction, false);
+            this.registerBubbleInWorld(bubble, false);
+        }, 800);
+    },
+
+    registerBubbleInWorld(bubble, isPoison) {
+        if (!this.world) return;
+        this.world.bubbleAnimations.push(bubble);
+        if (!this.world.audioManager) return;
+        if (isPoison) this.world.audioManager.playPoisonShootSound();
+        else this.world.audioManager.playBubbleShootSound();
+    },
+
+    scheduleAttackReset(delay) {
+        setTimeout(() => {
+            this.isAttacking = false;
+            this.currentImage = 0;
+        }, delay);
+    },
+
+    startAttackState() {
+        this.isAttacking = true;
+        this.currentImage = 0;
     },
 
     /**
@@ -54,35 +64,26 @@ Object.assign(Character.prototype, {
      * @returns {BubbleAnimation|null} Created animation or null on cooldown.
      */
     throwPoisonBubble() {
-        if (this.canThrowPoisonBubble()) {
-            this.lastThrowTime = Date.now();
-            this.poison -= 30;
-            if (this.poison < 0) {
-                this.poison = 0;
-            }
-            this.isAttacking = true;
-            this.currentImage = 0;
-
-            const direction = this.otherDirection ? -1 : 1;
-            const offsetX = this.otherDirection ? 0 : this.width;
-            let bubbleAnimation = null;
-            setTimeout(() => {
-                bubbleAnimation = new BubbleAnimation(this.x + offsetX, this.y + 50, direction, true);
-                if (this.world) {
-                    this.world.bubbleAnimations.push(bubbleAnimation);
-                    if (this.world.audioManager) {
-                        this.world.audioManager.playPoisonShootSound();
-                    }
-                }
-            }, 800);
-            setTimeout(() => {
-                this.isAttacking = false;
-                this.currentImage = 0;
-            }, 800);
-
-            return bubbleAnimation;
-        }
+        if (!this.canThrowPoisonBubble()) return null;
+        this.lastThrowTime = Date.now();
+        this.deductPoison();
+        this.startAttackState();
+        const direction = this.otherDirection ? -1 : 1;
+        const offsetX = this.otherDirection ? 0 : this.width;
+        this.schedulePoisonBubble(offsetX, direction);
+        this.scheduleAttackReset(800);
         return null;
+    },
+
+    deductPoison() {
+        this.poison = Math.max(0, this.poison - 30);
+    },
+
+    schedulePoisonBubble(offsetX, direction) {
+        setTimeout(() => {
+            const bubble = new BubbleAnimation(this.x + offsetX, this.y + 50, direction, true);
+            this.registerBubbleInWorld(bubble, true);
+        }, 800);
     },
 
     /**
@@ -99,31 +100,32 @@ Object.assign(Character.prototype, {
      * @returns {FinSlap|null} The created projectile or null on cooldown.
      */
     throwFinSlap() {
-        if (this.canThrowFinSlap()) {
-            this.lastThrowTime = Date.now();
-            this.isFinSlapping = true;
-            this.currentImage = 0;
-
-            const direction = this.otherDirection ? -1 : 1;
-            const offsetX = this.otherDirection ? 0 : 120;
-            let finSlap = null;
-            setTimeout(() => {
-                finSlap = new FinSlap(this.x + offsetX, this.y + 50, direction);
-                if (this.world) {
-                    this.world.finSlaps.push(finSlap);
-                    if (this.world.audioManager) {
-                        this.world.audioManager.playFinSlapSound();
-                    }
-                }
-            }, 300);
-            setTimeout(() => {
-                this.isFinSlapping = false;
-                this.currentImage = 0;
-            }, 600);
-
-            return finSlap;
-        }
+        if (!this.canThrowFinSlap()) return null;
+        this.lastThrowTime = Date.now();
+        this.isFinSlapping = true;
+        this.currentImage = 0;
+        const direction = this.otherDirection ? -1 : 1;
+        const offsetX = this.otherDirection ? 0 : 120;
+        this.scheduleFinSlap(offsetX, direction);
+        this.scheduleFinSlapReset(600);
         return null;
+    },
+
+    scheduleFinSlap(offsetX, direction) {
+        setTimeout(() => {
+            const finSlap = new FinSlap(this.x + offsetX, this.y + 50, direction);
+            if (this.world) {
+                this.world.finSlaps.push(finSlap);
+                if (this.world.audioManager) this.world.audioManager.playFinSlapSound();
+            }
+        }, 300);
+    },
+
+    scheduleFinSlapReset(delay) {
+        setTimeout(() => {
+            this.isFinSlapping = false;
+            this.currentImage = 0;
+        }, delay);
     },
 
     /**
@@ -141,15 +143,17 @@ Object.assign(Character.prototype, {
      * @returns {void}
      */
     die() {
-        if (this.isDead) {
-            return;
-        }
+        if (this.isDead) return;
         this.isDead = true;
         this.isHurt = false;
         this.isAttacking = false;
         this.isFinSlapping = false;
         this.currentImage = 0;
         this.deadAnimationFinished = false;
+        this.triggerDeathScreens();
+    },
+
+    triggerDeathScreens() {
         if (this.world && this.world.gameOverScreen) {
             this.world.gameOverScreen.show(this.world.audioManager);
         }

@@ -35,33 +35,32 @@ function showOptionsScreen() {
 function updateBackButtons() {
     const backToStartButton = $('back-to-start-button');
     const returnToTitleButton = $('return-to-title-button');
-
-    if (isGamePaused) {
-        hideEl('back-to-start-button');
-        showEl('return-to-title-button');
-        if (backToStartButton) {
-            backToStartButton.dataset.i18n = 'to_title';
-            backToStartButton.textContent = getLanguageStrings(window.gameSettings.language || 'de').to_title;
-        }
-        if (returnToTitleButton) {
-            returnToTitleButton.textContent = getLanguageStrings(window.gameSettings.language || 'de').to_title;
-        }
-        if (isResponsiveLayout()) {
-            hideEl('back-to-game-button');
-        } else {
-            showEl('back-to-game-button');
-        }
-    } else {
-        showEl('back-to-start-button');
-        hideEl('return-to-title-button');
-        if (backToStartButton) {
-            backToStartButton.dataset.i18n = 'back_start';
-            backToStartButton.textContent = getLanguageStrings(window.gameSettings.language || 'de').back_start;
-        }
-        hideEl('back-to-game-button');
-    }
-
+    if (isGamePaused) updatePausedBackButtons(backToStartButton, returnToTitleButton);
+    else updateUnpausedBackButtons(backToStartButton);
     updateBackIconVisibility();
+}
+
+function updatePausedBackButtons(backToStartButton, returnToTitleButton) {
+    const strings = getLanguageStrings(window.gameSettings.language || 'de');
+    hideEl('back-to-start-button');
+    showEl('return-to-title-button');
+    if (backToStartButton) {
+        backToStartButton.dataset.i18n = 'to_title';
+        backToStartButton.textContent = strings.to_title;
+    }
+    if (returnToTitleButton) returnToTitleButton.textContent = strings.to_title;
+    if (isResponsiveLayout()) hideEl('back-to-game-button');
+    else showEl('back-to-game-button');
+}
+
+function updateUnpausedBackButtons(backToStartButton) {
+    showEl('back-to-start-button');
+    hideEl('return-to-title-button');
+    if (backToStartButton) {
+        backToStartButton.dataset.i18n = 'back_start';
+        backToStartButton.textContent = getLanguageStrings(window.gameSettings.language || 'de').back_start;
+    }
+    hideEl('back-to-game-button');
 }
 
 /**
@@ -70,24 +69,25 @@ function updateBackButtons() {
  * @returns {void}
  */
 function showOptionsSubmenu(submenu) {
+    hideAllOptionsSubmenus();
+    showRequestedOptionsSubmenu(submenu);
+    updateBackIconVisibility();
+}
+
+function hideAllOptionsSubmenus() {
     hideEl('options-menu');
     hideEl('options-language');
     hideEl('options-help');
     hideEl('options-audio');
     hideEl('options-impressum');
-    if (submenu === 'menu') {
-        showEl('options-menu');
-    } else if (submenu === 'language') {
-        showEl('options-language');
-    } else if (submenu === 'help') {
-        showEl('options-help');
-    } else if (submenu === 'audio') {
-        showEl('options-audio');
-    } else if (submenu === 'impressum') {
-        showEl('options-impressum');
-    }
+}
 
-    updateBackIconVisibility();
+function showRequestedOptionsSubmenu(submenu) {
+    if (submenu === 'menu') showEl('options-menu');
+    else if (submenu === 'language') showEl('options-language');
+    else if (submenu === 'help') showEl('options-help');
+    else if (submenu === 'audio') showEl('options-audio');
+    else if (submenu === 'impressum') showEl('options-impressum');
 }
 
 /**
@@ -185,6 +185,14 @@ function pauseAndReturnToMenu() {
 function bindUI() {
     if (uiBound) return;
     uiBound = true;
+    bindGlobalViewportListeners();
+    bindHtmlFullscreenButtonHandlers();
+    bindActionClickRouter();
+    bindAudioSliderHandlers();
+    bindMobileControls();
+}
+
+function bindGlobalViewportListeners() {
     window.addEventListener('resize', updateOrientationLock);
     window.addEventListener('orientationchange', updateOrientationLock);
     window.addEventListener('resize', updateBackIconVisibility);
@@ -193,80 +201,66 @@ function bindUI() {
     window.addEventListener('orientationchange', updateMobileControlsVisibility);
     document.addEventListener('fullscreenchange', updateMobileControlsVisibility);
     document.addEventListener('fullscreenchange', updateHtmlFullscreenButton);
+}
+
+function bindHtmlFullscreenButtonHandlers() {
     const htmlFsBtn = $('html-fullscreen-button');
-    if (htmlFsBtn) {
-        htmlFsBtn.addEventListener('keydown', (e) => {
-            const isSpace = e.code === 'Space' || e.key === ' ';
-            const isEnter = e.key === 'Enter';
-            if (!isSpace && !isEnter) return;
+    if (!htmlFsBtn) return;
+    htmlFsBtn.addEventListener('keydown', handleFullscreenButtonKeydown);
+    htmlFsBtn.addEventListener('click', handleFullscreenButtonClick);
+}
 
-            e.preventDefault();
-            e.stopPropagation();
-            htmlFsBtn.blur();
-        });
+function handleFullscreenButtonKeydown(e) {
+    const isSpace = e.code === 'Space' || e.key === ' ';
+    const isEnter = e.key === 'Enter';
+    if (!isSpace && !isEnter) return;
+    e.preventDefault();
+    e.stopPropagation();
+    $('html-fullscreen-button')?.blur();
+}
 
-        htmlFsBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            htmlFsBtn.blur();
+function handleFullscreenButtonClick(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    $('html-fullscreen-button')?.blur();
+    const container = $('canvas')?.closest('.game-panel') || document.body;
+    if (!container) return;
+    if (!document.fullscreenElement) container.requestFullscreen();
+    else document.exitFullscreen();
+}
 
-            const container = $('canvas')?.closest('.game-panel') || document.body;
-            if (!container) return;
-            if (!document.fullscreenElement) {
-                container.requestFullscreen();
-            } else {
-                document.exitFullscreen();
-            }
-        });
-    }
+function bindActionClickRouter() {
     document.addEventListener('click', (event) => {
         const button = event.target.closest('[data-action]');
         if (!button) return;
-
-        const action = button.dataset.action;
-        if (action === 'start-game') {
-            startGameFromHTML();
-        } else if (action === 'open-options') {
-            showOptionsScreen();
-        } else if (action === 'open-submenu') {
-            showOptionsSubmenu(button.dataset.target);
-        } else if (action === 'back-options') {
-            const isInMainOptionsMenu = !$('options-menu').classList.contains('is-hidden');
-            if (!isInMainOptionsMenu) {
-                backToOptionsMenu();
-            } else if (isGamePaused) {
-                backToGame();
-            } else {
-                hideOptionsScreen();
-            }
-        } else if (action === 'back-start') {
-            if (isGamePaused) {
-                returnToTitle();
-            } else {
-                hideOptionsScreen();
-            }
-        } else if (action === 'back-game') {
-            backToGame();
-        } else if (action === 'game-menu') {
-            pauseAndReturnToMenu();
-        } else if (action === 'set-language') {
-            changeLanguage(button.dataset.lang, button);
-        } else if (action === 'toggle-mute') {
-            toggleMute();
-        }
+        routeAction(button.dataset.action, button);
     });
+}
 
+function routeAction(action, button) {
+    if (action === 'start-game') startGameFromHTML();
+    else if (action === 'open-options') showOptionsScreen();
+    else if (action === 'open-submenu') showOptionsSubmenu(button.dataset.target);
+    else if (action === 'back-options') handleBackOptionsAction();
+    else if (action === 'back-start') (isGamePaused ? returnToTitle() : hideOptionsScreen());
+    else if (action === 'back-game') backToGame();
+    else if (action === 'game-menu') pauseAndReturnToMenu();
+    else if (action === 'set-language') changeLanguage(button.dataset.lang, button);
+    else if (action === 'toggle-mute') toggleMute();
+}
+
+function handleBackOptionsAction() {
+    const isInMainOptionsMenu = !$('options-menu').classList.contains('is-hidden');
+    if (!isInMainOptionsMenu) backToOptionsMenu();
+    else if (isGamePaused) backToGame();
+    else hideOptionsScreen();
+}
+
+function bindAudioSliderHandlers() {
     const musicSlider = $('music-slider');
-    if (musicSlider) {
-        musicSlider.addEventListener('input', (event) => updateMusicVolume(event.target.value));
-    }
-
+    if (musicSlider) musicSlider.addEventListener('input', (event) => updateMusicVolume(event.target.value));
     const sfxSlider = $('sfx-slider');
-    if (sfxSlider) {
-        sfxSlider.addEventListener('input', (event) => updateSFXVolume(event.target.value));
-    }
-
-    bindMobileControls();
+    if (sfxSlider) sfxSlider.addEventListener('input', (event) => updateSFXVolume(event.target.value));
 }
 
 /**
@@ -276,20 +270,22 @@ function bindUI() {
  * @returns {void}
  */
 function changeLanguage(lang, button) {
-    if (!TRANSLATIONS[lang]) {
-        lang = 'de';
-    }
+    const nextLang = resolveLanguageCode(lang);
+    if (button) setActiveLanguageButton(nextLang);
+    persistLanguageSetting(nextLang);
+    applyLanguage(nextLang);
+    updateMuteButtonLabel();
+}
 
-    if (button) {
-        setActiveLanguageButton(lang);
-    }
+function resolveLanguageCode(lang) {
+    if (TRANSLATIONS[lang]) return lang;
+    return 'de';
+}
 
+function persistLanguageSetting(lang) {
     window.gameSettings = window.gameSettings || {};
     window.gameSettings.language = lang;
-
     localStorage.setItem('sharkieLanguage', lang);
-    applyLanguage(lang);
-    updateMuteButtonLabel();
 }
 
 /**

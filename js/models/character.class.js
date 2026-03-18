@@ -144,6 +144,13 @@ class Character extends MovableObject{
      */
     constructor() {
         super();
+        this.loadCharacterImages();
+        this.initCharacterSize();
+        this.animate();
+        this.handleKeyboard();
+    }
+
+    loadCharacterImages() {
         this.loadImage('1.Sharkie/1.IDLE/1.png');
         this.loadImages(this.IMAGES_IDLE);
         this.loadImages(this.IMAGES_LONG_IDLE);
@@ -155,11 +162,12 @@ class Character extends MovableObject{
         this.loadImages(this.IMAGES_DEAD_POISON);
         this.loadImages(this.IMAGES_DEAD_ELECTRIC);
         this.loadImages(this.IMAGES_FIN_SLAP);
+    }
+
+    initCharacterSize() {
         this.width = 200;
         this.height = 140;
         this.speed = 5;
-        this.animate();
-        this.handleKeyboard();
     }
 
     /**
@@ -167,60 +175,71 @@ class Character extends MovableObject{
      * @returns {void}
      */
     animate() {
-        setInterval(() => {
-            if (this.isDead) {
-                const images = this.getDeathImages();
-                if (this.deadAnimationFinished) {
-                    this.img = this.imageCache[images[images.length - 1]];
-                    return;
-                }
+        setInterval(() => this.updateAnimationFrame(), 100);
+    }
 
-                let path = images[this.currentImage % images.length];
-                this.img = this.imageCache[path];
-                this.currentImage++;
+    updateAnimationFrame() {
+        if (this.renderDeathFrame()) {
+            return;
+        }
+        if (this.isLongIdle) {
+            this.renderLongIdleFrame();
+            return;
+        }
+        this.playImageSequence(this.getCurrentActionImages());
+    }
 
-                if (this.currentImage >= images.length) {
-                    this.deadAnimationFinished = true;
-                    this.currentImage = images.length - 1;
-                }
-                return;
-            }
-            if (this.isHurt) {
-                const hurtImages = this.lastDamageType === 'electric'
-                    ? this.IMAGES_HURT
-                    : this.IMAGES_HURT_POISON;
-                let path = hurtImages[this.currentImage % hurtImages.length];
-                this.img = this.imageCache[path];
-                this.currentImage++;
-            } else if (this.isFinSlapping) {
-                let path = this.IMAGES_FIN_SLAP[this.currentImage % this.IMAGES_FIN_SLAP.length];
-                this.img = this.imageCache[path];
-                this.currentImage++;
-            } else if (this.isAttacking) {
-                let path = this.IMAGES_ATTACK[this.currentImage % this.IMAGES_ATTACK.length];
-                this.img = this.imageCache[path];
-                this.currentImage++;
-            } else if (this.isLongIdle) {
-                if (this.currentImage < this.IMAGES_LONG_IDLE.length) {
-                    let path = this.IMAGES_LONG_IDLE[this.currentImage];
-                    this.img = this.imageCache[path];
-                    this.currentImage++;
-                } else {
-                    const sleepIndex = (this.currentImage - this.IMAGES_LONG_IDLE.length) % this.IMAGES_SLEEP_LOOP.length;
-                    let path = this.IMAGES_SLEEP_LOOP[sleepIndex];
-                    this.img = this.imageCache[path];
-                    this.currentImage++;
-                }
-            } else if (this.isSwimming) {
-                let path = this.IMAGES_SWIM[this.currentImage % this.IMAGES_SWIM.length];
-                this.img = this.imageCache[path];
-                this.currentImage++;
-            } else {
-                let path = this.IMAGES_IDLE[this.currentImage % this.IMAGES_IDLE.length];
-                this.img = this.imageCache[path];
-                this.currentImage++;
-            }
-        }, 100);
+    renderDeathFrame() {
+        if (!this.isDead) return false;
+        const images = this.getDeathImages();
+        if (this.deadAnimationFinished) {
+            this.img = this.imageCache[images[images.length - 1]];
+            return true;
+        }
+        this.advanceDeathFrame(images);
+        return true;
+    }
+
+    advanceDeathFrame(images) {
+        this.playImageSequence(images);
+        if (this.currentImage >= images.length) {
+            this.deadAnimationFinished = true;
+            this.currentImage = images.length - 1;
+        }
+    }
+
+    renderLongIdleFrame() {
+        let path = '';
+        if (this.currentImage < this.IMAGES_LONG_IDLE.length) {
+            path = this.IMAGES_LONG_IDLE[this.currentImage];
+        } else {
+            const sleepIndex = (this.currentImage - this.IMAGES_LONG_IDLE.length) % this.IMAGES_SLEEP_LOOP.length;
+            path = this.IMAGES_SLEEP_LOOP[sleepIndex];
+        }
+        this.img = this.imageCache[path];
+        this.currentImage++;
+    }
+
+    getCurrentActionImages() {
+        if (this.isHurt) {
+            return this.lastDamageType === 'electric' ? this.IMAGES_HURT : this.IMAGES_HURT_POISON;
+        }
+        if (this.isFinSlapping) {
+            return this.IMAGES_FIN_SLAP;
+        }
+        if (this.isAttacking) {
+            return this.IMAGES_ATTACK;
+        }
+        if (this.isSwimming) {
+            return this.IMAGES_SWIM;
+        }
+        return this.IMAGES_IDLE;
+    }
+
+    playImageSequence(images) {
+        const path = images[this.currentImage % images.length];
+        this.img = this.imageCache[path];
+        this.currentImage++;
     }
 
     /**
@@ -230,42 +249,68 @@ class Character extends MovableObject{
      * @returns {void}
      */
     hit(damageType, damage = 10) {
-        if (this.isDead) {
+        if (this.shouldIgnoreHit()) {
             return;
         }
+        this.applyHitType(damageType);
+        this.startHurtState();
+        this.playHitSound();
+        this.applyDamage(damage);
         if (this.energy <= 0) {
             this.die();
             return;
         }
+        this.scheduleHurtRecovery();
+    }
+
+    shouldIgnoreHit() {
+        if (this.isDead) {
+            return true;
+        }
+        if (this.energy > 0) {
+            return false;
+        }
+        this.die();
+        return true;
+    }
+
+    applyHitType(damageType) {
         if (damageType) {
             this.lastDamageType = damageType;
         }
+    }
+
+    startHurtState() {
         this.isHurt = true;
-        if (this.world && this.world.audioManager) {
-            if (this.lastDamageType === 'electric') {
-                this.world.audioManager.playElectricSound();
-            } else {
-                this.world.audioManager.playHurtSound();
-            }
-        }
-        
         this.lastHitTime = Date.now();
         this.currentImage = 0;
+    }
+
+    playHitSound() {
+        if (!this.world || !this.world.audioManager) {
+            return;
+        }
+        if (this.lastDamageType === 'electric') {
+            this.world.audioManager.playElectricSound();
+            return;
+        }
+        this.world.audioManager.playHurtSound();
+    }
+
+    applyDamage(damage) {
         this.energy -= damage;
         if (this.energy < 0) {
             this.energy = 0;
         }
+    }
 
-        if (this.energy <= 0) {
-            this.die();
-            return;
-        }
-        
+    scheduleHurtRecovery() {
         setTimeout(() => {
-            if (!this.isDead) {
-                this.isHurt = false;
-                this.currentImage = 0;
+            if (this.isDead) {
+                return;
             }
+            this.isHurt = false;
+            this.currentImage = 0;
         }, 500);
     }
 
@@ -274,72 +319,60 @@ class Character extends MovableObject{
      * @returns {void}
      */
     handleKeyboard() {
-        setInterval(() => {
-            if (this.isDead) {
-                return;
-            }
-            let moved = false;
-            if (window.keyboard && window.keyboard.RIGHT) {
-                this.moveRight();
-                this.otherDirection = false;
-                moved = true;
-            }
-            if (window.keyboard && window.keyboard.LEFT) {
-                this.moveLeft();
-                this.otherDirection = true;
-                moved = true;
-            }
-            if (window.keyboard && window.keyboard.UP) {
-                this.moveUp();
-                moved = true;
-            }
-            if (window.keyboard && window.keyboard.DOWN) {
-                this.moveDown();
-                moved = true;
-            }
-            if (window.keyboard && window.keyboard.D) {
-                moved = true;
-            }
-            if (window.keyboard && window.keyboard.F) {
-                moved = true;
-            }
-            if (window.keyboard && window.keyboard.SPACE) {
-                moved = true;
-            }
-            const wasSwimming = this.isSwimming;
-            this.isSwimming = moved && !this.isAttacking && !this.isFinSlapping && !this.isHurt;
+        setInterval(() => this.updateMovementFromInput(), 1000 / 60);
+    }
 
-            if (moved) {
-                this.lastActivity = Date.now();
-                this.isLongIdle = false;
-                if (this.isSwimming && !wasSwimming) {
-                    this.currentImage = 0;
-                }
-            } else {
-                const idleTime = Date.now() - this.lastActivity;    
-                if (idleTime > 5000) {
-                    this.isLongIdle = true;
-                } else {
-                    this.isLongIdle = false;
-                }
-            }
-            const mapWidth = this.world ? this.world.mapWidth : 960;
-            const canvasHeight = this.world ? this.world.canvas.height : 540;
-            const maxX = Math.max(0, mapWidth - this.width);
-            const maxY = Math.max(0, canvasHeight - this.height);
-            if (this.x < 0) {
-                this.x = 0;
-            }
-            if (this.x > maxX) {
-                this.x = maxX;
-            }
-            if (this.y < 0) {
-                this.y = 0;
-            }
-            if (this.y > maxY) {
-                this.y = maxY;
-            }
-        }, 1000 / 60);
+    updateMovementFromInput() {
+        if (this.isDead) {
+            return;
+        }
+        let moved = this.applyDirectionalInput();
+        moved = moved || this.isActionInputActive();
+        this.updateSwimmingState(moved);
+        this.updateIdleState(moved);
+        this.clampToWorldBounds();
+    }
+
+    applyDirectionalInput() {
+        let moved = false;
+        if (window.keyboard && window.keyboard.RIGHT) { this.moveRight(); this.otherDirection = false; moved = true; }
+        if (window.keyboard && window.keyboard.LEFT) { this.moveLeft(); this.otherDirection = true; moved = true; }
+        if (window.keyboard && window.keyboard.UP) { this.moveUp(); moved = true; }
+        if (window.keyboard && window.keyboard.DOWN) { this.moveDown(); moved = true; }
+        return moved;
+    }
+
+    isActionInputActive() {
+        return !!(window.keyboard && (window.keyboard.D || window.keyboard.F || window.keyboard.SPACE));
+    }
+
+    updateSwimmingState(moved) {
+        const wasSwimming = this.isSwimming;
+        this.isSwimming = moved && !this.isAttacking && !this.isFinSlapping && !this.isHurt;
+        if (this.isSwimming && !wasSwimming) {
+            this.currentImage = 0;
+        }
+    }
+
+    updateIdleState(moved) {
+        if (moved) {
+            this.lastActivity = Date.now();
+            this.isLongIdle = false;
+            return;
+        }
+        const idleTime = Date.now() - this.lastActivity;
+        this.isLongIdle = idleTime > 5000;
+    }
+
+    clampToWorldBounds() {
+        const mapWidth = this.world ? this.world.mapWidth : 960;
+        const canvasHeight = this.world ? this.world.canvas.height : 540;
+        const maxX = Math.max(0, mapWidth - this.width);
+        const maxY = Math.max(0, canvasHeight - this.height);
+        if (this.x < 0) { this.x = 0; }
+        if (this.x > maxX) { this.x = maxX; }
+        if (this.y < 0) { this.y = 0; }
+        if (this.y > maxY) { this.y = maxY; }
     }
 
 }

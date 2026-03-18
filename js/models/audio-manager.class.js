@@ -30,40 +30,40 @@ class AudioManager {
      * @returns {void}
      */
     loadAudio() {
+        this.loadMusicTracks();
+        this.loadSfxTracks();
+        this.loadVoiceTracks();
+    }
+
+    loadMusicTracks() {
         this.bgMusic.src = 'audio/Super Mario 64 Soundtrack - Dire, Dire Docks.mp3';
         this.bgMusic.loop = true;
         this.bgMusic.volume = this.musicVolume;
+    }
 
+    loadSfxTracks() {
         this.coinSound.src = 'audio/Gold.mp3';
-        this.coinSound.volume = this.sfxVolume;
-
         this.failSound.src = 'audio/Fail.mp3';
-        this.failSound.volume = this.sfxVolume;
-
         this.potionSound.src = 'audio/Potion.mp3';
-        this.potionSound.volume = this.sfxVolume;
-
         this.victorySound.src = 'audio/8 BIT Victory sound effect.mp3';
-        this.victorySound.volume = this.sfxVolume;
-        
         this.finSlapSound.src = 'audio/Punch.mp3';
-        this.finSlapSound.volume = this.sfxVolume;
-
         this.electricSound.src = 'audio/Electricity.mp3';
-        this.electricSound.volume = this.sfxVolume;
-
         this.hurtSound.src = 'audio/confusion.mp3';
-        this.hurtSound.volume = this.sfxVolume;
-
         this.bubbleShootSound.src = 'audio/Bubbleshoot.mp3';
-        this.bubbleShootSound.volume = this.sfxVolume;
-
         this.poisonShootSound.src = 'audio/Poisenshoot.mp3';
-        this.poisonShootSound.volume = this.sfxVolume;
+        this.applySfxVolumes();
+    }
 
+    applySfxVolumes() {
+        const sfx = [this.coinSound, this.failSound, this.potionSound, this.victorySound,
+            this.finSlapSound, this.electricSound, this.hurtSound,
+            this.bubbleShootSound, this.poisonShootSound];
+        sfx.forEach(s => { s.volume = this.sfxVolume; });
+    }
+
+    loadVoiceTracks() {
         this.darkZoneVoiceSound.src = 'audio/DU KANNST NICHT VORBEI!!!.mp3';
         this.darkZoneVoiceSound.volume = this.sfxVolume;
-
         this.bossIntroSound.src = 'audio/chiiri-monster.mp3';
         this.bossIntroSound.volume = this.sfxVolume;
     }

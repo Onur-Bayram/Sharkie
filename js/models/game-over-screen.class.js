@@ -42,31 +42,36 @@ class GameOverScreen {
      * @returns {void}
      */
     draw(ctx) {
-        if (!this.isVisible) {
-            return;
-        }
-        if (this.opacity < 1) {
-            this.opacity += this.fadeInSpeed;
-            if (this.opacity > 1) this.opacity = 1;
-        }
-
+        if (!this.isVisible) return;
+        this.advanceGameOverFade();
         ctx.save();
         ctx.globalAlpha = this.opacity;
+        this.renderGameOverBackground(ctx);
+        this.renderGameOverImage(ctx);
+        ctx.restore();
+    }
+
+    advanceGameOverFade() {
+        if (this.opacity < 1) {
+            this.opacity = Math.min(1, this.opacity + this.fadeInSpeed);
+        }
+    }
+
+    renderGameOverBackground(ctx) {
         ctx.fillStyle = 'black';
         ctx.fillRect(0, 0, 800, 540);
+    }
+
+    renderGameOverImage(ctx) {
         const currentImg = this.gameOverImages[this.currentImage];
-        if (currentImg && currentImg.complete) {
-            const x = (800 - this.gameOverWidth) / 2;
-            const y = (540 - this.gameOverHeight) / 2 - 80;
-            ctx.imageSmoothingEnabled = true;
-            ctx.imageSmoothingQuality = 'high';
-            ctx.shadowColor = 'rgba(255, 255, 255, 0.3)';
-            ctx.shadowBlur = 10;
-            
-            ctx.drawImage(currentImg, x, y, this.gameOverWidth, this.gameOverHeight);
-        }
-        
-        ctx.restore();
+        if (!currentImg || !currentImg.complete) return;
+        const x = (800 - this.gameOverWidth) / 2;
+        const y = (540 - this.gameOverHeight) / 2 - 80;
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.shadowColor = 'rgba(255, 255, 255, 0.3)';
+        ctx.shadowBlur = 10;
+        ctx.drawImage(currentImg, x, y, this.gameOverWidth, this.gameOverHeight);
     }
 
     /**

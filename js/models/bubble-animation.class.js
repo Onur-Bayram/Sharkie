@@ -13,13 +13,13 @@ class BubbleAnimation extends MovableObject {
      */
     constructor(x, y, direction, isPoison = false) {
         super();
-        
+        this.initBubbleParams(x, y, direction, isPoison);
+        this.loadBubbleImage(isPoison);
+        this.throw();
+        this.animate();
+    }
 
-        let imagePath = isPoison ? 
-            '1.Sharkie/4.Attack/Bubble trap/Poisoned Bubble (for whale).png' :
-            '1.Sharkie/4.Attack/Bubble trap/Bubble.png';
-        
-        this.loadImage(imagePath);
+    initBubbleParams(x, y, direction, isPoison) {
         this.x = x;
         this.y = y;
         this.width = 60;
@@ -29,8 +29,13 @@ class BubbleAnimation extends MovableObject {
         this.isPoison = isPoison;
         this.pulseScale = 1;
         this.pulseSpeed = 0.02;
-        this.throw();
-        this.animate();
+    }
+
+    loadBubbleImage(isPoison) {
+        const path = isPoison
+            ? '1.Sharkie/4.Attack/Bubble trap/Poisoned Bubble (for whale).png'
+            : '1.Sharkie/4.Attack/Bubble trap/Bubble.png';
+        this.loadImage(path);
     }
 
     /**

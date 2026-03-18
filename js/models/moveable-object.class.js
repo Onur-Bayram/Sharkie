@@ -116,29 +116,30 @@ isCollidingCollect(obj) {
  * @returns {boolean}
  */
 isCollidingCoin(obj) {
-    const characterBackInsetX = 68;
-    const characterFrontInsetX = 56;
-    const characterInsetY = 44;
+    const {left, right, top, bottom} = this.getCoinHitbox(obj);
+    if (right <= left || bottom <= top) return false;
+    return this.hasMinimumOverlap(left, right, top, bottom);
+}
+
+getCoinHitbox(obj) {
+    const backInset = 68;
+    const frontInset = 56;
+    const insetY = 44;
     const coinInset = 6;
-    const minContactPixels = 8;
-
     const isFacingLeft = !!this.otherDirection;
-    const characterLeftInset = isFacingLeft ? characterFrontInsetX : characterBackInsetX;
-    const characterRightInset = isFacingLeft ? characterBackInsetX : characterFrontInsetX;
+    const leftInset = isFacingLeft ? frontInset : backInset;
+    const rightInset = isFacingLeft ? backInset : frontInset;
+    return {
+        left: Math.max(this.x + leftInset, obj.x + coinInset),
+        right: Math.min(this.x + this.width - rightInset, obj.x + obj.width - coinInset),
+        top: Math.max(this.y + insetY, obj.y + coinInset),
+        bottom: Math.min(this.y + this.height - insetY, obj.y + obj.height - coinInset)
+    };
+}
 
-    const left = Math.max(this.x + characterLeftInset, obj.x + coinInset);
-    const right = Math.min(this.x + this.width - characterRightInset, obj.x + obj.width - coinInset);
-    const top = Math.max(this.y + characterInsetY, obj.y + coinInset);
-    const bottom = Math.min(this.y + this.height - characterInsetY, obj.y + obj.height - coinInset);
-
-    if (right <= left || bottom <= top) {
-        return false;
-    }
-
-    const overlapWidth = right - left;
-    const overlapHeight = bottom - top;
-
-    return overlapWidth >= minContactPixels && overlapHeight >= minContactPixels;
+hasMinimumOverlap(left, right, top, bottom) {
+    const minContactPixels = 8;
+    return (right - left) >= minContactPixels && (bottom - top) >= minContactPixels;
 }
 
 }

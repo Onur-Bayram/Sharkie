@@ -20,8 +20,15 @@ class Jellyfish extends MovableObject {
      */
     constructor(x = null, y = null) {
         super();
+        this.initJellyfishType();
+        this.initJellyfishImages();
+        this.initJellyfishPosition(x, y);
+        this.initJellyfishPhysics();
+        this.animate();
+    }
+
+    initJellyfishType() {
         this.type = Math.random() > 0.7 ? 'dangerous' : 'regular';
-        
         if (this.type === 'regular') {
             this.color = Math.random() > 0.5 ? 'yellow' : 'lila';
             this.hp = 30;
@@ -31,24 +38,27 @@ class Jellyfish extends MovableObject {
             this.hp = 40;
             this.isElectric = true;
         }
+    }
 
+    initJellyfishImages() {
         this.loadSwimImages();
         this.loadDeadImages();
-        
         this.loadImage(this.IMAGES_SWIM[0]);
         this.loadImages(this.IMAGES_SWIM);
         this.loadImages(this.IMAGES_DEAD);
-        
+    }
+
+    initJellyfishPosition(x, y) {
         this.x = x !== null ? x : 200 + Math.random() * 300;
         this.y = y !== null ? y : 150 + Math.random() * 200;
         this.width = 80;
         this.height = 80;
-        
+    }
+
+    initJellyfishPhysics() {
         this.speed = 0.15 + Math.random() * 0.2;
         this.verticalSpeed = 0.5 + Math.random() * 0.5;
         this.targetY = this.y;
-        
-        this.animate();
     }
 
     /**
@@ -145,43 +155,44 @@ class Jellyfish extends MovableObject {
      * @returns {void}
      */
     animate() {
+        this.runJellyfishAnimationLoop();
+        this.runJellyfishMovementLoop();
+        this.runJellyfishTargetLoop();
+    }
+
+    runJellyfishAnimationLoop() {
+        setInterval(() => this.tickJellyfishAnimation(), 150);
+    }
+
+    tickJellyfishAnimation() {
+        const images = this.getCurrentImages();
+        if (this.isDead && this.deadAnimationFinished) {
+            this.img = this.imageCache[images[images.length - 1]];
+            return;
+        }
+        this.img = this.imageCache[images[this.currentImage % images.length]];
+        this.currentImage++;
+        if (this.isDead && this.currentImage >= images.length) {
+            this.deadAnimationFinished = true;
+            this.currentImage = images.length - 1;
+        }
+    }
+
+    runJellyfishMovementLoop() {
+        setInterval(() => this.tickJellyfishMovement(), 1000 / 60);
+    }
+
+    tickJellyfishMovement() {
+        if (this.isDead) return;
+        this.moveLeft();
+        if (Math.abs(this.y - this.targetY) > 1) {
+            this.y += this.y < this.targetY ? this.verticalSpeed : -this.verticalSpeed;
+        }
+    }
+
+    runJellyfishTargetLoop() {
         setInterval(() => {
-            const images = this.getCurrentImages();
-
-            if (this.isDead && this.deadAnimationFinished) {
-                this.img = this.imageCache[images[images.length - 1]];
-                return;
-            }
-
-            let path = images[this.currentImage % images.length];
-            this.img = this.imageCache[path];
-            this.currentImage++;
-
-            if (this.isDead && this.currentImage >= images.length) {
-                this.deadAnimationFinished = true;
-                this.currentImage = images.length - 1;
-                return;
-            }
-        }, 150);
-        
-        setInterval(() => {
-            if (this.isDead) {
-                return;
-            }
-
-            this.moveLeft();
-            if (Math.abs(this.y - this.targetY) > 1) {
-                if (this.y < this.targetY) {
-                    this.y += this.verticalSpeed;
-                } else {
-                    this.y -= this.verticalSpeed;
-                }
-            }
-        }, 1000 / 60);
-        setInterval(() => {
-            if (!this.isDead) {
-                this.targetY = 50 + Math.random() * 400;
-            }
+            if (!this.isDead) this.targetY = 50 + Math.random() * 400;
         }, 3000);
     }
 

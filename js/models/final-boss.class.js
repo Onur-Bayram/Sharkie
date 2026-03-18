@@ -84,13 +84,21 @@ class FinalBoss extends MovableObject {
      */
     constructor(x, y) {
         super();
+        this.loadBossImages();
+        this.initBossPosition(x, y);
+        this.animate();
+    }
+
+    loadBossImages() {
         this.loadImage(this.IMAGES_INTRODUCE[0]);
         this.loadImages(this.IMAGES_INTRODUCE);
         this.loadImages(this.IMAGES_FLOATING);
         this.loadImages(this.IMAGES_ATTACK);
         this.loadImages(this.IMAGES_HURT);
         this.loadImages(this.IMAGES_DEAD);
+    }
 
+    initBossPosition(x, y) {
         this.x = x;
         this.y = y;
         this.width = 450;
@@ -99,8 +107,6 @@ class FinalBoss extends MovableObject {
         this.floatingTargetX = x;
         this.floatingTargetY = y;
         this.lastStyleChangeTime = Date.now();
-
-        this.animate();
     }
 
     /**
@@ -109,53 +115,73 @@ class FinalBoss extends MovableObject {
      * @returns {void}
      */
     animate() {
-        setInterval(() => {
-            if (!this.isActive) {
-                return;
-            }
-            if (this.state === 'introduce' && !this.hasStartedIntro) {
-                return;
-            }
+        setInterval(() => this.updateAnimationFrame(), 150);
+        setInterval(() => this.updateMovementFrame(), 1000 / 60);
+    }
 
-            const images = this.getCurrentImages();
-            
-            if (this.isDead && this.deadAnimationFinished) {
-                this.img = this.imageCache[images[images.length - 1]];
-                return;
-            }
+    updateAnimationFrame() {
+        if (!this.canAnimateNow()) return;
+        const images = this.getCurrentImages();
+        if (this.renderDeadLastFrame(images)) return;
+        this.playCurrentFrame(images);
+        this.syncStateAfterFrame();
+    }
 
-            let path = images[this.currentImage % images.length];
-            this.img = this.imageCache[path];
-            this.currentImage++;
-            if (this.state === 'introduce' && this.currentImage >= this.IMAGES_INTRODUCE.length) {
-                this.introduced = true;
-                this.state = 'floating';
-                this.currentImage = 0;
-            }
+    canAnimateNow() {
+        if (!this.isActive) return false;
+        if (this.state === 'introduce' && !this.hasStartedIntro) return false;
+        return true;
+    }
 
-            if (this.state === 'attacking' && this.currentImage >= this.IMAGES_ATTACK.length) {
-                this.isAttacking = false;
-                this.state = 'floating';
-                this.currentImage = 0;
-            }
+    renderDeadLastFrame(images) {
+        if (!this.isDead || !this.deadAnimationFinished) return false;
+        this.img = this.imageCache[images[images.length - 1]];
+        return true;
+    }
 
-            if (this.state === 'hurt' && this.currentImage >= this.IMAGES_HURT.length) {
-                this.isHurt = false;
-                this.state = 'floating';
-                this.currentImage = 0;
-            }
+    playCurrentFrame(images) {
+        const path = images[this.currentImage % images.length];
+        this.img = this.imageCache[path];
+        this.currentImage++;
+    }
 
-            if (this.isDead && this.currentImage >= this.IMAGES_DEAD.length) {
-                this.deadAnimationFinished = true;
-                this.currentImage = this.IMAGES_DEAD.length - 1;
-            }
-        }, 150);
-        setInterval(() => {
-            if (!this.isActive || !this.introduced || this.isDead) {
-                return;
-            }
-            this.updateFloatingBehavior();
-        }, 1000 / 60);
+    syncStateAfterFrame() {
+        this.finishIntroIfNeeded();
+        this.finishAttackIfNeeded();
+        this.finishHurtIfNeeded();
+        this.finishDeathIfNeeded();
+    }
+
+    finishIntroIfNeeded() {
+        if (this.state !== 'introduce' || this.currentImage < this.IMAGES_INTRODUCE.length) return;
+        this.introduced = true;
+        this.state = 'floating';
+        this.currentImage = 0;
+    }
+
+    finishAttackIfNeeded() {
+        if (this.state !== 'attacking' || this.currentImage < this.IMAGES_ATTACK.length) return;
+        this.isAttacking = false;
+        this.state = 'floating';
+        this.currentImage = 0;
+    }
+
+    finishHurtIfNeeded() {
+        if (this.state !== 'hurt' || this.currentImage < this.IMAGES_HURT.length) return;
+        this.isHurt = false;
+        this.state = 'floating';
+        this.currentImage = 0;
+    }
+
+    finishDeathIfNeeded() {
+        if (!this.isDead || this.currentImage < this.IMAGES_DEAD.length) return;
+        this.deadAnimationFinished = true;
+        this.currentImage = this.IMAGES_DEAD.length - 1;
+    }
+
+    updateMovementFrame() {
+        if (!this.isActive || !this.introduced || this.isDead) return;
+        this.updateFloatingBehavior();
     }
 
     /**
@@ -185,26 +211,25 @@ class FinalBoss extends MovableObject {
      * @returns {void}
      */
     updateFloatingBehavior() {
-        if (this.isAttacking || this.isHurt) {
-            return;
-        }
-        const currentTime = Date.now();
-        if (currentTime - this.lastStyleChangeTime > this.styleChangeDuration) {
-            const styles = ['aggressive', 'aggressive', 'aggressive', 'normal', 'circle'];
-            this.swimStyle = styles[Math.floor(Math.random() * styles.length)];
-            this.lastStyleChangeTime = currentTime;
-        }
-        if (this.swimStyle === 'aggressive') {
-            this.floatingSpeed = 5.5;
-        } else if (this.swimStyle === 'defensive') {
-            this.floatingSpeed = 3.5;
-        } else if (this.swimStyle === 'circle') {
-            this.floatingSpeed = 4.8;
-        } else {
-            this.floatingSpeed = 3.8;
-        }
-
+        if (this.isAttacking || this.isHurt) return;
+        this.updateSwimStyle();
+        this.updateFloatingSpeed();
         this.applyMovement();
+    }
+
+    updateSwimStyle() {
+        const currentTime = Date.now();
+        if (currentTime - this.lastStyleChangeTime <= this.styleChangeDuration) return;
+        const styles = ['aggressive', 'aggressive', 'aggressive', 'normal', 'circle'];
+        this.swimStyle = styles[Math.floor(Math.random() * styles.length)];
+        this.lastStyleChangeTime = currentTime;
+    }
+
+    updateFloatingSpeed() {
+        if (this.swimStyle === 'aggressive') this.floatingSpeed = 5.5;
+        else if (this.swimStyle === 'defensive') this.floatingSpeed = 3.5;
+        else if (this.swimStyle === 'circle') this.floatingSpeed = 4.8;
+        else this.floatingSpeed = 3.8;
     }
 
     /**
@@ -214,55 +239,78 @@ class FinalBoss extends MovableObject {
      */
     applyMovement() {
         if (!this.character) {
-            if (Math.random() > 0.5) {
-                this.y += this.floatingSpeed * 2.5;
-            } else {
-                this.y -= this.floatingSpeed * 2.5;
-            }
+            this.applyIdleDriftMovement();
             return;
         }
+        const vector = this.getCharacterVector();
+        this.applyStyleMovement(vector);
+        this.clampPositionToBossArea();
+    }
 
-        const charX = this.character.x;
-        const charY = this.character.y;
-        const distX = charX - this.x;
-        const distY = charY - this.y;
+    applyIdleDriftMovement() {
+        const direction = Math.random() > 0.5 ? 1 : -1;
+        this.y += this.floatingSpeed * 2.5 * direction;
+    }
+
+    getCharacterVector() {
+        const distX = this.character.x - this.x;
+        const distY = this.character.y - this.y;
         const distance = Math.sqrt(distX * distX + distY * distY);
+        return { distX, distY, distance };
+    }
 
-        if (this.swimStyle === 'aggressive') {
-            if (distance > 50) {
-                this.x += (distX / distance) * this.floatingSpeed;
-                this.y += (distY / distance) * this.floatingSpeed;
-            }
-        } else if (this.swimStyle === 'defensive') {
-            if (distance < 800) {
-                this.x -= (distX / distance) * this.floatingSpeed;
-                this.y -= (distY / distance) * this.floatingSpeed;
-            } else {
-                this.x += (distX / distance) * this.floatingSpeed * 1.7;
-            }
-        } else if (this.swimStyle === 'circle') {
-            const angle = Math.atan2(distY, distX);
-            const desiredDistance = 600;
-            
-            this.floatingTargetX = charX + Math.cos(angle + 0.05) * desiredDistance;
-            this.floatingTargetY = charY + Math.sin(angle + 0.05) * desiredDistance;
-            
-            const targetDist = Math.sqrt(Math.pow(this.floatingTargetX - this.x, 2) + Math.pow(this.floatingTargetY - this.y, 2));
-            if (targetDist > 10) {
-                const targetDistX = this.floatingTargetX - this.x;
-                const targetDistY = this.floatingTargetY - this.y;
-                this.x += (targetDistX / targetDist) * this.floatingSpeed;
-                this.y += (targetDistY / targetDist) * this.floatingSpeed;
-            }
-        } else {
-            if (distance > 400) {
-                this.x += (distX / distance) * this.floatingSpeed * 1.8;
-                this.y += (distY / distance) * this.floatingSpeed * 1.8;
-            } else if (distance < 300) {
-                this.x -= (distX / distance) * this.floatingSpeed * 1.6;
-                this.y -= (distY / distance) * this.floatingSpeed * 1.6;
-            }
+    applyStyleMovement(vector) {
+        if (this.swimStyle === 'aggressive') this.applyAggressiveMovement(vector);
+        else if (this.swimStyle === 'defensive') this.applyDefensiveMovement(vector);
+        else if (this.swimStyle === 'circle') this.applyCircleMovement(vector);
+        else this.applyNormalMovement(vector);
+    }
+
+    applyAggressiveMovement(vector) {
+        if (vector.distance <= 50) return;
+        this.x += (vector.distX / vector.distance) * this.floatingSpeed;
+        this.y += (vector.distY / vector.distance) * this.floatingSpeed;
+    }
+
+    applyDefensiveMovement(vector) {
+        if (vector.distance < 800) {
+            this.x -= (vector.distX / vector.distance) * this.floatingSpeed;
+            this.y -= (vector.distY / vector.distance) * this.floatingSpeed;
+            return;
         }
+        this.x += (vector.distX / vector.distance) * this.floatingSpeed * 1.7;
+    }
+
+    applyCircleMovement(vector) {
+        const angle = Math.atan2(vector.distY, vector.distX);
+        const desiredDistance = 600;
+        this.floatingTargetX = this.character.x + Math.cos(angle + 0.05) * desiredDistance;
+        this.floatingTargetY = this.character.y + Math.sin(angle + 0.05) * desiredDistance;
+        this.moveToFloatingTarget();
+    }
+
+    moveToFloatingTarget() {
+        const targetDistX = this.floatingTargetX - this.x;
+        const targetDistY = this.floatingTargetY - this.y;
+        const targetDist = Math.sqrt(targetDistX * targetDistX + targetDistY * targetDistY);
+        if (targetDist <= 10) return;
+        this.x += (targetDistX / targetDist) * this.floatingSpeed;
+        this.y += (targetDistY / targetDist) * this.floatingSpeed;
+    }
+
+    applyNormalMovement(vector) {
+        if (vector.distance > 400) {
+            this.x += (vector.distX / vector.distance) * this.floatingSpeed * 1.8;
+            this.y += (vector.distY / vector.distance) * this.floatingSpeed * 1.8;
+            return;
+        }
+        if (vector.distance < 300) {
+            this.x -= (vector.distX / vector.distance) * this.floatingSpeed * 1.6;
+            this.y -= (vector.distY / vector.distance) * this.floatingSpeed * 1.6;
+        }
+    }
+
+    clampPositionToBossArea() {
         const mapBounds = 6720;
         if (this.x < 4800) this.x = 4800;
         if (this.x > mapBounds - this.width) this.x = mapBounds - this.width;
@@ -311,25 +359,21 @@ class FinalBoss extends MovableObject {
      * @returns {void}
      */
     hit(damage) {
-        if (this.isDead) {
-            return;
-        }
-
-        // Intro darf nicht durch Hurt unterbrochen werden, sonst bleibt der Boss unbeweglich.
-        if (!this.introduced || this.state === 'introduce') {
-            return;
-        }
-
+        if (this.isDead) return;
+        if (!this.introduced || this.state === 'introduce') return;
         this.hp -= damage;
-        
         if (this.hp <= 0) {
             this.hp = 0;
             this.die();
         } else {
-            this.isHurt = true;
-            this.state = 'hurt';
-            this.currentImage = 0;
+            this.applyBossHurt();
         }
+    }
+
+    applyBossHurt() {
+        this.isHurt = true;
+        this.state = 'hurt';
+        this.currentImage = 0;
     }
 
     /**
