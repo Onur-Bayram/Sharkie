@@ -1,4 +1,7 @@
 Object.assign(World.prototype, {
+SMALL_POISON_BOTTLE_VALUE: 20,
+LARGE_POISON_BOTTLE_VALUE: 40,
+
 /**
  * Performs all collision checks for the current frame and updates
  * boss, collection and combat logic.
@@ -88,6 +91,7 @@ collectStaticPoisonBottles() {
     for (let i = this.poisonBottles.length - 1; i >= 0; i--) {
         const bottle = this.poisonBottles[i];
         if (!this.character.isCollidingCollect(bottle)) continue;
+        this.character.poison = Math.min(this.character.poison + this.SMALL_POISON_BOTTLE_VALUE, this.character.maxPoison);
         this.poisonBar.setPercentage(this.character.poison);
         this.audioManager.playPotionSound();
         this.poisonBottles.splice(i, 1);
@@ -99,7 +103,7 @@ collectAnimatedPoisonBottles() {
         const bottle = this.animatedPoisonBottles[i];
         if (bottle.collected || !this.character.isCollidingCollect(bottle)) continue;
         bottle.collected = true;
-        this.character.poison = Math.min(this.character.poison + 50, 100);
+        this.character.poison = Math.min(this.character.poison + this.LARGE_POISON_BOTTLE_VALUE, this.character.maxPoison);
         this.poisonBar.setPercentage(this.character.poison);
         this.audioManager.playPotionSound();
         this.animatedPoisonBottles.splice(i, 1);

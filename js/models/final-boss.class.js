@@ -74,13 +74,13 @@ class FinalBoss extends MovableObject {
     floatingTargetY = 0;
     swimStyle = 'aggressive'; // normal, aggressive, defensive, circle
     lastStyleChangeTime = 0;
-    styleChangeDuration = 3000; // 3 Sekunden pro Stil
+    styleChangeDuration = 3000; 
     activityRadius = 900;
     attackRadius = 900;
 
     /**
-     * @param {number} x Startposition auf der X-Achse.
-     * @param {number} y Startposition auf der Y-Achse.
+     * @param {number} x 
+     * @param {number} y 
      */
     constructor(x, y) {
         super();

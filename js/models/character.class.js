@@ -19,6 +19,7 @@ class Character extends MovableObject{
     maxEnergy = 100;
     poison = 100;
     maxPoison = 100;
+    poisonPerShot = 20;
     lastThrowTime = 0;
 
     IMAGES_IDLE = [

@@ -9,12 +9,12 @@ Object.assign(Character.prototype, {
     },
 
     /**
-     * Checks if a poison bubble can be thrown (cooldown, poison supply ≥30 and no current attack).
+     * Checks if a poison bubble can be thrown (cooldown, enough poison and no current attack).
      * @returns {boolean}
      */
     canThrowPoisonBubble() {
         const currentTime = Date.now();
-        return !this.isDead && this.poison >= 30 && (currentTime - this.lastThrowTime > 1200) && !this.isAttacking;
+        return !this.isDead && this.poison >= this.poisonPerShot && (currentTime - this.lastThrowTime > 1200) && !this.isAttacking;
     },
 
     /**
@@ -60,7 +60,7 @@ Object.assign(Character.prototype, {
     },
 
     /**
-     * Throws a poison bubble (costs 30 poison points) and starts the attack animation.
+        * Throws a poison bubble (costs poisonPerShot points) and starts the attack animation.
      * @returns {BubbleAnimation|null} Created animation or null on cooldown.
      */
     throwPoisonBubble() {
@@ -76,7 +76,7 @@ Object.assign(Character.prototype, {
     },
 
     deductPoison() {
-        this.poison = Math.max(0, this.poison - 30);
+        this.poison = Math.max(0, this.poison - this.poisonPerShot);
     },
 
     schedulePoisonBubble(offsetX, direction) {
