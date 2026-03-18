@@ -122,10 +122,10 @@ isCollidingCoin(obj) {
 }
 
 getCoinHitbox(obj) {
-    const backInset = 68;
-    const frontInset = 56;
-    const insetY = 44;
-    const coinInset = 6;
+    const backInset = 36;
+    const frontInset = 52;
+    const insetY = 40;
+    const coinInset = 5;
     const isFacingLeft = !!this.otherDirection;
     const leftInset = isFacingLeft ? frontInset : backInset;
     const rightInset = isFacingLeft ? backInset : frontInset;
@@ -138,7 +138,7 @@ getCoinHitbox(obj) {
 }
 
 hasMinimumOverlap(left, right, top, bottom) {
-    const minContactPixels = 8;
+    const minContactPixels = 4;
     return (right - left) >= minContactPixels && (bottom - top) >= minContactPixels;
 }
 
