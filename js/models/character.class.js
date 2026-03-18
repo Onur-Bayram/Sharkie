@@ -1,6 +1,6 @@
 /**
- * Spielcharakter Sharkie – erbt von MovableObject.
- * Verwaltet Animationszustände (Schwimmen, Angriff, Verletzt, Tot), Energie, Giftstatus und Tastatursteuerung.
+ * Sharkie player character - inherits from MovableObject.
+ * Manages animation states (swimming, attacking, hurt, dead), energy, poison status, and keyboard control.
  */
 class Character extends MovableObject{
 
@@ -140,7 +140,7 @@ class Character extends MovableObject{
     ];
     
     /**
-     * Erstellt den Charakter, lädt alle Animations-Bildserien und startet Animations- und Tastaturschleife.
+     * Creates the character, loads all animation frames and starts animation and keyboard loops.
      */
     constructor() {
         super();
@@ -163,7 +163,7 @@ class Character extends MovableObject{
     }
 
     /**
-     * Startet die Animations-Schleife und wählt je nach Zustand die passende Bildsequenz aus.
+     * Starts the animation loop and selects the appropriate frame sequence based on state.
      * @returns {void}
      */
     animate() {
@@ -224,9 +224,9 @@ class Character extends MovableObject{
     }
 
     /**
-     * Verarbeitet Trefferschaden, setzt den Hurt-Zustand und ruft bei 0 HP `die()` auf.
-     * @param {'electric'|'poison'|string} damageType Art des Schadens.
-     * @param {number} [damage=10] Schadensmenge.
+     * Processes hit damage, sets the hurt state and calls `die()` at 0 HP.
+     * @param {'electric'|'poison'|string} damageType Type of damage.
+     * @param {number} [damage=10] Damage amount.
      * @returns {void}
      */
     hit(damageType, damage = 10) {
@@ -270,7 +270,7 @@ class Character extends MovableObject{
     }
 
     /**
-     * Verarbeitet Tastatureingaben in einer 60-fps-Schleife und steuert Bewegung und Animationszustand.
+     * Processes keyboard input in a 60-fps loop and controls movement and animation state.
      * @returns {void}
      */
     handleKeyboard() {

@@ -1,5 +1,5 @@
 /**
- * Flossenschlag-Projektil – kurze Nahkampfanimation, läuft einmalig durch den Bildvorrat.
+ * Fin slap projectile - brief melee animation, runs once through the image sequence.
  */
 class FinSlap extends MovableObject {
     IMAGES = [
@@ -18,10 +18,10 @@ class FinSlap extends MovableObject {
     createdTime = Date.now();
 
     /**
-     * Erstellt den Flossenschlag an der angegebenen Position mit Richtungsangabe.
-     * @param {number} x X-Position.
-     * @param {number} y Y-Position.
-     * @param {1|-1} [direction=1] Angriffsrichtung (1 = rechts, -1 = links).
+     * Creates the fin slap at the given position with direction.
+     * @param {number} x X-position.
+     * @param {number} y Y-position.
+     * @param {1|-1} [direction=1] Attack direction (1 = right, -1 = left).
      */
     constructor(x, y, direction = 1) {
         super();
@@ -35,9 +35,9 @@ class FinSlap extends MovableObject {
     }
 
     /**
-     * Zeichnet den Flossenschlag auf den Canvas, gespiegelt bei linker Richtung.
-     * @param {CanvasRenderingContext2D} ctx Zeichenkontext.
-     * @param {number} cameraX Aktueller Kamera-X-Offset.
+     * Draws the fin slap on canvas, mirrored for left direction.
+     * @param {CanvasRenderingContext2D} ctx Drawing context.
+     * @param {number} cameraX Current camera X-offset.
      * @returns {void}
      */
     draw(ctx, cameraX) {
@@ -54,7 +54,7 @@ class FinSlap extends MovableObject {
     }
 
     /**
-     * Setzt das nächste Bild in der Sequenz (wird einmalig pro Frame aufgerufen).
+     * Sets the next image in the sequence (called once per frame).
      * @returns {void}
      */
     animate() {
@@ -66,7 +66,7 @@ class FinSlap extends MovableObject {
     }
 
     /**
-     * Gibt zurück ob der Flossenschlag noch aktiv ist (noch nicht alle Bilder durchgelaufen).
+     * Returns whether the fin slap is still active (not all images cycled through).
      * @returns {boolean}
      */
     isAlive() {

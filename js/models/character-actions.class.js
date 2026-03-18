@@ -1,6 +1,6 @@
 Object.assign(Character.prototype, {
     /**
-     * Prüft ob eine normale Blase geworfen werden darf (Cooldown und kein laufender Angriff).
+     * Checks if a normal bubble can be thrown (cooldown and no current attack).
      * @returns {boolean}
      */
     canThrowNormalBubble() {
@@ -9,7 +9,7 @@ Object.assign(Character.prototype, {
     },
 
     /**
-     * Prüft ob eine Giftblase geworfen werden darf (Cooldown, Giftvorrat ≥30 und kein laufender Angriff).
+     * Checks if a poison bubble can be thrown (cooldown, poison supply ≥30 and no current attack).
      * @returns {boolean}
      */
     canThrowPoisonBubble() {
@@ -18,8 +18,8 @@ Object.assign(Character.prototype, {
     },
 
     /**
-     * Wirft eine normale Blase und startet die Angriffsanimation.
-     * @returns {BubbleAnimation|null} Erstelle Animation oder null bei Cooldown.
+     * Throws a normal bubble and starts the attack animation.
+     * @returns {BubbleAnimation|null} Created animation or null on cooldown.
      */
     throwNormalBubble() {
         if (this.canThrowNormalBubble()) {
@@ -50,8 +50,8 @@ Object.assign(Character.prototype, {
     },
 
     /**
-     * Wirft eine Giftblase (kostet 30 Giftpunkte) und startet die Angriffsanimation.
-     * @returns {BubbleAnimation|null} Erstelle Animation oder null bei Cooldown.
+     * Throws a poison bubble (costs 30 poison points) and starts the attack animation.
+     * @returns {BubbleAnimation|null} Created animation or null on cooldown.
      */
     throwPoisonBubble() {
         if (this.canThrowPoisonBubble()) {
@@ -86,7 +86,7 @@ Object.assign(Character.prototype, {
     },
 
     /**
-     * Prüft ob ein Flossenschlag ausgeführt werden darf.
+     * Checks if a fin slap can be executed.
      * @returns {boolean}
      */
     canThrowFinSlap() {
@@ -95,8 +95,8 @@ Object.assign(Character.prototype, {
     },
 
     /**
-     * Führt einen Flossenschlag aus und erstellt das FinSlap-Projektil.
-     * @returns {FinSlap|null} Das erstellte Projektil oder null bei Cooldown.
+     * Executes a fin slap and creates the FinSlap projectile.
+     * @returns {FinSlap|null} The created projectile or null on cooldown.
      */
     throwFinSlap() {
         if (this.canThrowFinSlap()) {
@@ -127,7 +127,7 @@ Object.assign(Character.prototype, {
     },
 
     /**
-     * Gibt die passenden Sterbebilder abhängig vom letzten Schadenstyp zurück.
+     * Returns the appropriate death images based on the last damage type.
      * @returns {string[]}
      */
     getDeathImages() {
@@ -137,7 +137,7 @@ Object.assign(Character.prototype, {
     },
 
     /**
-     * Leitet den Tod des Charakters ein, zeigt den Game-Over-Bildschirm und spielt den Fail-Sound ab.
+     * Initiates the character's death, displays the game-over screen and plays the fail sound.
      * @returns {void}
      */
     die() {

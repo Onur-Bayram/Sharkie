@@ -1,6 +1,6 @@
 /**
- * Animierte (fallende) Giftflasche – wird erst sichtbar wenn der Charakter in der Nähe ist,
- * dann fällt sie langsam nach unten und kann eingesammelt werden.
+ * Animated (falling) poison bottle - becomes visible when character is nearby,
+ * then falls slowly downward and can be collected.
  */
 class AnimatedPoisonBottle extends MovableObject {
     
@@ -22,9 +22,9 @@ class AnimatedPoisonBottle extends MovableObject {
     visibilityRange = 300; 
 
     /**
-     * Erstellt eine animierte Giftflasche mit optionalem Start-Y-Wert.
-     * @param {number} x X-Position.
-     * @param {number} [startY=-100] Y-Startposition (standard außerhalb des Sichtfeldes).
+     * Creates an animated poison bottle with optional start Y value.
+     * @param {number} x X-position.
+     * @param {number} [startY=-100] Y-start position (default outside view).
      */
     constructor(x, startY = -100) {
         super();
@@ -41,7 +41,7 @@ class AnimatedPoisonBottle extends MovableObject {
     }
 
     /**
-     * Startet die Animations-Schleife für die Dreh-Animation der Flasche.
+     * Starts the animation loop for the bottle's rotation animation.
      * @returns {void}
      */
     animate() {
@@ -53,7 +53,7 @@ class AnimatedPoisonBottle extends MovableObject {
     }
 
     /**
-     * Startet die Fall-Schleife – bewegt die Flasche nach unten wenn sichtbar und nicht eingesammelt.
+     * Starts the fall loop – moves the bottle down if visible and not collected.
      * @returns {void}
      */
     fall() {
@@ -65,8 +65,8 @@ class AnimatedPoisonBottle extends MovableObject {
     }
 
     /**
-     * Aktiviert die Sichtbarkeit wenn der Charakter sich innerhalb der Sichtweite befindet.
-     * @param {number} characterX X-Position des Charakters.
+     * Activates visibility if the character is within view range.
+     * @param {number} characterX Character's X-position.
      * @returns {void}
      */
     checkVisibility(characterX) {

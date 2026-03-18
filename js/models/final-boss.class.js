@@ -1,5 +1,5 @@
 /**
- * Endgegner mit Intro-, Schwimm-, Angriffs-, Schaden- und Todeszuständen.
+ * Final boss with intro, swimming, attack, damage, and death states.
  */
 class FinalBoss extends MovableObject {
 
@@ -104,7 +104,7 @@ class FinalBoss extends MovableObject {
     }
 
     /**
-     * Startet die Animations- und Bewegungs-Schleifen des Bosses.
+     * Starts animation and movement loops of the boss.
      *
      * @returns {void}
      */
@@ -159,7 +159,7 @@ class FinalBoss extends MovableObject {
     }
 
     /**
-     * Liefert die Bildsequenz passend zum aktuellen Boss-Zustand.
+     * Returns the image sequence appropriate to the current boss state.
      *
      * @returns {string[]}
      */
@@ -180,7 +180,7 @@ class FinalBoss extends MovableObject {
     }
 
     /**
-     * Aktualisiert Schwimmstil und Bewegung des Bosses.
+     * Updates swimming style and movement of the boss.
      *
      * @returns {void}
      */
@@ -208,7 +208,7 @@ class FinalBoss extends MovableObject {
     }
 
     /**
-     * Bewegt den Boss abhängig vom aktuellen Schwimmstil und der Character-Position.
+     * Moves the boss based on current swimming style and character position.
      *
      * @returns {void}
      */
@@ -271,9 +271,9 @@ class FinalBoss extends MovableObject {
     }
 
     /**
-     * Prüft, ob der Boss nah genug für einen Angriff ist.
+     * Checks if the boss is close enough for an attack.
      *
-     * @param {Character} character Spielerfigur.
+     * @param {Character} character Player character.
      * @returns {void}
      */
     checkProximityAttack(character) {
@@ -293,7 +293,7 @@ class FinalBoss extends MovableObject {
     }
 
     /**
-     * Versetzt den Boss in den Angriffs-Zustand.
+     * Puts the boss in attack state.
      *
      * @returns {void}
      */
@@ -305,9 +305,9 @@ class FinalBoss extends MovableObject {
     }
 
     /**
-     * Fügt dem Boss Schaden zu und wechselt bei Bedarf in Hurt- oder Dead-Zustand.
+     * Deals damage to the boss and switches to hurt or dead state if needed.
      *
-     * @param {number} damage Schadenswert.
+     * @param {number} damage Damage amount.
      * @returns {void}
      */
     hit(damage) {
@@ -333,7 +333,7 @@ class FinalBoss extends MovableObject {
     }
 
     /**
-     * Startet die Todesanimation des Bosses.
+     * Starts the death animation of the boss.
      *
      * @returns {void}
      */
@@ -348,10 +348,10 @@ class FinalBoss extends MovableObject {
     }
 
     /**
-     * Aktualisiert Sichtbarkeit und Aktivität des Bosses relativ zur Kamera.
+     * Updates visibility and activity of the boss relative to the camera.
      *
-     * @param {number} cameraX Aktuelle X-Position der Kamera.
-     * @param {number} [canvasWidth=960] Breite des sichtbaren Bereichs.
+     * @param {number} cameraX Current camera X-position.
+     * @param {number} [canvasWidth=960] Width of the visible area.
      * @returns {void}
      */
     checkVisibility(cameraX, canvasWidth = 960) {

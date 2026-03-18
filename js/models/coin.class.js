@@ -1,5 +1,5 @@
 /**
- * Sammelbare Münze mit Rotations-Animation.
+ * Collectible coin with rotation animation.
  */
 class Coin extends MovableObject {
     IMAGES = [
@@ -13,9 +13,9 @@ class Coin extends MovableObject {
     currentImage = 0;
 
     /**
-     * Erstellt eine Münze an der angegebenen Position und startet die Animation.
-     * @param {number} x X-Position.
-     * @param {number} y Y-Position.
+     * Creates a coin at the given position and starts the animation.
+     * @param {number} x X-position.
+     * @param {number} y Y-position.
      */
     constructor(x, y) {
         super();
@@ -29,7 +29,7 @@ class Coin extends MovableObject {
     }
 
     /**
-     * Startet die Animations-Schleife für die Münz-Rotation (solange nicht eingesammelt).
+     * Starts the animation loop for coin rotation (as long as not collected).
      * @returns {void}
      */
     animate() {

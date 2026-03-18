@@ -1,5 +1,5 @@
 /**
- * Giftvorrat-Anzeige des Spielers als Bildleiste (6 Zustände von 0% bis 100%).
+ * Player poison supply display as image bar (6 states from 0% to 100%).
  */
 class PoisonBar extends MovableObject {
     percentage = 100;
@@ -14,7 +14,7 @@ class PoisonBar extends MovableObject {
     ];
 
     /**
-     * Erstellt die Giftleiste und positioniert sie unter der Lebensanzeige.
+     * Creates the poison bar and positions it below the health display.
      */
     constructor() {
         super();
@@ -27,8 +27,8 @@ class PoisonBar extends MovableObject {
     }
 
     /**
-     * Setzt den angezeigten Prozentwert und wählt das passende Bild.
-     * @param {number} percentage Giftvorrat in Prozent (0–100).
+     * Sets the displayed percentage value and selects the appropriate image.
+     * @param {number} percentage Poison supply in percent (0–100).
      * @returns {void}
      */
     setPercentage(percentage) {

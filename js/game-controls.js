@@ -1,10 +1,10 @@
 /**
- * Wandelt Maus- oder Touch-Koordinaten aus dem Viewport in Spielkoordinaten
- * des Canvas um und berücksichtigt dabei mögliche Ränder.
+ * Converts mouse or touch coordinates from viewport to game canvas coordinates,
+ * accounting for possible borders.
  *
- * @param {number} clientX X-Koordinate des Pointers im Viewport.
- * @param {number} clientY Y-Koordinate des Pointers im Viewport.
- * @returns {{x: number, y: number} | null} Canvas-Position oder null außerhalb der Spielfläche.
+ * @param {number} clientX X-coordinate of the pointer in the viewport.
+ * @param {number} clientY Y-coordinate of the pointer in the viewport.
+ * @returns {{x: number, y: number} | null} Canvas position or null outside the play area.
  */
 function getCanvasPointerPosition(clientX, clientY) {
     if (!canvas) {
@@ -47,11 +47,11 @@ function getCanvasPointerPosition(clientX, clientY) {
 }
 
 /**
- * Verarbeitet eine Pointer-Interaktion auf dem Canvas und leitet Treffer auf
- * den Neustart-Button weiter.
+ * Processes a pointer interaction on the canvas and forwards hits to
+ * the restart button.
  *
- * @param {number} clientX X-Koordinate des Pointers im Viewport.
- * @param {number} clientY Y-Koordinate des Pointers im Viewport.
+ * @param {number} clientX X-coordinate of the pointer in the viewport.
+ * @param {number} clientY Y-coordinate of the pointer in the viewport.
  * @returns {void}
  */
 function handleCanvasPointer(clientX, clientY) {
@@ -70,7 +70,7 @@ function handleCanvasPointer(clientX, clientY) {
 }
 
 /**
- * Setzt alle Tastaturzustände und aktiven mobilen Pointer-Eingaben zurück.
+ * Resets all keyboard states and active mobile pointer inputs.
  *
  * @returns {void}
  */
@@ -87,8 +87,8 @@ function resetKeyboardState() {
 }
 
 /**
- * Prüft, ob das aktuelle Gerät ein Smartphone im Hochformat ist, bei dem
- * das Spiel gesperrt werden soll.
+ * Checks if the current device is a smartphone in portrait mode, in which
+ * the game should be locked.
  *
  * @returns {boolean}
  */
@@ -97,8 +97,8 @@ function isPortraitPhoneLayout() {
 }
 
 /**
- * Wendet das Verhalten für die Ausrichtungssperre an und pausiert oder
- * setzt das Spiel bei Bedarf fort.
+ * Applies orientation lock behavior and pauses or
+ * resumes the game as needed.
  *
  * @returns {void}
  */
@@ -139,7 +139,7 @@ function updateOrientationLock() {
 }
 
 /**
- * Prüft, ob aktuell ein responsiver Breakpoint aktiv ist.
+ * Checks if a responsive breakpoint is currently active.
  *
  * @returns {boolean}
  */
@@ -148,8 +148,7 @@ function isResponsiveLayout() {
 }
 
 /**
- * Blendet das Zurück-Symbol der Optionen abhängig vom aktuellen Zustand ein
- * oder aus.
+ * Shows or hides the options back icon depending on the current state.
  *
  * @returns {void}
  */
@@ -168,7 +167,7 @@ function updateBackIconVisibility() {
 }
 
 /**
- * Erkennt, ob das aktuelle Gerät hauptsächlich per Touch bedient wird.
+ * Detects whether the current device is primarily controlled by touch.
  *
  * @returns {boolean}
  */
@@ -177,8 +176,8 @@ function isTouchGameplayDevice() {
 }
 
 /**
- * Aktualisiert die Sichtbarkeit der mobilen Steuerung und des Vollbild-Buttons
- * anhand des aktuellen UI- und Gerätezustands.
+ * Updates the visibility of mobile controls and fullscreen button
+ * based on current UI and device state.
  *
  * @returns {void}
  */
@@ -207,7 +206,7 @@ function updateMobileControlsVisibility() {
 }
 
 /**
- * Aktualisiert das Symbol und den Tooltip des HTML-Vollbild-Buttons.
+ * Updates the icon and tooltip of the HTML fullscreen button.
  *
  * @returns {void}
  */
@@ -219,8 +218,8 @@ function updateHtmlFullscreenButton() {
 }
 
 /**
- * Bindet die Pointer-basierten Mobile-Controls und synchronisiert sie mit
- * dem Tastaturzustand.
+ * Binds pointer-based mobile controls and synchronizes them with
+ * keyboard state.
  *
  * @returns {void}
  */

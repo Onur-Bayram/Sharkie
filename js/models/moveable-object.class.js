@@ -1,6 +1,6 @@
 /**
- * Basisklasse für alle beweglichen Spielobjekte.
- * Verwaltet Position, Bild, gemeinsamen Bildcache und grundlegende Bewegungslogik.
+ * Base class for all movable game objects.
+ * Manages position, image, shared image cache, and basic movement logic.
  */
 class MovableObject {
 x = 50;
@@ -15,8 +15,8 @@ speed = 0.15;
 static sharedImageCache = {};
 
 /**
- * Gibt ein Bild aus dem gemeinsamen Cache zurück oder erstellt es neu.
- * @param {string} path Relativer Bildpfad.
+ * Retrieves an image from the shared cache or creates it if not present.
+ * @param {string} path Relative image path.
  * @returns {HTMLImageElement}
  */
 getSharedImage(path) {
@@ -29,8 +29,8 @@ getSharedImage(path) {
 }
 
 /**
- * Setzt das aktuelle Hauptbild des Objekts.
- * @param {string} path Relativer Bildpfad.
+ * Sets the current main image of the object.
+ * @param {string} path Relative image path.
  * @returns {void}
  */
 loadImage(path) {
@@ -38,8 +38,8 @@ loadImage(path) {
 }
 
 /**
- * Lädt ein Array von Bildpfaden in den lokalen Bildcache.
- * @param {string[]} arr Array mit Bildpfaden.
+ * Loads an array of image paths into the local image cache.
+ * @param {string[]} arr Array of image paths.
  * @returns {void}
  */
 loadImages(arr) {
@@ -49,7 +49,7 @@ loadImages(arr) {
 }
 
 /**
- * Bewegt das Objekt um `speed` Einheiten nach rechts.
+ * Moves the object `speed` units to the right.
  * @returns {void}
  */
 moveRight() {
@@ -57,7 +57,7 @@ moveRight() {
 }
 
 /**
- * Bewegt das Objekt um `speed` Einheiten nach links.
+ * Moves the object `speed` units to the left.
  * @returns {void}
  */
 moveLeft() {
@@ -65,7 +65,7 @@ moveLeft() {
 }
 
 /**
- * Bewegt das Objekt um `speed` Einheiten nach oben.
+ * Moves the object `speed` units upward.
  * @returns {void}
  */
 moveUp() {
@@ -73,7 +73,7 @@ moveUp() {
 }
 
 /**
- * Bewegt das Objekt um `speed` Einheiten nach unten.
+ * Moves the object `speed` units downward.
  * @returns {void}
  */
 moveDown() {
@@ -81,8 +81,8 @@ moveDown() {
 }
 
 /**
- * Prüft ob dieses Objekt mit einem anderen kollidiert (mit Hitbox-Einzug).
- * @param {MovableObject} obj Zu prüfendes Objekt.
+ * Checks if this object collides with another (with hitbox inset).
+ * @param {MovableObject} obj Object to check collision against.
  * @returns {boolean}
  */
 isColliding(obj) {
@@ -94,8 +94,8 @@ isColliding(obj) {
 }
 
 /**
- * Prüft ob dieses Objekt ein Sammelobjekt berührt (großzügigerer Radius als isColliding).
- * @param {MovableObject} obj Zu prüfendes Sammelobjekt.
+ * Checks if this object touches a collectible (more generous radius than isColliding).
+ * @param {MovableObject} obj Collectible object to check against.
  * @returns {boolean}
  */
 isCollidingCollect(obj) {
@@ -110,9 +110,9 @@ isCollidingCollect(obj) {
 }
 
 /**
- * Prüft eine präzise Kontakt-Kollision für Münzen.
- * Gesammelt wird nur bei echter sichtbarer Berührung.
- * @param {MovableObject} obj Zu prüfende Münze.
+ * Checks precise contact collision for coins.
+ * Collection only occurs on actual visible contact.
+ * @param {MovableObject} obj Coin to check against.
  * @returns {boolean}
  */
 isCollidingCoin(obj) {

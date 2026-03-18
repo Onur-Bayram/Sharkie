@@ -151,9 +151,9 @@ window.cancelAnimationFrame = (frameId) => {
 };
 
 /**
- * Liefert die Übersetzungen für die gewünschte Sprache oder Deutsch als Fallback.
+ * Returns translations for the desired language or German as fallback.
  *
- * @param {string} lang Sprachcode.
+ * @param {string} lang Language code.
  * @returns {Record<string, string>}
  */
 function getLanguageStrings(lang) {
@@ -161,7 +161,7 @@ function getLanguageStrings(lang) {
 }
 
 /**
- * Beendet alle registrierten Intervalle, Timeouts und Animation-Frames des Spiels.
+ * Terminates all registered intervals, timeouts, and animation frames of the game.
  *
  * @returns {void}
  */
@@ -177,7 +177,7 @@ function clearTrackedGameLoops() {
 }
 
 /**
- * Setzt Canvas-Größe, Transformation und Rendering-Zustand auf die Standardwerte zurück.
+ * Resets canvas size, transformation, and rendering state to default values.
  *
  * @returns {void}
  */
@@ -200,7 +200,7 @@ function resetCanvasState() {
 }
 
 /**
- * Räumt die aktuelle Spielinstanz auf und setzt globale Zustände zurück.
+ * Cleans up the current game instance and resets global states.
  *
  * @returns {void}
  */
@@ -219,9 +219,9 @@ function teardownCurrentGame() {
 }
 
 /**
- * Markiert den aktiven Sprach-Button in der Oberfläche.
+ * Marks the active language button in the interface.
  *
- * @param {string} lang Sprachcode des aktiven Buttons.
+ * @param {string} lang Language code of the active button.
  * @returns {void}
  */
 function setActiveLanguageButton(lang) {
@@ -231,9 +231,9 @@ function setActiveLanguageButton(lang) {
 }
 
 /**
- * Wendet die gewählte Sprache auf Texte und Tooltips der Oberfläche an.
+ * Applies the selected language to interface texts and tooltips.
  *
- * @param {string} lang Sprachcode.
+ * @param {string} lang Language code.
  * @returns {void}
  */
 function applyLanguage(lang) {
@@ -258,9 +258,9 @@ function applyLanguage(lang) {
 }
 
 /**
- * Passt die Canvas-Auflösung an den Vollbildmodus an.
+ * Adjusts canvas resolution for fullscreen mode.
  *
- * @param {boolean} isFullscreen Gibt an, ob das Spiel im Vollbild läuft.
+ * @param {boolean} isFullscreen Indicates whether the game is running in fullscreen.
  * @returns {void}
  */
 function updateCanvasResolution(isFullscreen) {
@@ -284,7 +284,7 @@ function updateCanvasResolution(isFullscreen) {
 }
 
 /**
- * Zeigt den Startbildschirm an und synchronisiert die UI mit den gespeicherten Einstellungen.
+ * Displays the start screen and synchronizes the UI with saved settings.
  *
  * @returns {void}
  */
@@ -315,7 +315,7 @@ function showStartScreen() {
 }
 
 /**
- * Initialisiert eine neue Spielwelt auf dem aktuellen Canvas.
+ * Initializes a new game world on the current canvas.
  *
  * @returns {void}
  */

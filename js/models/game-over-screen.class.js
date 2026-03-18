@@ -1,5 +1,5 @@
 /**
- * Game-Over-Bildschirm – blendet nach dem Tod des Spielers mit Einblend-Animation ein.
+ * Game-over screen - displays after player death with fade-in animation.
  */
 class GameOverScreen {
     gameOverImages = [];
@@ -17,7 +17,7 @@ class GameOverScreen {
     }
 
     /**
-     * Lädt alle Game-Over-Animationsbilder in den internen Array.
+     * Loads all game-over animation images into the internal array.
      * @returns {void}
      */
     loadImages() {
@@ -37,8 +37,8 @@ class GameOverScreen {
     }
 
     /**
-     * Zeichnet den Game-Over-Bildschirm mit Einblend-Effekt auf den Canvas.
-     * @param {CanvasRenderingContext2D} ctx Zeichenkontext.
+     * Draws the game-over screen with fade-in effect on canvas.
+     * @param {CanvasRenderingContext2D} ctx Drawing context.
      * @returns {void}
      */
     draw(ctx) {
@@ -70,8 +70,8 @@ class GameOverScreen {
     }
 
     /**
-     * Zeigt den Game-Over-Bildschirm an und spielt den Fail-Sound ab.
-     * @param {AudioManager} audioManager Audio-Manager für den Fail-Sound.
+     * Displays the game-over screen and plays the fail sound.
+     * @param {AudioManager} audioManager Audio manager for the fail sound.
      * @returns {void}
      */
     show(audioManager) {
@@ -87,7 +87,7 @@ class GameOverScreen {
     }
 
     /**
-     * Startet die Animations-Schleife für das Durchblenden der Bilder.
+     * Starts the animation loop for transitioning between images.
      * @returns {void}
      */
     startAnimation() {
@@ -105,7 +105,7 @@ class GameOverScreen {
     }
 
     /**
-     * Stoppt die Bildwechsel-Animation.
+     * Stops the image transition animation.
      * @returns {void}
      */
     stopAnimation() {
@@ -116,7 +116,7 @@ class GameOverScreen {
     }
 
     /**
-     * Versteckt den Game-Over-Bildschirm und setzt alle Zustände zurück.
+     * Hides the game-over screen and resets all states.
      * @returns {void}
      */
     hide() {

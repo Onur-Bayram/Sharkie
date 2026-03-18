@@ -1,7 +1,7 @@
 Object.assign(World.prototype, {
 /**
- * Führt alle Kollisionsprüfungen des aktuellen Frames aus und aktualisiert
- * dabei Boss-, Sammel- und Kampflogik.
+ * Performs all collision checks for the current frame and updates
+ * boss, collection and combat logic.
  *
  * @returns {void}
  */
@@ -60,7 +60,7 @@ checkCollisions() {
 },
 
 /**
- * Verarbeitet das Einsammeln von Giftflaschen und Münzen.
+ * Processes collection of poison bottles and coins.
  *
  * @returns {void}
  */
@@ -96,7 +96,7 @@ checkPoisonCollection() {
 },
 
 /**
- * Entfernt Gegner und Quallen, deren Todesanimation bereits abgeschlossen ist.
+ * Removes enemies and jellyfish whose death animation is already complete.
  *
  * @returns {void}
  */
@@ -116,7 +116,7 @@ cleanupDeadEnemies() {
 },
 
 /**
- * Prüft Kollisionen zwischen Blasen und möglichen Zielen.
+ * Checks collisions between bubbles and possible targets.
  *
  * @returns {void}
  */
@@ -198,7 +198,7 @@ checkBubbleCollisions() {
 },
 
 /**
- * Prüft Kollisionen zwischen Fin-Slap-Angriffen und möglichen Zielen.
+ * Checks collisions between fin slap attacks and possible targets.
  *
  * @returns {void}
  */
@@ -256,10 +256,10 @@ checkFinSlapCollisions() {
 },
 
 /**
- * Prüft die Kollision zwischen einem Fin-Slap und einem Objekt mit Hitbox-Abstand.
+ * Checks collision between a fin slap and an object with hitbox distance.
  *
- * @param {MovableObject} finSlap Fin-Slap-Angriff.
- * @param {MovableObject} obj Zielobjekt.
+ * @param {MovableObject} finSlap Fin slap attack.
+ * @param {MovableObject} obj Target object.
  * @returns {boolean}
  */
 isCollidingFinSlap(finSlap, obj) {
@@ -271,10 +271,10 @@ isCollidingFinSlap(finSlap, obj) {
 },
 
 /**
- * Prüft die Kollision zwischen einer Blase und einem Objekt mit Hitbox-Abstand.
+ * Checks collision between a bubble and an object with hitbox distance.
  *
- * @param {MovableObject} bubble Blasenprojektil.
- * @param {MovableObject} obj Zielobjekt.
+ * @param {MovableObject} bubble Bubble projectile.
+ * @param {MovableObject} obj Target object.
  * @returns {boolean}
  */
 isCollidingBubble(bubble, obj) {

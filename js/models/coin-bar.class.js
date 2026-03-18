@@ -1,5 +1,5 @@
 /**
- * Münz-Sammelanzeige als Bildleiste (6 Zustände proportional zu gesammelten Münzen).
+ * Coin collection display as image bar (6 states proportional to collected coins).
  */
 class CoinBar {
     IMAGES = [
@@ -21,7 +21,7 @@ class CoinBar {
     maxCoins = 0;
 
     /**
-     * Erstellt die Münzleiste und lädt alle Bilder.
+     * Creates the coin bar and loads all images.
      */
     constructor() {
         this.loadImages(this.IMAGES);
@@ -29,8 +29,8 @@ class CoinBar {
     }
 
     /**
-     * Lädt ein einzelnes Bild und setzt es als aktuelles Bild.
-     * @param {string} path Bildpfad.
+     * Loads a single image and sets it as the current image.
+     * @param {string} path Image path.
      * @returns {void}
      */
     loadImage(path) {
@@ -42,8 +42,8 @@ class CoinBar {
     }
 
     /**
-     * Lädt alle Bilder in den internen Cache.
-     * @param {string[]} array Array von Bildpfaden.
+     * Loads all images into the internal cache.
+     * @param {string[]} array Array of image paths.
      * @returns {void}
      */
     loadImages(array) {
@@ -55,9 +55,9 @@ class CoinBar {
     }
 
     /**
-     * Aktualisiert den Anzeigestatus basierend auf gesammelten Münzen.
-     * @param {number} coinCount Anzahl gesammelter Münzen.
-     * @param {number} [maxCoins=100] Gesamtzahl der Münzen.
+     * Updates the display status based on collected coins.
+     * @param {number} coinCount Number of collected coins.
+     * @param {number} [maxCoins=100] Total number of coins.
      * @returns {void}
      */
     setPercentage(coinCount, maxCoins = 100) {

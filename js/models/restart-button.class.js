@@ -1,5 +1,5 @@
 /**
- * Neustart-Button – wird nach Game-Over oder Sieg eingeblendet, mit Hover- und Float-Animation.
+ * Restart button - shown after game-over or victory, with hover and float animation.
  */
 class RestartButton {
     buttonX = 0;
@@ -19,7 +19,7 @@ class RestartButton {
     }
 
     /**
-     * Lädt das Button-Bild.
+     * Loads the button image.
      * @returns {void}
      */
     loadImage() {
@@ -28,7 +28,7 @@ class RestartButton {
     }
 
     /**
-     * Berechnet und setzt die zentrierte Button-Position.
+     * Calculates and sets the centered button position.
      * @returns {void}
      */
     updatePosition() {
@@ -37,8 +37,8 @@ class RestartButton {
     }
 
     /**
-     * Zeichnet den Button mit Float- und Hover-Skalierungseffekt auf den Canvas.
-     * @param {CanvasRenderingContext2D} ctx Zeichenkontext.
+     * Draws the button with float and hover scaling effects on canvas.
+     * @param {CanvasRenderingContext2D} ctx Drawing context.
      * @returns {void}
      */
     draw(ctx) {
@@ -75,9 +75,9 @@ class RestartButton {
     }
 
     /**
-     * Gibt zurück ob die Koordinaten innerhalb der (verschobenen) Button-Fläche liegen.
-     * @param {number} x X-Koordinate.
-     * @param {number} y Y-Koordinate.
+     * Returns whether coordinates are within the (shifted) button area.
+     * @param {number} x X-coordinate.
+     * @param {number} y Y-coordinate.
      * @returns {boolean}
      */
     isButtonHovered(x, y) {
@@ -87,9 +87,9 @@ class RestartButton {
     }
 
     /**
-     * Aktualisiert den Hover-Zustand basierend auf der Zeiger-Position.
-     * @param {number} x X-Koordinate.
-     * @param {number} y Y-Koordinate.
+     * Updates the hover state based on pointer position.
+     * @param {number} x X-coordinate.
+     * @param {number} y Y-coordinate.
      * @returns {void}
      */
     updateHoverState(x, y) {
@@ -101,10 +101,10 @@ class RestartButton {
     }
 
     /**
-     * Verarbeitet einen Klick und löst `window.restartGame()` aus wenn der Button getroffen wurde.
-     * @param {number} x X-Koordinate.
-     * @param {number} y Y-Koordinate.
-     * @returns {boolean} true wenn der Button geklickt wurde.
+     * Processes a click and triggers `window.restartGame()` if the button was hit.
+     * @param {number} x X-coordinate.
+     * @param {number} y Y-coordinate.
+     * @returns {boolean} true if the button was clicked.
      */
     handleClick(x, y) {
         if (!this.isVisible) {
@@ -120,7 +120,7 @@ class RestartButton {
     }
 
     /**
-     * Macht den Button sichtbar.
+     * show the button (called when game-over or victory screen is shown).
      * @returns {void}
      */
     show() {
@@ -128,7 +128,7 @@ class RestartButton {
     }
 
     /**
-     * Versteckt den Button.
+     * secrect button hide method (not used in current flow, but could be called to hide the button).
      * @returns {void}
      */
     hide() {

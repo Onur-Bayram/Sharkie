@@ -1,5 +1,5 @@
 /**
- * Sieg-Bildschirm – wird nach dem Tod des Bosses mit Einblend-Effekt angezeigt.
+ * Win screen - displayed after boss death with fade-in effect.
  */
 class WinScreen {
     youWinImg = null;
@@ -17,8 +17,8 @@ class WinScreen {
     }
 
     /**
-     * Zeichnet den Sieg-Bildschirm mit Goldschein-Effekt auf den Canvas.
-     * @param {CanvasRenderingContext2D} ctx Zeichenkontext.
+     * Draws the win screen with gold glow effect on canvas.
+     * @param {CanvasRenderingContext2D} ctx Drawing context.
      * @returns {void}
      */
     draw(ctx) {
@@ -49,8 +49,8 @@ class WinScreen {
     }
 
     /**
-     * Zeigt den Sieg-Bildschirm an und spielt den Victory-Sound ab.
-     * @param {AudioManager} audioManager Audio-Manager für den Victory-Sound.
+     * Displays the win screen and plays the victory sound.
+     * @param {AudioManager} audioManager Audio manager for the victory sound.
      * @returns {void}
      */
     show(audioManager) {
@@ -65,7 +65,7 @@ class WinScreen {
     }
 
     /**
-     * Versteckt den Sieg-Bildschirm und setzt alle Zustände zurück.
+     * Hides the win screen and resets all states.
      * @returns {void}
      */
     hide() {

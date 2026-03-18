@@ -1,6 +1,6 @@
 /**
- * Verwaltet alle Audio-Ressourcen des Spiels – Hintergrundmusik, Soundeffekte,
- * Lautstärke-Einstellungen und Stummschaltung.
+ * Manages all audio resources of the game – background music, sound effects,
+ * volume settings, and muting.
  */
 class AudioManager {
     bgMusic = new Audio();
@@ -26,7 +26,7 @@ class AudioManager {
     }
     
     /**
-     * Lädt alle Audio-Dateipfade und setzt initiale Lautstärken.
+     * Loads all audio file paths and sets initial volumes.
      * @returns {void}
      */
     loadAudio() {
@@ -69,7 +69,7 @@ class AudioManager {
     }
     
     /**
-     * Startet die Hintergrundmusik (wenn nicht stummgeschaltet und Musik aktiviert).
+     * Starts background music (if not muted and music is enabled).
      * @returns {void}
      */
     play() {
@@ -79,7 +79,7 @@ class AudioManager {
     }
     
     /**
-     * Pausiert die Hintergrundmusik.
+     * Pauses background music.
      * @returns {void}
      */
     pause() {
@@ -88,7 +88,7 @@ class AudioManager {
     }
     
     /**
-     * Stoppt die Hintergrundmusik und setzt die Abspielposition auf den Anfang zurück.
+     * Stops background music and resets playback position to the beginning.
      * @returns {void}
      */
     stop() {
@@ -98,8 +98,8 @@ class AudioManager {
     }
     
     /**
-     * Setzt die Musik-Lautstärke und wendet sie sofort an.
-     * @param {number} volume Lautstärke (0–1).
+     * Sets music volume and applies it immediately.
+     * @param {number} volume Volume (0–1).
      * @returns {void}
      */
     setMusicVolume(volume) {
@@ -108,8 +108,8 @@ class AudioManager {
     }
 
     /**
-     * Aktiviert oder deaktiviert die Stummschaltung für alle Sounds.
-     * @param {boolean} muted true = stummschalten.
+     * Enables or disables muting for all sounds.
+     * @param {boolean} muted true = mute.
      * @returns {void}
      */
     setMuted(muted) {
@@ -128,8 +128,8 @@ class AudioManager {
     }
 
     /**
-     * Aktiviert oder deaktiviert die Hintergrundmusik separat von der Stummschaltung.
-     * @param {boolean} enabled true = Musik aktivieren.
+     * Enables or disables background music separately from muting.
+     * @param {boolean} enabled true = enable music.
      * @returns {void}
      */
     setBackgroundMusicEnabled(enabled) {
@@ -144,8 +144,8 @@ class AudioManager {
     }
 
     /**
-     * Setzt die Lautstärke aller Soundeffekte.
-     * @param {number} volume Lautstärke (0–1).
+     * Sets the volume for all sound effects.
+     * @param {number} volume Volume (0-1).
      * @returns {void}
      */
     setSFXVolume(volume) {
@@ -164,7 +164,7 @@ class AudioManager {
     }
 
     /**
-     * Spielt den Münz-Sound ab (geklont, damit überlappend möglich).
+     * Plays the coin sound (cloned so overlapping is possible).
      * @returns {void}
      */
     playCoinSound() {
@@ -175,7 +175,7 @@ class AudioManager {
     }
 
     /**
-     * Spielt den Fail-Sound beim Tod des Spielers ab.
+     * Plays the fail sound when the player dies.
      * @returns {void}
      */
     playFailSound() {
@@ -186,7 +186,7 @@ class AudioManager {
     }
 
     /**
-     * Spielt den Trank-Sound beim Einsammeln einer Giftflasche ab.
+     * Plays the potion sound when collecting a poison bottle.
      * @returns {void}
      */
     playPotionSound() {
@@ -197,7 +197,7 @@ class AudioManager {
     }
 
     /**
-     * Spielt den Victory-Sound beim Besiegen des Bosses ab.
+     * Plays the victory sound when defeating the boss.
      * @returns {void}
      */
     playVictorySound() {
@@ -208,7 +208,7 @@ class AudioManager {
     }
 
     /**
-     * Spielt den Flossenschlag-Sound ab.
+     * Plays the fin slap sound.
      * @returns {void}
      */
     playFinSlapSound() {
@@ -219,7 +219,7 @@ class AudioManager {
     }
 
     /**
-     * Spielt den Elektro-Schock-Sound ab (Treffer durch elektrische Qualle).
+     * Plays the electric shock sound (hit by electric jellyfish).
      * @returns {void}
      */
     playElectricSound() {
@@ -230,7 +230,7 @@ class AudioManager {
     }
 
     /**
-     * Spielt den Treffer-Sound bei normalen Giftangriffen ab.
+     * Plays the hurt sound for normal poison attacks.
      * @returns {void}
      */
     playHurtSound() {
@@ -241,7 +241,7 @@ class AudioManager {
     }
 
     /**
-     * Spielt den Sound beim Abfeuern einer normalen Blase ab.
+     * Plays the sound when firing a normal bubble.
      * @returns {void}
      */
     playBubbleShootSound() {
@@ -252,7 +252,7 @@ class AudioManager {
     }
 
     /**
-     * Spielt den Sound beim Abfeuern einer Giftblase ab.
+     * Plays the sound when firing a poison bubble.
      * @returns {void}
      */
     playPoisonShootSound() {
@@ -263,7 +263,7 @@ class AudioManager {
     }
 
     /**
-     * Spielt die Sprachausgabe beim Betreten der dunklen Bosszone ab.
+     * Plays voice output when entering the dark boss zone.
      * @returns {void}
      */
     playDarkZoneVoiceSound() {
@@ -274,7 +274,7 @@ class AudioManager {
     }
 
     /**
-     * Spielt den Boss-Intro-Sound beim ersten Erscheinen des Bosses ab.
+     * Plays the boss intro sound when the boss first appears.
      * @returns {void}
      */
     playBossIntroSound() {

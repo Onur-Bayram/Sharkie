@@ -1,7 +1,7 @@
 Object.assign(World.prototype, {
 /**
- * Rendert den gesamten Spielframe, aktualisiert Kameraposition, zeichnet alle Objekte
- * und plant den nächsten Frame via requestAnimationFrame.
+ * Renders the entire game frame, updates camera position, draws all objects
+ * and schedules the next frame via requestAnimationFrame.
  * @returns {void}
  */
 draw() {
@@ -118,7 +118,7 @@ draw() {
 },
 
 /**
- * Pausiert das Spiel – stoppt den Animations-Frame und die Hintergrundmusik.
+ * Pauses the game – stops the animation frame and background music.
  * @returns {void}
  */
 pauseGame() {
@@ -133,7 +133,7 @@ pauseGame() {
 },
 
 /**
- * Setzt das Spiel fort – reaktiviert Musik und startet den Animations-Loop neu.
+ * Resumes the game – reactivates music and restarts the animation loop.
  * @returns {void}
  */
 resumeGame() {
@@ -148,9 +148,9 @@ resumeGame() {
 },
 
 /**
- * Prüft die Kollision zwischen Charakter und Boss mit großzügigem Hitbox-Abstand.
- * @param {Character} character Spielcharakter.
- * @param {FinalBoss} boss Endgegner.
+ * Checks collision between character and boss with generous hitbox distance.
+ * @param {Character} character Player character.
+ * @param {FinalBoss} boss Final boss enemy.
  * @returns {boolean}
  */
 isCollidingBoss(character, boss) {

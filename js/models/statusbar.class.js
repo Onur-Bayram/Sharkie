@@ -1,5 +1,5 @@
 /**
- * Lebensanzeige des Spielers als Bildleiste (6 Zustände von 0% bis 100%).
+ * Player health display as image bar (6 states from 0% to 100%).
  */
 class StatusBar extends MovableObject {
     percentage = 100;
@@ -14,7 +14,7 @@ class StatusBar extends MovableObject {
     ];
 
     /**
-     * Erstellt die Statusleiste und positioniert sie oben links.
+     * Creates the status bar and positions it in the top left.
      */
     constructor() {
         super();
@@ -27,8 +27,8 @@ class StatusBar extends MovableObject {
     }
 
     /**
-     * Setzt den angezeigten Prozentwert und wählt das passende Bild.
-     * @param {number} percentage Lebensenergie in Prozent (0–100).
+     * Sets the displayed percentage value and selects the appropriate image.
+     * @param {number} percentage Health energy in percent (0–100).
      * @returns {void}
      */
     setPercentage(percentage) {

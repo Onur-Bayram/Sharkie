@@ -1,5 +1,5 @@
 /**
- * Statische Giftflasche zum Einsammeln – wählt zufällig Variante (links/rechts, dunkel/hell).
+ * Static poison bottle for collection - randomly selects variant (left/right, dark/light).
  */
 class PoisonBottle extends MovableObject {
     
@@ -7,9 +7,9 @@ class PoisonBottle extends MovableObject {
     height = 50;
 
     /**
-     * Erstellt eine Giftflasche an der angegebenen Position.
-     * @param {number} x X-Position.
-     * @param {number} y Y-Position.
+     * Creates a poison bottle at the given position.
+     * @param {number} x X-position.
+     * @param {number} y Y-position.
      */
     constructor(x, y) {
         super();

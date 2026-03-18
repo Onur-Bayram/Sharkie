@@ -1,6 +1,6 @@
 /**
- * Haupt-Spielwelt – initialisiert alle Spielobjekte, verwaltet Zustandsvariablen
- * und startet den Render- und Kollisions-Loop.
+ * Main game world - initializes all game objects, manages state variables,
+ * and starts the render and collision loop.
  */
 class World {
 
@@ -73,8 +73,8 @@ ctx;
 
     
     /**
-     * Erstellt die Spielwelt auf dem übergebenen Canvas und startet den Spielloop.
-     * @param {HTMLCanvasElement} canvas Das Ziel-Canvas-Element.
+     * Creates the game world on the given canvas and starts the game loop.
+     * @param {HTMLCanvasElement} canvas The target canvas element.
      */
     constructor(canvas) {
         this.canvas = canvas;
@@ -104,7 +104,7 @@ ctx;
 }
 
     /**
-     * Erstellt zufällig verteilte Pufferfisch-Gegner auf der Karte.
+     * Creates randomly distributed pufferfish enemies on the map.
      * @returns {Pufferfish[]}
      */
     createEnemies() {
@@ -125,7 +125,7 @@ ctx;
 }
 
     /**
-     * Erstellt zufällig verteilte Quallen auf der Karte.
+     * Creates randomly distributed jellyfish on the map.
      * @returns {Jellyfish[]}
      */
     createJellyfishes() {
@@ -146,7 +146,7 @@ ctx;
 }
 
     /**
-     * Erstellt statische Giftflaschen auf der Karte.
+     * Creates static poison bottles on the map.
      * @returns {PoisonBottle[]}
      */
     createPoisonBottles() {
@@ -167,7 +167,7 @@ ctx;
 }
 
     /**
-     * Erstellt animierte (fallende) Giftflaschen auf der Karte.
+     * Creates animated (falling) poison bottles on the map.
      * @returns {AnimatedPoisonBottle[]}
      */
     createAnimatedPoisonBottles() {
@@ -185,7 +185,7 @@ ctx;
 }
 
     /**
-     * Erstellt zufällig verteilte Münzen auf der Karte.
+     * Creates randomly distributed coins on the map.
      * @returns {Coin[]}
      */
     createCoins() {
@@ -206,7 +206,7 @@ ctx;
 }
 
     /**
-     * Startet den Wur-Intervall für Tasten F (normale Blase), D (Giftblase) und Leertaste (Flossenschlag).
+     * Starts the throw interval for keys F (normal bubble), D (poison bubble) and spacebar (fin slap).
      * @returns {void}
      */
     handleThrow() {

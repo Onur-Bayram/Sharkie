@@ -1,6 +1,6 @@
 /**
- * Startet ein neues Spiel aus dem HTML-Startbildschirm heraus.
- * Bricht ab wenn das Gerät im Hochformat-Telefon-Layout ist.
+ * Starts a new game from the HTML start screen.
+ * Aborts if the device is in portrait phone layout.
  * @returns {void}
  */
 function startGameFromHTML() {
@@ -16,7 +16,7 @@ function startGameFromHTML() {
 }
 
 /**
- * Zeigt den Options-Bildschirm an und blendet den Spielbereich aus.
+ * Displays the options screen and hides the game area.
  * @returns {void}
  */
 function showOptionsScreen() {
@@ -29,7 +29,7 @@ function showOptionsScreen() {
 }
 
 /**
- * Aktualisiert die Zurück-Buttons je nachdem ob das Spiel pausiert ist oder nicht.
+ * Updates the back buttons depending on whether the game is paused or not.
  * @returns {void}
  */
 function updateBackButtons() {
@@ -65,8 +65,8 @@ function updateBackButtons() {
 }
 
 /**
- * Wechselt zum angegebenen Options-Untermenü und versteckt alle anderen.
- * @param {'menu'|'language'|'help'|'audio'|'impressum'} submenu Zu zeigendes Untermenü.
+ * Switches to the specified options submenu and hides all others.
+ * @param {'menu'|'language'|'help'|'audio'|'impressum'} submenu Submenu to display.
  * @returns {void}
  */
 function showOptionsSubmenu(submenu) {
@@ -91,7 +91,7 @@ function showOptionsSubmenu(submenu) {
 }
 
 /**
- * Kehrt zum Options-Hauptmenü zurück.
+ * Returns to the options main menu.
  * @returns {void}
  */
 function backToOptionsMenu() {
@@ -99,7 +99,7 @@ function backToOptionsMenu() {
 }
 
 /**
- * Schließt den Options-Bildschirm ohne laufendes Spiel und zeigt den Startbildschirm.
+ * Closes the options screen without running game and shows start screen.
  * @returns {void}
  */
 function hideOptionsScreen() {
@@ -113,7 +113,7 @@ function hideOptionsScreen() {
 }
 
 /**
- * Beendet das laufende Spiel und kehrt zum Startbildschirm zurück (verlässt auch Vollbild).
+ * Terminates the running game and returns to the start screen (also exits fullscreen).
  * @returns {void}
  */
 function returnToTitle() {
@@ -131,7 +131,7 @@ function returnToTitle() {
 }
 
 /**
- * Startet das Spiel neu ohne zum Startbildschirm zurückzukehren.
+ * Restarts the game without returning to the start screen.
  * @returns {void}
  */
 function restartGame() {
@@ -146,7 +146,7 @@ function restartGame() {
 }
 
 /**
- * Blendet den Options-Bildschirm aus und setzt das laufende Spiel fort.
+ * Hides the options screen and resumes the running game.
  * @returns {void}
  */
 function backToGame() {
@@ -162,7 +162,7 @@ function backToGame() {
 }
 
 /**
- * Pausiert das Spiel und öffnet den Options-Bildschirm (in-game Pause-Menü).
+ * Pauses the game and opens the options screen (in-game pause menu).
  * @returns {void}
  */
 function pauseAndReturnToMenu() {
@@ -178,8 +178,8 @@ function pauseAndReturnToMenu() {
 }
 
 /**
- * Bindet alle globalen UI-Event-Listener (Resize, Orientierung, Fullscreen, Klicks, Slider).
- * Wird nur einmal ausgeführt (Guard via `uiBound`).
+ * Binds all global UI event listeners (resize, orientation, fullscreen, clicks, sliders).
+ * Executed only once (guarded by `uiBound`).
  * @returns {void}
  */
 function bindUI() {
@@ -270,9 +270,9 @@ function bindUI() {
 }
 
 /**
- * Wechselt die Spielsprache, speichert sie im localStorage und wendet alle Übersetzungen an.
- * @param {string} lang Sprachcode (z.B. 'de', 'en', 'es').
- * @param {HTMLElement|null} button Der angeklickte Sprachbutton (oder null).
+ * Changes the game language, saves it to localStorage, and applies all translations.
+ * @param {string} lang Language code (e.g. 'de', 'en', 'es').
+ * @param {HTMLElement|null} button The clicked language button (or null).
  * @returns {void}
  */
 function changeLanguage(lang, button) {
@@ -293,7 +293,7 @@ function changeLanguage(lang, button) {
 }
 
 /**
- * Aktualisiert die Beschriftung des Stummschaltungs-Buttons je nach aktuellem Zustand.
+ * Updates the label of the mute button based on the current state.
  * @returns {void}
  */
 function updateMuteButtonLabel() {
@@ -325,8 +325,8 @@ function toggleMute() {
 }
 
 /**
- * Setzt die Musik-Lautstärke über den HTML-Slider und aktualisiert den AudioManager.
- * @param {string|number} value Lautstärkewert in Prozent (0–100).
+ * Sets the music volume via the HTML slider and updates the AudioManager.
+ * @param {string|number} value Volume value in percent (0–100).
  * @returns {void}
  */
 function updateMusicVolume(value) {
@@ -340,8 +340,8 @@ function updateMusicVolume(value) {
 }
 
 /**
- * Setzt die Soundeffekt-Lautstärke über den HTML-Slider und aktualisiert den AudioManager.
- * @param {string|number} value Lautstärkewert in Prozent (0–100).
+ * Sets the sound effects volume via the HTML slider and updates the AudioManager.
+ * @param {string|number} value Volume value in percent (0–100).
  * @returns {void}
  */
 function updateSFXVolume(value) {

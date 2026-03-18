@@ -1,5 +1,5 @@
 /**
- * Boss-HP-Anzeige als Canvas-gezeichneter Balken mit Farb-Feedback (grün/gelb/rot).
+ * Boss HP display as canvas-drawn bar with color feedback (green/yellow/red).
  */
 class BossBar {
     x = 320;
@@ -10,9 +10,9 @@ class BossBar {
     maxHp = 500;
 
     /**
-     * Setzt die aktuellen und maximalen HP des Bosses.
-     * @param {number} currentHp Aktuelle HP.
-     * @param {number} [maxHp=500] Maximale HP.
+     * Sets current and maximum HP of the boss.
+     * @param {number} currentHp Current HP.
+     * @param {number} [maxHp=500] Maximum HP.
      * @returns {void}
      */
     setPercentage(currentHp, maxHp = 500) {
@@ -21,8 +21,8 @@ class BossBar {
     }
 
     /**
-     * Zeichnet den HP-Balken mit Rahmen, Füllfarbe und HP-Text auf den Canvas.
-     * @param {CanvasRenderingContext2D} ctx Zeichenkontext.
+     * Draws the HP bar with frame, fill color and HP text on the canvas.
+     * @param {CanvasRenderingContext2D} ctx Drawing context.
      * @returns {void}
      */
     draw(ctx) {

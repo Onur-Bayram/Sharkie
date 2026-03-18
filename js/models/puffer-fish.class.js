@@ -1,6 +1,6 @@
 /**
- * Kugelfisch-Gegner – wechselt zwischen Schwimmen, Übergang und aufgeblähtem Zustand.
- * Kann durch Blasen oder Flossenschlag getötet werden; beim Flossenschlag wird ein Knockback ausgelöst.
+ * Pufferfish enemy - alternates between swimming, transition, and inflated states.
+ * Can be killed by bubbles or fin slap; knockback is triggered by fin slap.
  */
 class Pufferfish extends MovableObject{
 
@@ -19,9 +19,9 @@ class Pufferfish extends MovableObject{
     knockbackGravity = 0.30;
 
     /**
-     * Erstellt einen Kugelfisch mit zufälliger Farbvariante und Position.
-     * @param {number|null} [x=null] X-Startposition (zufällig wenn null).
-     * @param {number|null} [y=null] Y-Startposition (zufällig wenn null).
+     * Creates a pufferfish with random color variant and position.
+     * @param {number|null} [x=null] X-start position (random if null).
+     * @param {number|null} [y=null] Y-start position (random if null).
      */
     constructor(x = null, y = null){
         super();
@@ -78,7 +78,7 @@ class Pufferfish extends MovableObject{
     }
 
     /**
-     * Startet Animations-, Bewegungs- und Blasenzyklus-Schleifen.
+     * Starts animation, movement and bubble cycle loops.
      * @returns {void}
      */
     animate() {
@@ -133,7 +133,7 @@ class Pufferfish extends MovableObject{
     }
 
     /**
-     * Plant einen regelmäßigen Blasenaufbläh-Zyklus mit zufälligem Intervall.
+     * Schedules a regular bubble inflation cycle with random interval.
      * @returns {void}
      */
     scheduleBubbleCycle() {
@@ -154,7 +154,7 @@ class Pufferfish extends MovableObject{
     }
 
     /**
-     * Startet den Übergangs-Zustand zum aufgeblähten Schwimmen.
+     * Starts the transition state to inflated swimming.
      * @returns {void}
      */
     startTransitionToBubble() {
@@ -163,7 +163,7 @@ class Pufferfish extends MovableObject{
     }
 
     /**
-     * Startet den Übergangs-Zustand zurück zum normalen Schwimmen.
+     * Starts the transition state back to normal swimming.
      * @returns {void}
      */
     startTransitionToSwim() {
@@ -172,7 +172,7 @@ class Pufferfish extends MovableObject{
     }
 
     /**
-     * Schließt den aktuellen Übergangszustand ab und wechselt zum Zielzustand.
+     * Completes the current transition state and switches to the target state.
      * @returns {void}
      */
     finishTransition() {
@@ -185,7 +185,7 @@ class Pufferfish extends MovableObject{
     }
 
     /**
-     * Prüft ob sich der Kugelfisch gerade in einem Übergangszustand befindet.
+     * Checks if the pufferfish is currently in a transition state.
      * @returns {boolean}
      */
     isTransitionState() {
@@ -193,7 +193,7 @@ class Pufferfish extends MovableObject{
     }
 
     /**
-     * Gibt die aktuell passende Bildsequenz je nach Zustand zurück.
+     * Returns the currently appropriate image sequence depending on state.
      * @returns {string[]}
      */
     getCurrentImages() {
@@ -213,7 +213,7 @@ class Pufferfish extends MovableObject{
     }
 
     /**
-     * Gibt die Sterbebilder für den aktuellen Farbtyp zurück (normaler Tod).
+     * Returns death images for the current color type (normal death).
      * @returns {string[]}
      */
     getDeadImages() {
@@ -239,7 +239,7 @@ class Pufferfish extends MovableObject{
     }
 
     /**
-     * Gibt die Sterbebilder für den Flossenschlag-Tod zurück.
+     * Returns death images for fin slap death.
      * @returns {string[]}
      */
     getDeadImagesFinSlap() {
@@ -265,9 +265,9 @@ class Pufferfish extends MovableObject{
     }
 
     /**
-     * Leitet den Tod des Kugelfisches ein; bei Flossenschlag wird Knockback aktiviert.
-     * @param {'default'|'finSlap'} [cause='default'] Todesursache.
-     * @param {number} [direction=1] Richtung für den Knockback (1 = rechts, -1 = links).
+     * Initiates puffer fish death; knockback is activated on fin slap.
+     * @param {'default'|'finSlap'} [cause='default'] Cause of death.
+     * @param {number} [direction=1] Direction for knockback (1 = right, -1 = left).
      * @returns {void}
      */
     die(cause = 'default', direction = 1) {
@@ -286,7 +286,7 @@ class Pufferfish extends MovableObject{
     }
 
     /**
-     * Wendet den Knockback-Vektor an und simuliert Schwerkraft nach einem Flossenschlag.
+     * Applies the knockback vector and simulates gravity after a fin slap.
      * @returns {void}
      */
     applyFinSlapKnockback() {

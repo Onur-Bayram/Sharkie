@@ -1,6 +1,6 @@
 /**
- * Quallen-Gegner – wird zufällig als 'regular' (gelb/lila) oder 'dangerous' (grün/pink) erzeugt.
- * Gefährliche Quallen verursachen elektrischen Schaden.
+ * Jellyfish enemy - randomly created as 'regular' (yellow/purple) or 'dangerous' (green/pink).
+ * Dangerous jellyfish cause electric damage.
  */
 class Jellyfish extends MovableObject {
     
@@ -14,9 +14,9 @@ class Jellyfish extends MovableObject {
     color = 'yellow'; // 'yellow', 'lila', 'green', 'pink'
 
     /**
-     * Erstellt eine Qualle mit zufälligem Typ, Farbe und Position.
-     * @param {number|null} [x=null] X-Startposition (zufällig wenn null).
-     * @param {number|null} [y=null] Y-Startposition (zufällig wenn null).
+     * Creates a jellyfish with random type, color and position.
+     * @param {number|null} [x=null] X-start position (random if null).
+     * @param {number|null} [y=null] Y-start position (random if null).
      */
     constructor(x = null, y = null) {
         super();
@@ -52,7 +52,7 @@ class Jellyfish extends MovableObject {
     }
 
     /**
-     * Lädt die Swim-Bildpfade abhängig von Typ und Farbe.
+     * Loads swim image paths depending on type and color.
      * @returns {void}
      */
     loadSwimImages() {
@@ -68,7 +68,7 @@ class Jellyfish extends MovableObject {
     }
 
     /**
-     * Lädt die Sterbe-Bildpfade abhängig von Farbe und Farbordner.
+     * Loads death image paths depending on color and color folder.
      * @returns {void}
      */
     loadDeadImages() {
@@ -84,7 +84,7 @@ class Jellyfish extends MovableObject {
     }
 
     /**
-     * Gibt den Dateiname-Farbcode für die Swim-Animation zurück.
+     * Returns the file name color code for the swim animation.
      * @returns {string}
      */
     getColorCode() {
@@ -103,7 +103,7 @@ class Jellyfish extends MovableObject {
     }
 
     /**
-     * Gibt den Ordnernamen für die Sterbebilder zurück (Ordner-Groß-/Kleinschreibung beachten).
+     * Returns the folder name for death images (note case sensitivity).
      * @returns {string}
      */
     getColorFolder() {
@@ -122,7 +122,7 @@ class Jellyfish extends MovableObject {
     }
 
     /**
-     * Gibt das Dateipräfix für die Sterbebilder zurück.
+     * Returns the file prefix for death images.
      * @returns {string}
      */
     getDeadColorCode() {
@@ -141,7 +141,7 @@ class Jellyfish extends MovableObject {
     }
 
     /**
-     * Startet Animations- und Bewegungsschleifen (Schwimmen links und vertikales Pendeln).
+     * Starts animation and movement loops (swim left and vertical swinging).
      * @returns {void}
      */
     animate() {
@@ -186,7 +186,7 @@ class Jellyfish extends MovableObject {
     }
 
     /**
-     * Gibt die aktuell passende Bildsequenz zurück (schwimmen oder tot).
+     * Returns the currently appropriate image sequence (swimming or dead).
      * @returns {string[]}
      */
     getCurrentImages() {
@@ -197,7 +197,7 @@ class Jellyfish extends MovableObject {
     }
 
     /**
-     * Leitet den Tod der Qualle ein und setzt den Animationszustand zurück.
+     * Initiates jellyfish death and resets the animation state.
      * @returns {void}
      */
     die() {

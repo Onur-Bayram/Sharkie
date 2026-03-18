@@ -1,15 +1,15 @@
 /**
- * Blase als Projektil – fliegt in eine Richtung und pulsiert visuell.
- * Kann normal (blau) oder giftig (lila) sein.
+ * Bubble as projectile - flies in one direction and pulses visually.
+ * Can be normal (blue) or poisonous (purple).
  */
 class BubbleAnimation extends MovableObject {
     
     /**
-     * Erstellt eine Blase und startet Bewegungs- und Puls-Animation.
-     * @param {number} x X-Startposition.
-     * @param {number} y Y-Startposition.
-     * @param {1|-1} direction Flugrichtung (1 = rechts, -1 = links).
-     * @param {boolean} [isPoison=false] Ob es sich um eine Giftblase handelt.
+     * Creates a bubble and starts movement and pulse animation.
+     * @param {number} x Start X-position.
+     * @param {number} y Start Y-position.
+     * @param {1|-1} direction Flight direction (1 = right, -1 = left).
+     * @param {boolean} [isPoison=false] Whether it's a poison bubble.
      */
     constructor(x, y, direction, isPoison = false) {
         super();
@@ -34,7 +34,7 @@ class BubbleAnimation extends MovableObject {
     }
 
     /**
-     * Startet die Bewegungsschleife – verschiebt die Blase in Flugrichtung.
+     * Starts the movement loop – moves the bubble in flight direction.
      * @returns {void}
      */
     throw() {
@@ -44,7 +44,7 @@ class BubbleAnimation extends MovableObject {
     }
 
     /**
-     * Startet die Puls-Animations-Schleife (wechselt pulseScale zwischen 0.95 und 1.2).
+     * Starts the pulse animation loop (toggles pulseScale between 0.95 and 1.2).
      * @returns {void}
      */
     animate() {
@@ -57,9 +57,9 @@ class BubbleAnimation extends MovableObject {
     }
 
     /**
-     * Zeichnet die Blase auf den Canvas mit Pulsier-Skalierung und Kamera-Offset.
-     * @param {CanvasRenderingContext2D} ctx Zeichenkontext.
-     * @param {number} cameraX Aktueller Kamera-X-Offset.
+     * Draws the bubble on canvas with pulse scaling and camera offset.
+     * @param {CanvasRenderingContext2D} ctx Drawing context.
+     * @param {number} cameraX Current camera X-offset.
      * @returns {void}
      */
     draw(ctx, cameraX) {

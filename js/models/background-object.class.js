@@ -1,12 +1,12 @@
 /**
- * Hintergrundobjekt – lädt ein Hintergrundbild und setzt Position und Größe.
+ * Background object - loads a background image and sets position and size.
  */
 class BackgroundObject extends MovableObject {
     /**
-     * Erstellt ein Hintergrundobjekt mit dem angegebenen Bild und Koordinaten.
-     * @param {string} imagePath Pfad zum Hintergrundbild.
-     * @param {number} x X-Position.
-     * @param {number} y Y-Position.
+     * Creates a background object with the given image and coordinates.
+     * @param {string} imagePath Path to the background image.
+     * @param {number} x X-position.
+     * @param {number} y Y-position.
      */
     constructor(imagePath, x, y) {  
         super();
