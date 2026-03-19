@@ -1,4 +1,4 @@
-Object.assign(World.prototype, {
+﻿Object.assign(World.prototype, {
 SMALL_POISON_BOTTLE_VALUE: 20,
 LARGE_POISON_BOTTLE_VALUE: 40,
 
@@ -21,6 +21,9 @@ checkCollisions() {
     this.checkFinSlapCollisions();
 },
 
+/**
+ * Updates boss combat state.
+ */
 updateBossCombatState() {
     if (!this.finalBoss) return;
     const hadStartedIntro = this.finalBoss.hasStartedIntro;
@@ -33,6 +36,9 @@ updateBossCombatState() {
     this.finalBoss.checkProximityAttack(this.character);
 },
 
+/**
+ * Checks enemy body collisions.
+ */
 checkEnemyBodyCollisions() {
     this.enemies.forEach((enemy) => {
         if (enemy.isDead || this.character.isDead || !this.character.isColliding(enemy)) return;
@@ -42,6 +48,9 @@ checkEnemyBodyCollisions() {
     });
 },
 
+/**
+ * Checks jellyfish body collisions.
+ */
 checkJellyfishBodyCollisions() {
     this.jellyfishes.forEach((jellyfish) => {
         if (jellyfish.isDead || this.character.isDead || !this.character.isColliding(jellyfish)) return;
@@ -52,6 +61,9 @@ checkJellyfishBodyCollisions() {
     });
 },
 
+/**
+ * Checks boss body collision.
+ */
 checkBossBodyCollision() {
     if (!this.finalBoss || this.finalBoss.isDead || this.character.isDead) return;
     if (!this.isCollidingBoss(this.character, this.finalBoss)) return;
@@ -60,11 +72,17 @@ checkBossBodyCollision() {
     this.statusBar.setPercentage(this.character.energy);
 },
 
+/**
+ * Determines whether character can take contact damage.
+ */
 canCharacterTakeContactDamage() {
     const currentTime = Date.now();
     return !this.character.isHurt || (currentTime - this.character.lastHitTime > 600);
 },
 
+/**
+ * Handles boss end state.
+ */
 handleBossEndState() {
     if (!this.finalBoss || !this.finalBoss.isDead || !this.finalBoss.deadAnimationFinished) return;
     if (this.character.isDead) return;
@@ -72,6 +90,9 @@ handleBossEndState() {
     if (this.restartButton) this.restartButton.show();
 },
 
+/**
+ * Updates animated bottle visibility.
+ */
 updateAnimatedBottleVisibility() {
     this.animatedPoisonBottles.forEach((bottle) => bottle.checkVisibility(this.character.x));
 },
@@ -87,6 +108,9 @@ checkPoisonCollection() {
     this.collectCoins();
 },
 
+/**
+ * Collects static poison bottles.
+ */
 collectStaticPoisonBottles() {
     for (let i = this.poisonBottles.length - 1; i >= 0; i--) {
         const bottle = this.poisonBottles[i];
@@ -98,6 +122,9 @@ collectStaticPoisonBottles() {
     }
 },
 
+/**
+ * Collects animated poison bottles.
+ */
 collectAnimatedPoisonBottles() {
     for (let i = this.animatedPoisonBottles.length - 1; i >= 0; i--) {
         const bottle = this.animatedPoisonBottles[i];
@@ -110,6 +137,9 @@ collectAnimatedPoisonBottles() {
     }
 },
 
+/**
+ * Collects coins.
+ */
 collectCoins() {
     for (let i = this.coins.length - 1; i >= 0; i--) {
         const coin = this.coins[i];
@@ -155,6 +185,9 @@ checkBubbleCollisions() {
     }
 },
 
+/**
+ * Handles poison bubble hit.
+ */
 handlePoisonBubbleHit(bubble) {
     const damage = 100;
     if (this.hitEnemyListWithBubble(this.enemies, bubble, damage, (enemy) => enemy.die())) return true;
@@ -165,11 +198,17 @@ handlePoisonBubbleHit(bubble) {
     return true;
 },
 
+/**
+ * Handles normal bubble hit.
+ */
 handleNormalBubbleHit(bubble) {
     const damage = 50;
     return this.hitEnemyListWithBubble(this.jellyfishes, bubble, damage, (jellyfish) => jellyfish.die());
 },
 
+/**
+ * Handles enemy list hit with bubble.
+ */
 hitEnemyListWithBubble(list, bubble, damage, dieCallback) {
     for (let j = list.length - 1; j >= 0; j--) {
         const target = list[j];
@@ -182,6 +221,9 @@ hitEnemyListWithBubble(list, bubble, damage, dieCallback) {
     return false;
 },
 
+/**
+ * Cleans up dead target.
+ */
 cleanupIfDeadTarget(list, index, target) {
     if (!target.isDead) return false;
     if (target.deadAnimationFinished) list.splice(index, 1);
@@ -202,6 +244,9 @@ checkFinSlapCollisions() {
     }
 },
 
+/**
+ * Handles fin slap hit.
+ */
 handleFinSlapHit(finSlap) {
     if (this.hitEnemyListWithFinSlap(this.enemies, finSlap, (enemy) => enemy.die('finSlap', finSlap.direction))) return true;
     if (this.hitEnemyListWithFinSlap(this.jellyfishes, finSlap, (jellyfish) => jellyfish.die())) return true;
@@ -211,6 +256,9 @@ handleFinSlapHit(finSlap) {
     return true;
 },
 
+/**
+ * Handles enemy list hit with fin slap.
+ */
 hitEnemyListWithFinSlap(list, finSlap, dieCallback) {
     for (let j = list.length - 1; j >= 0; j--) {
         const target = list[j];

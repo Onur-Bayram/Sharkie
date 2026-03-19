@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Background object - loads a background image and sets position and size.
  */
 class BackgroundObject extends MovableObject {

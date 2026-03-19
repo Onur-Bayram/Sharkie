@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Base class for all movable game objects.
  * Manages position, image, shared image cache, and basic movement logic.
  */
@@ -121,6 +121,9 @@ isCollidingCoin(obj) {
     return this.hasMinimumOverlap(left, right, top, bottom);
 }
 
+/**
+ * Gets coin hitbox.
+ */
 getCoinHitbox(obj) {
     const backInset = 36;
     const frontInset = 52;
@@ -137,6 +140,9 @@ getCoinHitbox(obj) {
     };
 }
 
+/**
+ * Checks minimum overlap.
+ */
 hasMinimumOverlap(left, right, top, bottom) {
     const minContactPixels = 4;
     return (right - left) >= minContactPixels && (bottom - top) >= minContactPixels;

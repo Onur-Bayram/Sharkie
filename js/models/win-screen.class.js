@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Win screen - displayed after boss death with fade-in effect.
  */
 class WinScreen {
@@ -11,6 +11,9 @@ class WinScreen {
     opacity = 0;
     fadeInSpeed = 0.03;
 
+    /**
+     * Creates a new instance.
+     */
     constructor() {
         this.youWinImg = new Image();
         this.youWinImg.src = encodeURI('6.Botones/Tittles/You win/Mesa de trabajo 1.png');
@@ -31,17 +34,26 @@ class WinScreen {
         ctx.restore();
     }
 
+    /**
+     * Advances fade-in.
+     */
     advanceFadeIn() {
         if (this.opacity < 1) {
             this.opacity = Math.min(1, this.opacity + this.fadeInSpeed);
         }
     }
 
+    /**
+     * Renders win background.
+     */
     renderWinBackground(ctx) {
         ctx.fillStyle = 'black';
         ctx.fillRect(0, 0, 800, 540);
     }
 
+    /**
+     * Renders win image.
+     */
     renderWinImage(ctx) {
         if (!this.youWinImg || !this.youWinImg.complete) return;
         const x = (800 - this.youWinWidth) / 2;

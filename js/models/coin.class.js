@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Collectible coin with rotation animation.
  */
 class Coin extends MovableObject {

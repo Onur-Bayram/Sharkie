@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Boss HP display as canvas-drawn bar with color feedback (green/yellow/red).
  */
 class BossBar {
@@ -34,11 +34,17 @@ class BossBar {
         this.drawBarText(ctx);
     }
 
+    /**
+     * Draws bar background.
+     */
     drawBarBackground(ctx) {
         ctx.fillStyle = '#333333';
         ctx.fillRect(this.x, this.y, this.width, this.height);
     }
 
+    /**
+     * Draws bar border.
+     */
     drawBarBorder(ctx) {
         const borderWidth = 3;
         ctx.strokeStyle = '#FFFFFF';
@@ -46,6 +52,9 @@ class BossBar {
         ctx.strokeRect(this.x + borderWidth / 2, this.y + borderWidth / 2, this.width - borderWidth, this.height - borderWidth);
     }
 
+    /**
+     * Draws bar fill.
+     */
     drawBarFill(ctx, percentage) {
         const borderWidth = 3;
         const padding = borderWidth + 2;
@@ -57,6 +66,9 @@ class BossBar {
         ctx.fillRect(this.x + padding, this.y + padding, innerWidth * percentage, innerHeight);
     }
 
+    /**
+     * Draws bar text.
+     */
     drawBarText(ctx) {
         ctx.fillStyle = '#FFFFFF';
         ctx.font = 'bold 16px Arial';

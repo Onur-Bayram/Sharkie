@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Coin collection display as image bar (6 states proportional to collected coins).
  */
 class CoinBar {

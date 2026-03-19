@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Main game world - initializes all game objects, manages state variables,
  * and starts the render and collision loop.
  */
@@ -84,6 +84,9 @@ ctx;
         this.startWorld();
     }
 
+    /**
+     * Initializes world objects.
+     */
     initWorldObjects() {
         this.character.world = this;
         this.backgroundObjects = [...this.backgroundObjectsLight, ...this.backgroundObjectsDark];
@@ -100,12 +103,18 @@ ctx;
         this.bossBar.setPercentage(this.finalBoss.hp, this.finalBoss.maxHp);
     }
 
+    /**
+     * Initializes world screens.
+     */
     initWorldScreens() {
         this.winScreen.hide();
         this.gameOverScreen.hide();
         this.restartButton.hide();
     }
 
+    /**
+     * Starts world loop and audio.
+     */
     startWorld() {
         this.handleThrow();
         this.audioManager.play();
@@ -130,6 +139,9 @@ ctx;
             (x, y) => new Jellyfish(x, y));
     }
 
+    /**
+     * Creates random actors.
+     */
     createRandomActors(count, minX, maxX, minY, maxY, factory) {
         const safeMaxY = Math.max(minY, maxY);
         return Array.from({length: count}, () => {
@@ -183,6 +195,9 @@ ctx;
         setInterval(() => this.tickThrowInput(), 100);
     }
 
+    /**
+     * Processes throw input tick.
+     */
     tickThrowInput() {
         if (this.isPaused) return;
         if (window.keyboard && window.keyboard.F) this.character.throwNormalBubble();

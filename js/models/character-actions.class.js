@@ -1,4 +1,4 @@
-Object.assign(Character.prototype, {
+﻿Object.assign(Character.prototype, {
     /**
      * Checks if a normal bubble can be thrown (cooldown and no current attack).
      * @returns {boolean}
@@ -32,6 +32,9 @@ Object.assign(Character.prototype, {
         return null;
     },
 
+    /**
+     * Schedules normal bubble.
+     */
     scheduleNormalBubble(offsetX, direction) {
         setTimeout(() => {
             const bubble = new BubbleAnimation(this.x + offsetX, this.y + 50, direction, false);
@@ -39,6 +42,9 @@ Object.assign(Character.prototype, {
         }, 800);
     },
 
+    /**
+     * Registers bubble in world.
+     */
     registerBubbleInWorld(bubble, isPoison) {
         if (!this.world) return;
         this.world.bubbleAnimations.push(bubble);
@@ -47,6 +53,9 @@ Object.assign(Character.prototype, {
         else this.world.audioManager.playBubbleShootSound();
     },
 
+    /**
+     * Schedules attack reset.
+     */
     scheduleAttackReset(delay) {
         setTimeout(() => {
             this.isAttacking = false;
@@ -54,6 +63,9 @@ Object.assign(Character.prototype, {
         }, delay);
     },
 
+    /**
+     * Starts attack state.
+     */
     startAttackState() {
         this.isAttacking = true;
         this.currentImage = 0;
@@ -75,10 +87,16 @@ Object.assign(Character.prototype, {
         return null;
     },
 
+    /**
+     * Deducts poison.
+     */
     deductPoison() {
         this.poison = Math.max(0, this.poison - this.poisonPerShot);
     },
 
+    /**
+     * Schedules poison bubble.
+     */
     schedulePoisonBubble(offsetX, direction) {
         setTimeout(() => {
             const bubble = new BubbleAnimation(this.x + offsetX, this.y + 50, direction, true);
@@ -111,6 +129,9 @@ Object.assign(Character.prototype, {
         return null;
     },
 
+    /**
+     * Schedules fin slap.
+     */
     scheduleFinSlap(offsetX, direction) {
         setTimeout(() => {
             const finSlap = new FinSlap(this.x + offsetX, this.y + 50, direction);
@@ -121,6 +142,9 @@ Object.assign(Character.prototype, {
         }, 300);
     },
 
+    /**
+     * Schedules fin slap reset.
+     */
     scheduleFinSlapReset(delay) {
         setTimeout(() => {
             this.isFinSlapping = false;
@@ -153,6 +177,9 @@ Object.assign(Character.prototype, {
         this.triggerDeathScreens();
     },
 
+    /**
+     * Triggers death screens.
+     */
     triggerDeathScreens() {
         if (this.world && this.world.gameOverScreen) {
             this.world.gameOverScreen.show(this.world.audioManager);

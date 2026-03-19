@@ -1,5 +1,5 @@
-/**
- * Manages all audio resources of the game – background music, sound effects,
+﻿/**
+ * Manages all audio resources of the game - background music, sound effects,
  * volume settings, and muting.
  */
 class AudioManager {
@@ -21,6 +21,9 @@ class AudioManager {
     musicVolume = 0.5;
     sfxVolume = 0.6;
     
+    /**
+     * Creates a new instance.
+     */
     constructor() {
         this.loadAudio();
     }
@@ -35,12 +38,18 @@ class AudioManager {
         this.loadVoiceTracks();
     }
 
+    /**
+     * Loads music tracks.
+     */
     loadMusicTracks() {
         this.bgMusic.src = 'audio/Super Mario 64 Soundtrack - Dire, Dire Docks.mp3';
         this.bgMusic.loop = true;
         this.bgMusic.volume = this.musicVolume;
     }
 
+    /**
+     * Loads SFX tracks.
+     */
     loadSfxTracks() {
         this.coinSound.src = 'audio/Gold.mp3';
         this.failSound.src = 'audio/Fail.mp3';
@@ -54,6 +63,9 @@ class AudioManager {
         this.applySfxVolumes();
     }
 
+    /**
+     * Applies SFX volumes.
+     */
     applySfxVolumes() {
         const sfx = [this.coinSound, this.failSound, this.potionSound, this.victorySound,
             this.finSlapSound, this.electricSound, this.hurtSound,
@@ -61,6 +73,9 @@ class AudioManager {
         sfx.forEach(s => { s.volume = this.sfxVolume; });
     }
 
+    /**
+     * Loads voice tracks.
+     */
     loadVoiceTracks() {
         this.darkZoneVoiceSound.src = 'audio/DU KANNST NICHT VORBEI!!!.mp3';
         this.darkZoneVoiceSound.volume = this.sfxVolume;
@@ -99,7 +114,7 @@ class AudioManager {
     
     /**
      * Sets music volume and applies it immediately.
-     * @param {number} volume Volume (0–1).
+    * @param {number} volume Volume (0-1).
      * @returns {void}
      */
     setMusicVolume(volume) {

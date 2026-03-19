@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Pufferfish enemy - alternates between swimming, transition, and inflated states.
  * Can be killed by bubbles or fin slap; knockback is triggered by fin slap.
  */
@@ -32,10 +32,16 @@ class Pufferfish extends MovableObject{
         this.animate();
     }
 
+    /**
+     * Randomizes puffer color variant.
+     */
     randomizePufferColor() {
         this.colorVariant = Math.floor(Math.random() * 3) + 1;
     }
 
+    /**
+     * Loads puffer images.
+     */
     loadPufferImages() {
         const v = this.colorVariant;
         const base = '2.Enemy/1.Puffer fish (3 color options)';
@@ -52,6 +58,9 @@ class Pufferfish extends MovableObject{
         this.loadImages(this.IMAGES_DEAD_FINSLAP);
     }
 
+    /**
+     * Initializes puffer position.
+     */
     initPufferPosition(x, y) {
         this.x = x !== null ? x : 200 + Math.random() * 300;
         this.y = y !== null ? y : 150 + Math.random() * 200;
@@ -59,6 +68,9 @@ class Pufferfish extends MovableObject{
         this.height = 60;
     }
 
+    /**
+     * Initializes puffer physics.
+     */
     initPufferPhysics() {
         this.speed = 0.15 + Math.random() * 0.2;
         this.verticalSpeed = 0.5 + Math.random() * 0.5;
@@ -76,10 +88,16 @@ class Pufferfish extends MovableObject{
         this.scheduleBubbleCycle();
     }
 
+    /**
+     * Runs puffer animation loop.
+     */
     runPufferAnimationLoop() {
         setInterval(() => this.tickPufferAnimation(), 150);
     }
 
+    /**
+     * Processes puffer animation tick.
+     */
     tickPufferAnimation() {
         const images = this.getCurrentImages();
         if (this.showDeadLastPufferFrame(images)) return;
@@ -88,12 +106,18 @@ class Pufferfish extends MovableObject{
         this.checkPufferDeadOrTransition(images);
     }
 
+    /**
+     * Shows final dead puffer frame.
+     */
     showDeadLastPufferFrame(images) {
         if (!this.isDead || !this.deadAnimationFinished) return false;
         this.img = this.imageCache[images[images.length - 1]];
         return true;
     }
 
+    /**
+     * Checks dead and transition states.
+     */
     checkPufferDeadOrTransition(images) {
         if (this.isDead && this.currentImage >= images.length) {
             this.deadAnimationFinished = true;
@@ -105,10 +129,16 @@ class Pufferfish extends MovableObject{
         }
     }
 
+    /**
+     * Runs puffer movement loop.
+     */
     runPufferMovementLoop() {
         setInterval(() => this.tickPufferMovement(), 1000 / 60);
     }
 
+    /**
+     * Processes puffer movement tick.
+     */
     tickPufferMovement() {
         if (this.isDead) {
             if (this.deadCause === 'finSlap') this.applyFinSlapKnockback();
@@ -120,6 +150,9 @@ class Pufferfish extends MovableObject{
         }
     }
 
+    /**
+     * Runs puffer target loop.
+     */
     runPufferTargetLoop() {
         setInterval(() => {
             if (!this.isDead) this.targetY = 50 + Math.random() * 400;
@@ -135,6 +168,9 @@ class Pufferfish extends MovableObject{
         setInterval(() => this.tickBubbleCycle(), cycleDelay);
     }
 
+    /**
+     * Processes bubble cycle tick.
+     */
     tickBubbleCycle() {
         if (this.isDead) return;
         if (this.state === 'swim') {
@@ -220,6 +256,9 @@ class Pufferfish extends MovableObject{
         return this.getPufferDeadImagesByVariant();
     }
 
+    /**
+     * Gets dead images by variant.
+     */
     getPufferDeadImagesByVariant() {
         const base = '2.Enemy/1.Puffer fish (3 color options)/4.DIE';
         if (this.colorVariant === 1) {

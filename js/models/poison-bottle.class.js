@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Static poison bottle for collection - randomly selects variant (left/right, dark/light).
  */
 class PoisonBottle extends MovableObject {
@@ -16,7 +16,7 @@ class PoisonBottle extends MovableObject {
         const variant = Math.random() > 0.5 ? 'Left' : 'Right';
         const lightness = Math.random() > 0.5 ? 'Light' : 'Dark';
         
-        this.loadImage(`4. Marcadores/Posión/${lightness} - ${variant}.png`);
+        this.loadImage(`4. Marcadores/Posi\u00F3n/${lightness} - ${variant}.png`);
         
         this.x = x;
         this.y = y;

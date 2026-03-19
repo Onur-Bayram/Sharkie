@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Bubble as projectile - flies in one direction and pulses visually.
  * Can be normal (blue) or poisonous (purple).
  */
@@ -19,6 +19,9 @@ class BubbleAnimation extends MovableObject {
         this.animate();
     }
 
+    /**
+     * Initializes bubble params.
+     */
     initBubbleParams(x, y, direction, isPoison) {
         this.x = x;
         this.y = y;
@@ -31,6 +34,9 @@ class BubbleAnimation extends MovableObject {
         this.pulseSpeed = 0.02;
     }
 
+    /**
+     * Loads bubble image.
+     */
     loadBubbleImage(isPoison) {
         const path = isPoison
             ? '1.Sharkie/4.Attack/Bubble trap/Poisoned Bubble (for whale).png'
@@ -39,7 +45,7 @@ class BubbleAnimation extends MovableObject {
     }
 
     /**
-     * Starts the movement loop – moves the bubble in flight direction.
+    * Starts the movement loop - moves the bubble in flight direction.
      * @returns {void}
      */
     throw() {

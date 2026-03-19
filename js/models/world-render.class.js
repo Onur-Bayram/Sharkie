@@ -1,4 +1,4 @@
-Object.assign(World.prototype, {
+﻿Object.assign(World.prototype, {
 /**
  * Renders the entire game frame, updates camera position, draws all objects
  * and schedules the next frame via requestAnimationFrame.
@@ -13,18 +13,27 @@ draw() {
     this.scheduleNextFrame();
 },
 
+/**
+ * Updates frame state.
+ */
 updateFrameState() {
     this.checkCollisions();
     this.updateCameraX();
     this.handleDarkZoneAudio();
 },
 
+/**
+ * Updates camera X.
+ */
 updateCameraX() {
     this.cameraX = this.character.x - this.GAME_WIDTH / 2 + this.character.width / 2;
     if (this.cameraX < 0) this.cameraX = 0;
     if (this.cameraX > this.mapWidth - this.GAME_WIDTH) this.cameraX = this.mapWidth - this.GAME_WIDTH;
 },
 
+/**
+ * Handles dark zone audio.
+ */
 handleDarkZoneAudio() {
     if (this.darkZoneVoicePlayed || this.character.x < this.bossZoneStart) return;
     this.audioManager.setBackgroundMusicEnabled(false);
@@ -32,6 +41,9 @@ handleDarkZoneAudio() {
     this.darkZoneVoicePlayed = true;
 },
 
+/**
+ * Renders world layer.
+ */
 renderWorldLayer(now) {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.save();
@@ -42,6 +54,9 @@ renderWorldLayer(now) {
     this.ctx.restore();
 },
 
+/**
+ * Draws background.
+ */
 drawBackground(now) {
     this.backgroundObjects.forEach((background) => {
         if (!this.canDrawSprite(background)) return;
@@ -51,6 +66,9 @@ drawBackground(now) {
     });
 },
 
+/**
+ * Draws character.
+ */
 drawCharacter() {
     if (!this.canDrawSprite(this.character)) return;
     if (!this.character.otherDirection) {
@@ -64,6 +82,9 @@ drawCharacter() {
     this.ctx.restore();
 },
 
+/**
+ * Draws world actors.
+ */
 drawWorldActors() {
     this.drawSpriteList(this.enemies);
     this.drawSpriteList(this.jellyfishes);
@@ -75,6 +96,9 @@ drawWorldActors() {
     }
 },
 
+/**
+ * Draws sprite list.
+ */
 drawSpriteList(list) {
     list.forEach((item) => {
         if (!this.canDrawSprite(item)) return;
@@ -82,10 +106,16 @@ drawSpriteList(list) {
     });
 },
 
+/**
+ * Determines whether sprite can be drawn.
+ */
 canDrawSprite(item) {
     return !!(item && item.img && item.img.complete && item.img.naturalHeight !== 0);
 },
 
+/**
+ * Renders effects and UI.
+ */
 renderEffectsAndUi() {
     this.drawBubbleEffects();
     this.drawFinSlapEffects();
@@ -94,10 +124,16 @@ renderEffectsAndUi() {
     this.drawEndScreens();
 },
 
+/**
+ * Draws bubble effects.
+ */
 drawBubbleEffects() {
     this.bubbleAnimations.forEach((bubble) => bubble.draw(this.ctx, this.cameraX));
 },
 
+/**
+ * Draws fin slap effects.
+ */
 drawFinSlapEffects() {
     this.finSlaps.forEach((finSlap) => {
         finSlap.draw(this.ctx, this.cameraX);
@@ -105,21 +141,33 @@ drawFinSlapEffects() {
     });
 },
 
+/**
+ * Draws HUD bars.
+ */
 drawHudBars() {
     this.drawHudBar(this.statusBar);
     this.drawHudBar(this.poisonBar);
     this.drawHudBar(this.coinBar);
 },
 
+/**
+ * Draws HUD bar.
+ */
 drawHudBar(bar) {
     if (!this.canDrawSprite(bar)) return;
     this.ctx.drawImage(bar.img, bar.x, bar.y, bar.width, bar.height);
 },
 
+/**
+ * Draws boss bar.
+ */
 drawBossBar() {
     if (this.finalBoss && this.finalBoss.isActive) this.bossBar.draw(this.ctx);
 },
 
+/**
+ * Draws end screens.
+ */
 drawEndScreens() {
     if (this.character.isDead) {
         this.gameOverScreen.draw(this.ctx);
@@ -132,12 +180,15 @@ drawEndScreens() {
     }
 },
 
+/**
+ * Schedules next frame.
+ */
 scheduleNextFrame() {
     this.animationFrameId = requestAnimationFrame(() => this.draw());
 },
 
 /**
- * Pauses the game – stops the animation frame and background music.
+ * Pauses the game - stops the animation frame and background music.
  * @returns {void}
  */
 pauseGame() {
@@ -152,7 +203,7 @@ pauseGame() {
 },
 
 /**
- * Resumes the game – reactivates music and restarts the animation loop.
+ * Resumes the game - reactivates music and restarts the animation loop.
  * @returns {void}
  */
 resumeGame() {

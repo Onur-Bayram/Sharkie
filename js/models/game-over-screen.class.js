@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Game-over screen - displays after player death with fade-in animation.
  */
 class GameOverScreen {
@@ -12,6 +12,9 @@ class GameOverScreen {
     opacity = 0;
     fadeInSpeed = 0.03;
 
+    /**
+     * Creates a new instance.
+     */
     constructor() {
         this.loadImages();
     }
@@ -51,17 +54,26 @@ class GameOverScreen {
         ctx.restore();
     }
 
+    /**
+     * Advances game-over fade.
+     */
     advanceGameOverFade() {
         if (this.opacity < 1) {
             this.opacity = Math.min(1, this.opacity + this.fadeInSpeed);
         }
     }
 
+    /**
+     * Renders game-over background.
+     */
     renderGameOverBackground(ctx) {
         ctx.fillStyle = 'black';
         ctx.fillRect(0, 0, 800, 540);
     }
 
+    /**
+     * Renders game-over image.
+     */
     renderGameOverImage(ctx) {
         const currentImg = this.gameOverImages[this.currentImage];
         if (!currentImg || !currentImg.complete) return;

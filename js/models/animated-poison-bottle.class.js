@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Animated (falling) poison bottle - becomes visible when character is nearby,
  * then falls slowly downward and can be collected.
  */
@@ -53,7 +53,7 @@ class AnimatedPoisonBottle extends MovableObject {
     }
 
     /**
-     * Starts the fall loop – moves the bottle down if visible and not collected.
+    * Starts the fall loop - moves the bottle down if visible and not collected.
      * @returns {void}
      */
     fall() {

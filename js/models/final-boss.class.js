@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Final boss with intro, swimming, attack, damage, and death states.
  */
 class FinalBoss extends MovableObject {
@@ -81,8 +81,11 @@ class FinalBoss extends MovableObject {
     attackRadius = 900;
 
     /**
-     * @param {number} x 
-     * @param {number} y 
+     * Creates the final boss, preloads all animation sprites, and starts
+     * animation and movement loops.
+     *
+     * @param {number} x Initial X-position.
+     * @param {number} y Initial Y-position.
      */
     constructor(x, y) {
         super();
@@ -91,6 +94,11 @@ class FinalBoss extends MovableObject {
         this.animate();
     }
 
+    /**
+     * Loads all image sequences needed for boss states.
+     *
+     * @returns {void}
+     */
     loadBossImages() {
         this.loadImage(this.IMAGES_INTRODUCE[0]);
         this.loadImages(this.IMAGES_INTRODUCE);
@@ -100,6 +108,13 @@ class FinalBoss extends MovableObject {
         this.loadImages(this.IMAGES_DEAD);
     }
 
+    /**
+     * Initializes size, movement defaults, and initial patrol target.
+     *
+     * @param {number} x Initial X-position.
+     * @param {number} y Initial Y-position.
+     * @returns {void}
+     */
     initBossPosition(x, y) {
         this.x = x;
         this.y = y;
@@ -122,6 +137,11 @@ class FinalBoss extends MovableObject {
         setInterval(() => this.updateMovementFrame(), 1000 / 60);
     }
 
+    /**
+     * Advances the current animation frame and applies state transitions.
+     *
+     * @returns {void}
+     */
     updateAnimationFrame() {
         if (!this.canAnimateNow()) return;
         const images = this.getCurrentImages();
@@ -130,6 +150,11 @@ class FinalBoss extends MovableObject {
         this.syncStateAfterFrame();
     }
 
+    /**
+     * Determines whether animation updates should run in the current frame.
+     *
+     * @returns {boolean}
+     */
     canAnimateNow() {
         if (this.state === 'introduce' && !this.hasStartedIntro) return false;
         // Let transient states finish even if the boss is briefly outside the active range.
@@ -137,18 +162,35 @@ class FinalBoss extends MovableObject {
         return this.isActive;
     }
 
+    /**
+     * Keeps the final death frame visible once the death animation has completed.
+     *
+     * @param {string[]} images Current state image sequence.
+     * @returns {boolean} True if the method already rendered the frame.
+     */
     renderDeadLastFrame(images) {
         if (!this.isDead || !this.deadAnimationFinished) return false;
         this.img = this.imageCache[images[images.length - 1]];
         return true;
     }
 
+    /**
+     * Renders the next sprite in the given image sequence.
+     *
+     * @param {string[]} images Current state image sequence.
+     * @returns {void}
+     */
     playCurrentFrame(images) {
         const path = images[this.currentImage % images.length];
         this.img = this.imageCache[path];
         this.currentImage++;
     }
 
+    /**
+     * Applies post-frame state transitions.
+     *
+     * @returns {void}
+     */
     syncStateAfterFrame() {
         this.finishIntroIfNeeded();
         this.finishAttackIfNeeded();
@@ -156,6 +198,11 @@ class FinalBoss extends MovableObject {
         this.finishDeathIfNeeded();
     }
 
+    /**
+     * Completes intro sequence and switches to floating behavior.
+     *
+     * @returns {void}
+     */
     finishIntroIfNeeded() {
         if (this.state !== 'introduce' || this.currentImage < this.IMAGES_INTRODUCE.length) return;
         this.introduced = true;
@@ -164,6 +211,11 @@ class FinalBoss extends MovableObject {
         this.stateStartedAt = Date.now();
     }
 
+    /**
+     * Completes attack sequence and returns to floating behavior.
+     *
+     * @returns {void}
+     */
     finishAttackIfNeeded() {
         if (this.state !== 'attacking' || this.currentImage < this.IMAGES_ATTACK.length) return;
         this.isAttacking = false;
@@ -172,6 +224,11 @@ class FinalBoss extends MovableObject {
         this.stateStartedAt = Date.now();
     }
 
+    /**
+     * Completes hurt sequence and returns to floating behavior.
+     *
+     * @returns {void}
+     */
     finishHurtIfNeeded() {
         if (this.state !== 'hurt' || this.currentImage < this.IMAGES_HURT.length) return;
         this.isHurt = false;
@@ -180,18 +237,33 @@ class FinalBoss extends MovableObject {
         this.stateStartedAt = Date.now();
     }
 
+    /**
+     * Marks death animation as finished when its sequence is complete.
+     *
+     * @returns {void}
+     */
     finishDeathIfNeeded() {
         if (!this.isDead || this.currentImage < this.IMAGES_DEAD.length) return;
         this.deadAnimationFinished = true;
         this.currentImage = this.IMAGES_DEAD.length - 1;
     }
 
+    /**
+     * Updates movement and applies recovery guards for stuck transient states.
+     *
+     * @returns {void}
+     */
     updateMovementFrame() {
         this.recoverStuckTransientState();
         if (!this.isActive || !this.introduced || this.isDead) return;
         this.updateFloatingBehavior();
     }
 
+    /**
+     * Recovers from stuck hurt/attack states and sanitizes invalid coordinates.
+     *
+     * @returns {void}
+     */
     recoverStuckTransientState() {
         const now = Date.now();
 
@@ -264,6 +336,11 @@ class FinalBoss extends MovableObject {
         this.applyMovement();
     }
 
+    /**
+     * Updates current swim style on a timed interval.
+     *
+     * @returns {void}
+     */
     updateSwimStyle() {
         const currentTime = Date.now();
         if (currentTime - this.lastStyleChangeTime <= this.styleChangeDuration) return;
@@ -272,6 +349,11 @@ class FinalBoss extends MovableObject {
         this.lastStyleChangeTime = currentTime;
     }
 
+    /**
+     * Derives movement speed from the currently selected swim style.
+     *
+     * @returns {void}
+     */
     updateFloatingSpeed() {
         if (this.swimStyle === 'aggressive') this.floatingSpeed = 5.5;
         else if (this.swimStyle === 'defensive') this.floatingSpeed = 3.5;
@@ -294,11 +376,21 @@ class FinalBoss extends MovableObject {
         this.clampPositionToBossArea();
     }
 
+    /**
+     * Applies idle vertical drift when no valid character target exists.
+     *
+     * @returns {void}
+     */
     applyIdleDriftMovement() {
         const direction = Math.random() > 0.5 ? 1 : -1;
         this.y += this.floatingSpeed * 2.5 * direction;
     }
 
+    /**
+     * Builds a normalized vector from boss to character.
+     *
+     * @returns {{distX:number,distY:number,distance:number}}
+     */
     getCharacterVector() {
         const distX = this.character.x - this.x;
         const distY = this.character.y - this.y;
@@ -306,6 +398,12 @@ class FinalBoss extends MovableObject {
         return { distX, distY, distance };
     }
 
+    /**
+     * Routes movement logic to the currently active swim style.
+     *
+     * @param {{distX:number,distY:number,distance:number}} vector Vector to character.
+     * @returns {void}
+     */
     applyStyleMovement(vector) {
         if (this.swimStyle === 'aggressive') this.applyAggressiveMovement(vector);
         else if (this.swimStyle === 'defensive') this.applyDefensiveMovement(vector);
@@ -313,6 +411,12 @@ class FinalBoss extends MovableObject {
         else this.applyNormalMovement(vector);
     }
 
+    /**
+     * Moves aggressively toward the character.
+     *
+     * @param {{distX:number,distY:number,distance:number}} vector Vector to character.
+     * @returns {void}
+     */
     applyAggressiveMovement(vector) {
         if (vector.distance <= 50) {
             this.x -= this.floatingSpeed * 0.8;
@@ -322,6 +426,12 @@ class FinalBoss extends MovableObject {
         this.y += (vector.distY / vector.distance) * this.floatingSpeed;
     }
 
+    /**
+     * Moves defensively away from the character at short range.
+     *
+     * @param {{distX:number,distY:number,distance:number}} vector Vector to character.
+     * @returns {void}
+     */
     applyDefensiveMovement(vector) {
         if (vector.distance < 800) {
             this.x -= (vector.distX / vector.distance) * this.floatingSpeed;
@@ -331,6 +441,12 @@ class FinalBoss extends MovableObject {
         this.x += (vector.distX / vector.distance) * this.floatingSpeed * 1.7;
     }
 
+    /**
+     * Circles around the character by updating a moving target point.
+     *
+     * @param {{distX:number,distY:number,distance:number}} vector Vector to character.
+     * @returns {void}
+     */
     applyCircleMovement(vector) {
         const angle = Math.atan2(vector.distY, vector.distX);
         const desiredDistance = 600;
@@ -339,6 +455,11 @@ class FinalBoss extends MovableObject {
         this.moveToFloatingTarget();
     }
 
+    /**
+     * Moves the boss toward the current floating target.
+     *
+     * @returns {void}
+     */
     moveToFloatingTarget() {
         const targetDistX = this.floatingTargetX - this.x;
         const targetDistY = this.floatingTargetY - this.y;
@@ -348,6 +469,12 @@ class FinalBoss extends MovableObject {
         this.y += (targetDistY / targetDist) * this.floatingSpeed;
     }
 
+    /**
+     * Moves with normal behavior: approach when far, evade when too close.
+     *
+     * @param {{distX:number,distY:number,distance:number}} vector Vector to character.
+     * @returns {void}
+     */
     applyNormalMovement(vector) {
         if (vector.distance > 400) {
             this.x += (vector.distX / vector.distance) * this.floatingSpeed * 1.8;
@@ -363,6 +490,11 @@ class FinalBoss extends MovableObject {
         this.x += this.floatingSpeed * 0.65 * (this.character.x > this.x ? 1 : -1);
     }
 
+    /**
+     * Keeps the boss within the defined boss-zone boundaries.
+     *
+     * @returns {void}
+     */
     clampPositionToBossArea() {
         const mapBounds = 6720;
         if (this.x < 4800) this.x = 4800;
@@ -424,6 +556,11 @@ class FinalBoss extends MovableObject {
         }
     }
 
+    /**
+     * Applies hurt state after receiving damage.
+     *
+     * @returns {void}
+     */
     applyBossHurt() {
         this.isHurt = true;
         this.state = 'hurt';

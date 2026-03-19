@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Player health display as image bar (6 states from 0% to 100%).
  */
 class StatusBar extends MovableObject {
@@ -28,7 +28,7 @@ class StatusBar extends MovableObject {
 
     /**
      * Sets the displayed percentage value and selects the appropriate image.
-     * @param {number} percentage Health energy in percent (0–100).
+    * @param {number} percentage Health energy in percent (0-100).
      * @returns {void}
      */
     setPercentage(percentage) {

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Jellyfish enemy - randomly created as 'regular' (yellow/purple) or 'dangerous' (green/pink).
  * Dangerous jellyfish cause electric damage.
  */
@@ -27,6 +27,9 @@ class Jellyfish extends MovableObject {
         this.animate();
     }
 
+    /**
+     * Initializes jellyfish type.
+     */
     initJellyfishType() {
         this.type = Math.random() > 0.7 ? 'dangerous' : 'regular';
         if (this.type === 'regular') {
@@ -40,6 +43,9 @@ class Jellyfish extends MovableObject {
         }
     }
 
+    /**
+     * Initializes jellyfish images.
+     */
     initJellyfishImages() {
         this.loadSwimImages();
         this.loadDeadImages();
@@ -48,6 +54,9 @@ class Jellyfish extends MovableObject {
         this.loadImages(this.IMAGES_DEAD);
     }
 
+    /**
+     * Initializes jellyfish position.
+     */
     initJellyfishPosition(x, y) {
         this.x = x !== null ? x : 200 + Math.random() * 300;
         this.y = y !== null ? y : 150 + Math.random() * 200;
@@ -55,6 +64,9 @@ class Jellyfish extends MovableObject {
         this.height = 80;
     }
 
+    /**
+     * Initializes jellyfish physics.
+     */
     initJellyfishPhysics() {
         this.speed = 0.15 + Math.random() * 0.2;
         this.verticalSpeed = 0.5 + Math.random() * 0.5;
@@ -66,7 +78,7 @@ class Jellyfish extends MovableObject {
      * @returns {void}
      */
     loadSwimImages() {
-        const folder = this.type === 'regular' ? 'Regular damage' : 'Súper dangerous';
+        const folder = this.type === 'regular' ? 'Regular damage' : 'S\u00FAper dangerous';
         const colorCode = this.getColorCode();
         
         this.IMAGES_SWIM = [
@@ -160,10 +172,16 @@ class Jellyfish extends MovableObject {
         this.runJellyfishTargetLoop();
     }
 
+    /**
+     * Runs jellyfish animation loop.
+     */
     runJellyfishAnimationLoop() {
         setInterval(() => this.tickJellyfishAnimation(), 150);
     }
 
+    /**
+     * Processes jellyfish animation tick.
+     */
     tickJellyfishAnimation() {
         const images = this.getCurrentImages();
         if (this.isDead && this.deadAnimationFinished) {
@@ -178,10 +196,16 @@ class Jellyfish extends MovableObject {
         }
     }
 
+    /**
+     * Runs jellyfish movement loop.
+     */
     runJellyfishMovementLoop() {
         setInterval(() => this.tickJellyfishMovement(), 1000 / 60);
     }
 
+    /**
+     * Processes jellyfish movement tick.
+     */
     tickJellyfishMovement() {
         if (this.isDead) return;
         this.moveLeft();
@@ -190,6 +214,9 @@ class Jellyfish extends MovableObject {
         }
     }
 
+    /**
+     * Runs jellyfish target loop.
+     */
     runJellyfishTargetLoop() {
         setInterval(() => {
             if (!this.isDead) this.targetY = 50 + Math.random() * 400;

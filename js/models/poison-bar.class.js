@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Player poison supply display as image bar (6 states from 0% to 100%).
  */
 class PoisonBar extends MovableObject {
@@ -28,7 +28,7 @@ class PoisonBar extends MovableObject {
 
     /**
      * Sets the displayed percentage value and selects the appropriate image.
-     * @param {number} percentage Poison supply in percent (0–100).
+    * @param {number} percentage Poison supply in percent (0-100).
      * @returns {void}
      */
     setPercentage(percentage) {
