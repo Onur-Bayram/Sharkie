@@ -27,6 +27,24 @@ class AudioManager {
     constructor() {
         this.loadAudio();
     }
+
+    /**
+     * Starts audio playback and suppresses harmless interruption errors.
+     * @param {HTMLAudioElement} audio Audio element to play.
+     * @returns {void}
+     */
+    playAudio(audio) {
+        const playPromise = audio.play();
+        if (!playPromise || typeof playPromise.catch !== 'function') {
+            return;
+        }
+        playPromise.catch((error) => {
+            if (error && error.name === 'AbortError') {
+                return;
+            }
+            console.error(error);
+        });
+    }
     
     /**
      * Loads all audio file paths and sets initial volumes.
@@ -89,7 +107,7 @@ class AudioManager {
      */
     play() {
         if (this.isMuted || !this.isBackgroundMusicEnabled || this.isPlaying) return;
-        this.bgMusic.play();
+        this.playAudio(this.bgMusic);
         this.isPlaying = true;
     }
     
@@ -186,7 +204,7 @@ class AudioManager {
         if (this.isMuted) return;
         const coin = this.coinSound.cloneNode();
         coin.volume = this.sfxVolume;
-        coin.play();
+        this.playAudio(coin);
     }
 
     /**
@@ -197,7 +215,7 @@ class AudioManager {
         if (this.isMuted) return;
         const fail = this.failSound.cloneNode();
         fail.volume = this.sfxVolume;
-        fail.play();
+        this.playAudio(fail);
     }
 
     /**
@@ -208,7 +226,7 @@ class AudioManager {
         if (this.isMuted) return;
         const potion = this.potionSound.cloneNode();
         potion.volume = this.sfxVolume;
-        potion.play();
+        this.playAudio(potion);
     }
 
     /**
@@ -219,7 +237,7 @@ class AudioManager {
         if (this.isMuted) return;
         const victory = this.victorySound.cloneNode();
         victory.volume = this.sfxVolume;
-        victory.play();
+        this.playAudio(victory);
     }
 
     /**
@@ -230,7 +248,7 @@ class AudioManager {
         if (this.isMuted) return;
         const fin = this.finSlapSound.cloneNode();
         fin.volume = this.sfxVolume;
-        fin.play();
+        this.playAudio(fin);
     }
 
     /**
@@ -241,7 +259,7 @@ class AudioManager {
         if (this.isMuted) return;
         const elec = this.electricSound.cloneNode();
         elec.volume = this.sfxVolume;
-        elec.play();
+        this.playAudio(elec);
     }
 
     /**
@@ -252,7 +270,7 @@ class AudioManager {
         if (this.isMuted) return;
         const hurt = this.hurtSound.cloneNode();
         hurt.volume = this.sfxVolume;
-        hurt.play();
+        this.playAudio(hurt);
     }
 
     /**
@@ -263,7 +281,7 @@ class AudioManager {
         if (this.isMuted) return;
         const bubble = this.bubbleShootSound.cloneNode();
         bubble.volume = this.sfxVolume;
-        bubble.play();
+        this.playAudio(bubble);
     }
 
     /**
@@ -274,7 +292,7 @@ class AudioManager {
         if (this.isMuted) return;
         const poison = this.poisonShootSound.cloneNode();
         poison.volume = this.sfxVolume;
-        poison.play();
+        this.playAudio(poison);
     }
 
     /**
@@ -285,7 +303,7 @@ class AudioManager {
         if (this.isMuted) return;
         const voice = this.darkZoneVoiceSound.cloneNode();
         voice.volume = this.sfxVolume;
-        voice.play();
+        this.playAudio(voice);
     }
 
     /**
@@ -296,6 +314,6 @@ class AudioManager {
         if (this.isMuted) return;
         const intro = this.bossIntroSound.cloneNode();
         intro.volume = this.sfxVolume;
-        intro.play();
+        this.playAudio(intro);
     }
 }
