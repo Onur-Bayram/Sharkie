@@ -12,6 +12,7 @@ function startGameFromHTML() {
     $('canvas').classList.remove('hidden');
     showEl('game-menu-button');
     init();
+    requestTouchFullscreenIfNeeded();
     updateMobileControlsVisibility();
 }
 
@@ -141,6 +142,7 @@ function restartGame() {
     $('canvas').classList.remove('hidden');
     showEl('game-menu-button');
     init();
+    requestTouchFullscreenIfNeeded();
     updateHtmlFullscreenButton();
     updateMobileControlsVisibility();
 }
@@ -154,6 +156,7 @@ function backToGame() {
     $('options-screen').querySelector('.back-icon-button')?.classList.remove('is-visible');
     $('canvas').classList.remove('hidden');
     showEl('game-menu-button');
+    requestTouchFullscreenIfNeeded();
     updateMobileControlsVisibility();
     if (world && typeof world.resumeGame === 'function') {
         world.resumeGame();
@@ -305,7 +308,7 @@ function updateMuteButtonLabel() {
 }
 
 /**
- * Schaltet den Ton des Spiels um (stumm / laut) und persistiert den Zustand.
+ * sound toggle handler: toggles muting for all sounds, saves the setting to localStorage, and updates the AudioManager and button label.
  * @returns {void}
  */
 function toggleMute() {

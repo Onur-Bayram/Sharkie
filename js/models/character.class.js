@@ -428,9 +428,13 @@ class Character extends MovableObject{
     clampToWorldBounds() {
         const mapWidth = this.world ? this.world.mapWidth : 960;
         const canvasHeight = this.world ? this.world.canvas.height : 540;
+        if (this.world && !this.world.bossLevelLocked && this.x >= this.world.bossZoneStart) {
+            this.world.bossLevelLocked = true;
+        }
+        const minX = this.world && this.world.bossLevelLocked ? this.world.bossZoneStart : 0;
         const maxX = Math.max(0, mapWidth - this.width);
         const maxY = Math.max(0, canvasHeight - this.height);
-        if (this.x < 0) { this.x = 0; }
+        if (this.x < minX) { this.x = minX; }
         if (this.x > maxX) { this.x = maxX; }
         if (this.y < 0) { this.y = 0; }
         if (this.y > maxY) { this.y = maxY; }

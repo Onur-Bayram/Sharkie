@@ -194,7 +194,22 @@ function toggleMobileControls(baseGameplayVisible) {
 
 function toggleHtmlFullscreenButton(button, baseGameplayVisible) {
     if (!button) return;
+    if (isTouchGameplayDevice()) {
+        button.style.display = 'none';
+        return;
+    }
     button.style.display = baseGameplayVisible ? 'flex' : 'none';
+}
+
+/**
+ * aktiv the mobile controls by adding the 'visible' class.
+ * @returns {void}
+ */
+function requestTouchFullscreenIfNeeded() {
+    if (!isTouchGameplayDevice() || document.fullscreenElement) return;
+    const container = $('canvas')?.closest('.game-panel') || document.body;
+    if (!container || typeof container.requestFullscreen !== 'function') return;
+    container.requestFullscreen().catch(() => {});
 }
 
 /**

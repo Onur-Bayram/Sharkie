@@ -92,8 +92,24 @@ drawWorldActors() {
     this.drawSpriteList(this.animatedPoisonBottles);
     this.drawSpriteList(this.coins);
     if (this.finalBoss && this.canDrawSprite(this.finalBoss)) {
-        this.ctx.drawImage(this.finalBoss.img, this.finalBoss.x, this.finalBoss.y, this.finalBoss.width, this.finalBoss.height);
+        this.drawFinalBoss();
     }
+},
+
+/**
+ * Draws final boss and flips sprite based on movement direction.
+ */
+drawFinalBoss() {
+    const shouldFlip = this.finalBoss.facingLeft === false;
+    if (!shouldFlip) {
+        this.ctx.drawImage(this.finalBoss.img, this.finalBoss.x, this.finalBoss.y, this.finalBoss.width, this.finalBoss.height);
+        return;
+    }
+    this.ctx.save();
+    this.ctx.translate(this.finalBoss.x + this.finalBoss.width, this.finalBoss.y);
+    this.ctx.scale(-1, 1);
+    this.ctx.drawImage(this.finalBoss.img, 0, 0, this.finalBoss.width, this.finalBoss.height);
+    this.ctx.restore();
 },
 
 /**
@@ -224,14 +240,20 @@ resumeGame() {
  * @returns {boolean}
  */
 isCollidingBoss(character, boss) {
-    const characterInset = 36;
-    const bossSideInset = 32;
-    const bossTopInset = 185;
-    const bossBottomInset = 32;
-
-    return character.x + characterInset < boss.x + boss.width - bossSideInset &&
-           character.x + character.width - characterInset > boss.x + bossSideInset &&
-           character.y + characterInset < boss.y + boss.height - bossBottomInset &&
-           character.y + character.height - characterInset > boss.y + bossTopInset;
+    const characterBox = {
+        left: character.x + 42,
+        right: character.x + character.width - 42,
+        top: character.y + 42,
+        bottom: character.y + character.height - 42
+    };
+    const bossBodyBox = {
+        left: boss.x + 88,
+        right: boss.x + boss.width - 88,
+        top: boss.y + 238,
+        bottom: boss.y + boss.height - 44
+    };
+    const overlapX = Math.min(characterBox.right, bossBodyBox.right) - Math.max(characterBox.left, bossBodyBox.left);
+    const overlapY = Math.min(characterBox.bottom, bossBodyBox.bottom) - Math.max(characterBox.top, bossBodyBox.top);
+    return overlapX > 10 && overlapY > 10;
 }
 });

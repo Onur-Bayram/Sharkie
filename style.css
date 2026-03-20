@@ -819,7 +819,7 @@ body:fullscreen .screen-overlay {
 
 .mobile-controls {
     position: absolute;
-    bottom: 0;
+    bottom: max(8px, env(safe-area-inset-bottom));
     left: 0;
     right: 0;
     width: 100%;
@@ -853,13 +853,13 @@ body:fullscreen .screen-overlay {
 }
 
 .dpad-button {
-    width: 42px;
-    height: 42px;
+    width: 52px;
+    height: 52px;
     border: 2px solid rgba(150, 230, 255, 0.9);
     background: rgba(0, 180, 220, 0.85);
     border-radius: 8px;
     color: white;
-    font-size: 16px;
+    font-size: 20px;
     font-weight: bold;
     cursor: pointer;
     user-select: none;
@@ -879,16 +879,17 @@ body:fullscreen .screen-overlay {
     display: flex;
     align-items: flex-end;
     gap: 10px;
+    margin-right: 0;
 }
 
 .action-button {
-    width: 46px;
-    height: 46px;
+    width: 56px;
+    height: 56px;
     border: 2px solid rgba(200, 150, 255, 0.9);
     background: rgba(150, 100, 200, 0.85);
     border-radius: 50%;
     color: white;
-    font-size: 16px;
+    font-size: 24px;
     font-weight: bold;
     cursor: pointer;
     user-select: none;
@@ -906,7 +907,7 @@ body:fullscreen .screen-overlay {
 }
 
 
-/* Responsives Layout mit allgemeinen Breakpoints */
+/* Responsive Layout with General Breakpoints */
 
 @media (max-width: 1024px) {
     body {
@@ -942,20 +943,24 @@ body:fullscreen .screen-overlay {
     }
 
     .action-buttons {
-        margin-right: 60px;
+        margin-right: 0;
     }
 }
 
 @media (max-width: 1280px) {
     .action-buttons {
-        margin-right: 60px;
+        margin-right: 0;
     }
 }
 
-/* Touch-Geräte: Buttons auch im Vollbild anzeigen */
+/* Touch Devices: Show Buttons in Fullscreen */
 @media (hover: none) and (pointer: coarse) {
+    .mobile-controls {
+        padding: 12px 14px;
+    }
+
     .action-buttons {
-        margin-right: 60px;
+        margin-right: 0;
     }
 }
 
@@ -1107,15 +1112,15 @@ body:fullscreen .screen-overlay {
     }
 
     .dpad-button {
-        width: 36px;
-        height: 36px;
-        font-size: 13px;
+        width: 44px;
+        height: 44px;
+        font-size: 16px;
     }
 
     .action-button {
-        width: 38px;
-        height: 38px;
-        font-size: 13px;
+        width: 48px;
+        height: 48px;
+        font-size: 18px;
     }
 
     .screen-overlay {

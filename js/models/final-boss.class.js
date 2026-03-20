@@ -78,7 +78,11 @@ class FinalBoss extends MovableObject {
     lastStyleChangeTime = 0;
     styleChangeDuration = 3000; 
     activityRadius = 900;
-    attackRadius = 900;
+    attackRadius = 420;
+    facingLeft = true;
+    attackTargetX = 0;
+    attackTargetY = 0;
+    attackMoveSpeed = 8;
 
     /**
      * Creates the final boss, preloads all animation sprites, and starts
@@ -256,7 +260,28 @@ class FinalBoss extends MovableObject {
     updateMovementFrame() {
         this.recoverStuckTransientState();
         if (!this.isActive || !this.introduced || this.isDead) return;
+        if (this.state === 'attacking') {
+            this.updateAttackMovement();
+            return;
+        }
         this.updateFloatingBehavior();
+    }
+
+    /**
+     * Aktualisiert die Angriffsbewegung als kurzen Dash zum gespeicherten Zielpunkt.
+     *
+     * @returns {void}
+     */
+    updateAttackMovement() {
+        const distX = this.attackTargetX - this.x;
+        const distY = this.attackTargetY - this.y;
+        const distance = Math.max(Math.sqrt(distX * distX + distY * distY), 0.001);
+        if (distance > 10) {
+            this.x += (distX / distance) * this.attackMoveSpeed;
+            this.y += (distY / distance) * this.attackMoveSpeed;
+        }
+        this.updateFacingDirectionFromX(distX);
+        this.clampPositionToBossArea();
     }
 
     /**
@@ -355,10 +380,10 @@ class FinalBoss extends MovableObject {
      * @returns {void}
      */
     updateFloatingSpeed() {
-        if (this.swimStyle === 'aggressive') this.floatingSpeed = 5.5;
-        else if (this.swimStyle === 'defensive') this.floatingSpeed = 3.5;
-        else if (this.swimStyle === 'circle') this.floatingSpeed = 4.8;
-        else this.floatingSpeed = 3.8;
+        if (this.swimStyle === 'aggressive') this.floatingSpeed = 2.8;
+        else if (this.swimStyle === 'defensive') this.floatingSpeed = 1.9;
+        else if (this.swimStyle === 'circle') this.floatingSpeed = 2.3;
+        else this.floatingSpeed = 2.1;
     }
 
     /**
@@ -372,8 +397,20 @@ class FinalBoss extends MovableObject {
             return;
         }
         const vector = this.getCharacterVector();
+        this.updateFacingDirectionFromX(vector.distX);
         this.applyStyleMovement(vector);
         this.clampPositionToBossArea();
+    }
+
+    /**
+     * Setzt die Blickrichtung des Bosses anhand der X-Distanz zum Ziel.
+     *
+     * @param {number} distX X-Distanz zum Ziel.
+     * @returns {void}
+     */
+    updateFacingDirectionFromX(distX) {
+        if (Math.abs(distX) < 2) return;
+        this.facingLeft = distX < 0;
     }
 
     /**
@@ -383,7 +420,7 @@ class FinalBoss extends MovableObject {
      */
     applyIdleDriftMovement() {
         const direction = Math.random() > 0.5 ? 1 : -1;
-        this.y += this.floatingSpeed * 2.5 * direction;
+        this.y += this.floatingSpeed * 0.9 * direction;
     }
 
     /**
@@ -409,6 +446,21 @@ class FinalBoss extends MovableObject {
         else if (this.swimStyle === 'defensive') this.applyDefensiveMovement(vector);
         else if (this.swimStyle === 'circle') this.applyCircleMovement(vector);
         else this.applyNormalMovement(vector);
+        this.applyVerticalTracking(vector);
+    }
+
+    /**
+     * Hält den Boss auf der Y-Achse am Spieler, damit er auch am oberen Rand Druck macht.
+     *
+     * @param {{distX:number,distY:number,distance:number}} vector Vector to character.
+     * @returns {void}
+     */
+    applyVerticalTracking(vector) {
+        const verticalDistance = Math.abs(vector.distY);
+        if (verticalDistance < 20) return;
+        const upwardBoost = vector.distY < 0 ? 1.35 : 1;
+        const verticalStep = Math.min(this.floatingSpeed * 1.2 * upwardBoost, verticalDistance * 0.26);
+        this.y += Math.sign(vector.distY) * verticalStep;
     }
 
     /**
@@ -418,12 +470,15 @@ class FinalBoss extends MovableObject {
      * @returns {void}
      */
     applyAggressiveMovement(vector) {
-        if (vector.distance <= 50) {
-            this.x -= this.floatingSpeed * 0.8;
+        const desiredDistance = 220;
+        if (vector.distance < desiredDistance) {
+            this.x -= (vector.distX / vector.distance) * this.floatingSpeed * 0.9;
+            this.y -= (vector.distY / vector.distance) * this.floatingSpeed * 0.6;
             return;
         }
+        const wobble = Math.sin(Date.now() * 0.01) * 0.8;
         this.x += (vector.distX / vector.distance) * this.floatingSpeed;
-        this.y += (vector.distY / vector.distance) * this.floatingSpeed;
+        this.y += (vector.distY / vector.distance) * this.floatingSpeed + wobble;
     }
 
     /**
@@ -438,7 +493,7 @@ class FinalBoss extends MovableObject {
             this.y -= (vector.distY / vector.distance) * this.floatingSpeed;
             return;
         }
-        this.x += (vector.distX / vector.distance) * this.floatingSpeed * 1.7;
+        this.x += (vector.distX / vector.distance) * this.floatingSpeed * 1.1;
     }
 
     /**
@@ -476,18 +531,17 @@ class FinalBoss extends MovableObject {
      * @returns {void}
      */
     applyNormalMovement(vector) {
-        if (vector.distance > 400) {
-            this.x += (vector.distX / vector.distance) * this.floatingSpeed * 1.8;
-            this.y += (vector.distY / vector.distance) * this.floatingSpeed * 1.8;
+        if (vector.distance > 460) {
+            this.x += (vector.distX / vector.distance) * this.floatingSpeed * 1.1;
+            this.y += (vector.distY / vector.distance) * this.floatingSpeed * 1.1;
             return;
         }
-        if (vector.distance < 300) {
-            this.x -= (vector.distX / vector.distance) * this.floatingSpeed * 1.6;
-            this.y -= (vector.distY / vector.distance) * this.floatingSpeed * 1.6;
+        if (vector.distance < 280) {
+            this.x -= (vector.distX / vector.distance) * this.floatingSpeed * 1.0;
+            this.y -= (vector.distY / vector.distance) * this.floatingSpeed * 1.0;
             return;
         }
-        // In the 300-400 range, keep slight horizontal motion so the boss never appears frozen.
-        this.x += this.floatingSpeed * 0.65 * (this.character.x > this.x ? 1 : -1);
+        this.y += Math.sin(Date.now() * 0.009) * 0.7;
     }
 
     /**
@@ -497,9 +551,10 @@ class FinalBoss extends MovableObject {
      */
     clampPositionToBossArea() {
         const mapBounds = 6720;
+        const minY = -55;
         if (this.x < 4800) this.x = 4800;
         if (this.x > mapBounds - this.width) this.x = mapBounds - this.width;
-        if (this.y < 50) this.y = 50;
+        if (this.y < minY) this.y = minY;
         if (this.y > 540 - this.height) this.y = 540 - this.height;
     }
 
@@ -516,11 +571,13 @@ class FinalBoss extends MovableObject {
             return;
         }
 
-        const distance = Math.abs(this.x - character.x);
+        const distanceX = this.x - character.x;
+        const distanceY = this.y - character.y;
+        const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
         const currentTime = Date.now();
         
         
-        if (distance < this.attackRadius && currentTime - this.lastAttackTime > 3000) {
+        if (distance < this.attackRadius && currentTime - this.lastAttackTime > 2600) {
             this.attack();
         }
     }
@@ -536,6 +593,24 @@ class FinalBoss extends MovableObject {
         this.currentImage = 0;
         this.stateStartedAt = Date.now();
         this.lastAttackTime = this.stateStartedAt;
+        const targetOffsetX = this.facingLeft ? -120 : 120;
+        this.attackTargetX = this.character ? this.character.x + targetOffsetX : this.x;
+        this.attackTargetY = this.getAttackTargetY();
+    }
+
+    /**
+     * Berechnet die Y-Zielposition fuer den Biss, sodass das Maul auf Spielerhoehe landet.
+     *
+     * @returns {number}
+     */
+    getAttackTargetY() {
+        if (!this.character) return this.y;
+        const characterCenterY = this.character.y + this.character.height / 2;
+        const mouthOffsetY = this.height * 0.34;
+        const rawTargetY = characterCenterY - mouthOffsetY;
+        const minY = -55;
+        const maxY = 540 - this.height;
+        return Math.max(minY, Math.min(maxY, rawTargetY));
     }
 
     /**

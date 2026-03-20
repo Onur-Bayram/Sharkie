@@ -30,6 +30,10 @@ class World {
  animationFrameId = null;
  darkZoneVoicePlayed = false;
  bossIntroSoundPlayed = false;
+ bossLevelLocked = false;
+ lastBossBottleDropAt = 0;
+ bossBottleDropCooldown = 5500;
+ maxBossFightBottles = 4;
 
 backgroundObjectsLight = [
     new BackgroundObject('3. Background/Layers/5. Water/L.png', 0, 0),
