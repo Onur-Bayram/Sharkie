@@ -226,7 +226,7 @@ function handleFullscreenButtonClick(e) {
     e.preventDefault();
     e.stopPropagation();
     $('html-fullscreen-button')?.blur();
-    const container = $('canvas')?.closest('.game-panel') || document.body;
+    const container = document.body;
     if (!container) return;
     if (!document.fullscreenElement) container.requestFullscreen();
     else document.exitFullscreen();

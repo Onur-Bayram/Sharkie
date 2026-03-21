@@ -207,7 +207,7 @@ function toggleHtmlFullscreenButton(button, baseGameplayVisible) {
  */
 function requestTouchFullscreenIfNeeded() {
     if (!isTouchGameplayDevice() || document.fullscreenElement) return;
-    const container = $('canvas')?.closest('.game-panel') || document.body;
+    const container = document.body;
     if (!container || typeof container.requestFullscreen !== 'function') return;
     container.requestFullscreen().catch(() => {});
 }
