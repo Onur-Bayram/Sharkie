@@ -1,6 +1,6 @@
-﻿/**
- * Sharkie player character - inherits from MovableObject.
- * Manages animation states (swimming, attacking, hurt, dead), energy, poison status, and keyboard control.
+/**
+ * Player character model for Sharkie.
+ * Handles animation state, input-driven movement, combat states, and world bounds.
  */
 class Character extends MovableObject{
 
@@ -140,9 +140,6 @@ class Character extends MovableObject{
         '1.Sharkie/4.Attack/Fin slap/8.png'
     ];
     
-    /**
-     * Creates the character, loads all animation frames and starts animation and keyboard loops.
-     */
     constructor() {
         super();
         this.loadCharacterImages();
@@ -151,9 +148,6 @@ class Character extends MovableObject{
         this.handleKeyboard();
     }
 
-    /**
-     * Loads character images.
-     */
     loadCharacterImages() {
         this.loadImage('1.Sharkie/1.IDLE/1.png');
         this.loadImages(this.IMAGES_IDLE);
@@ -168,26 +162,16 @@ class Character extends MovableObject{
         this.loadImages(this.IMAGES_FIN_SLAP);
     }
 
-    /**
-     * Initializes character size.
-     */
     initCharacterSize() {
         this.width = 200;
         this.height = 140;
         this.speed = 5;
     }
 
-    /**
-     * Starts the animation loop and selects the appropriate frame sequence based on state.
-     * @returns {void}
-     */
     animate() {
         setInterval(() => this.updateAnimationFrame(), 100);
     }
 
-    /**
-     * Updates animation frame.
-     */
     updateAnimationFrame() {
         if (this.renderDeathFrame()) {
             return;
@@ -199,9 +183,6 @@ class Character extends MovableObject{
         this.playImageSequence(this.getCurrentActionImages());
     }
 
-    /**
-     * Renders death frame.
-     */
     renderDeathFrame() {
         if (!this.isDead) return false;
         const images = this.getDeathImages();
@@ -213,9 +194,6 @@ class Character extends MovableObject{
         return true;
     }
 
-    /**
-     * Advances death frame.
-     */
     advanceDeathFrame(images) {
         this.playImageSequence(images);
         if (this.currentImage >= images.length) {
@@ -224,9 +202,6 @@ class Character extends MovableObject{
         }
     }
 
-    /**
-     * Renders long idle frame.
-     */
     renderLongIdleFrame() {
         let path = '';
         if (this.currentImage < this.IMAGES_LONG_IDLE.length) {
@@ -239,9 +214,6 @@ class Character extends MovableObject{
         this.currentImage++;
     }
 
-    /**
-     * Gets current action images.
-     */
     getCurrentActionImages() {
         if (this.isHurt) {
             return this.lastDamageType === 'electric' ? this.IMAGES_HURT : this.IMAGES_HURT_POISON;
@@ -258,21 +230,12 @@ class Character extends MovableObject{
         return this.IMAGES_IDLE;
     }
 
-    /**
-     * Plays image sequence.
-     */
     playImageSequence(images) {
         const path = images[this.currentImage % images.length];
         this.img = this.imageCache[path];
         this.currentImage++;
     }
 
-    /**
-     * Processes hit damage, sets the hurt state and calls `die()` at 0 HP.
-     * @param {'electric'|'poison'|string} damageType Type of damage.
-     * @param {number} [damage=10] Damage amount.
-     * @returns {void}
-     */
     hit(damageType, damage = 10) {
         if (this.shouldIgnoreHit()) {
             return;
@@ -288,9 +251,6 @@ class Character extends MovableObject{
         this.scheduleHurtRecovery();
     }
 
-    /**
-     * Checks whether hit should be ignored.
-     */
     shouldIgnoreHit() {
         if (this.isDead) {
             return true;
@@ -302,27 +262,18 @@ class Character extends MovableObject{
         return true;
     }
 
-    /**
-     * Applies hit type.
-     */
     applyHitType(damageType) {
         if (damageType) {
             this.lastDamageType = damageType;
         }
     }
 
-    /**
-     * Starts hurt state.
-     */
     startHurtState() {
         this.isHurt = true;
         this.lastHitTime = Date.now();
         this.currentImage = 0;
     }
 
-    /**
-     * Plays hit sound.
-     */
     playHitSound() {
         if (!this.world || !this.world.audioManager) {
             return;
@@ -334,9 +285,6 @@ class Character extends MovableObject{
         this.world.audioManager.playHurtSound();
     }
 
-    /**
-     * Applies damage.
-     */
     applyDamage(damage) {
         this.energy -= damage;
         if (this.energy < 0) {
@@ -344,9 +292,6 @@ class Character extends MovableObject{
         }
     }
 
-    /**
-     * Schedules hurt recovery.
-     */
     scheduleHurtRecovery() {
         setTimeout(() => {
             if (this.isDead) {
@@ -357,17 +302,10 @@ class Character extends MovableObject{
         }, 500);
     }
 
-    /**
-     * Processes keyboard input in a 60-fps loop and controls movement and animation state.
-     * @returns {void}
-     */
     handleKeyboard() {
         setInterval(() => this.updateMovementFromInput(), 1000 / 60);
     }
 
-    /**
-     * Updates movement from input.
-     */
     updateMovementFromInput() {
         if (this.isDead) {
             return;
@@ -379,9 +317,6 @@ class Character extends MovableObject{
         this.clampToWorldBounds();
     }
 
-    /**
-     * Applies directional input.
-     */
     applyDirectionalInput() {
         let moved = false;
         if (window.keyboard && window.keyboard.RIGHT) { this.moveRight(); this.otherDirection = false; moved = true; }
@@ -391,16 +326,10 @@ class Character extends MovableObject{
         return moved;
     }
 
-    /**
-     * Checks whether action input is active.
-     */
     isActionInputActive() {
         return !!(window.keyboard && (window.keyboard.D || window.keyboard.F || window.keyboard.SPACE));
     }
 
-    /**
-     * Updates swimming state.
-     */
     updateSwimmingState(moved) {
         const wasSwimming = this.isSwimming;
         this.isSwimming = moved && !this.isAttacking && !this.isFinSlapping && !this.isHurt;
@@ -409,9 +338,6 @@ class Character extends MovableObject{
         }
     }
 
-    /**
-     * Updates idle state.
-     */
     updateIdleState(moved) {
         if (moved) {
             this.lastActivity = Date.now();
@@ -422,12 +348,10 @@ class Character extends MovableObject{
         this.isLongIdle = idleTime > 5000;
     }
 
-    /**
-     * Clamps character to world bounds.
-     */
     clampToWorldBounds() {
-        const mapWidth = this.world ? this.world.mapWidth : 960;
-        const canvasHeight = this.world ? this.world.canvas.height : 540;
+        const mapWidth = this.world && Number.isFinite(this.world.mapWidth) ? this.world.mapWidth : 960;
+        const rawGameHeight = this.world && Number.isFinite(this.world.GAME_HEIGHT) ? this.world.GAME_HEIGHT : 540;
+        const canvasHeight = Number.isFinite(rawGameHeight) && rawGameHeight > 0 ? rawGameHeight : 540;
         if (this.world && !this.world.bossLevelLocked && this.x >= this.world.bossZoneStart) {
             this.world.bossLevelLocked = true;
         }
@@ -441,3 +365,4 @@ class Character extends MovableObject{
     }
 
 }
+

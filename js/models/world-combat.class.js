@@ -107,7 +107,7 @@ checkBossBodyCollision() {
 },
 
 /**
- * Prueft den Bissbereich des Bosses, damit Treffer auch am oberen Bildschirmrand moeglich sind.
+ * Checks the boss bite hitbox so attacks can still connect near the upper screen edge.
  */
 isBossBiteHit(character, boss) {
     if (boss.state !== 'attacking') return false;

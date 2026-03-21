@@ -178,6 +178,7 @@ function updateMobileControlsVisibility() {
     const baseGameplayVisible = isBaseGameplayVisible();
     toggleMobileControls(baseGameplayVisible);
     toggleHtmlFullscreenButton(htmlFullscreenButton, baseGameplayVisible);
+    enforceMobileFullscreen(baseGameplayVisible);
 }
 
 function isBaseGameplayVisible() {
@@ -199,6 +200,28 @@ function toggleHtmlFullscreenButton(button, baseGameplayVisible) {
         return;
     }
     button.style.display = baseGameplayVisible ? 'flex' : 'none';
+}
+
+/**
+ * Keeps mobile gameplay in fullscreen when possible.
+ * @param {boolean} [baseGameplayVisible] Precomputed gameplay visibility.
+ * @returns {void}
+ */
+function enforceMobileFullscreen(baseGameplayVisible) {
+    const gameplayVisible = baseGameplayVisible ?? isBaseGameplayVisible();
+    if (!isTouchGameplayDevice() || !gameplayVisible || document.fullscreenElement) return;
+    requestTouchFullscreenIfNeeded();
+}
+
+/**
+ * Requests fullscreen again from a user gesture if mobile gameplay is visible.
+ * @returns {void}
+ */
+function ensureMobileFullscreenFromGesture() {
+    if (!isTouchGameplayDevice() || document.fullscreenElement) return;
+    if (isPortraitPhoneLayout()) return;
+    if (!canvas || canvas.classList.contains('hidden')) return;
+    requestTouchFullscreenIfNeeded();
 }
 
 /**

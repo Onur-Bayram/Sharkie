@@ -204,6 +204,8 @@ function bindGlobalViewportListeners() {
     window.addEventListener('orientationchange', updateMobileControlsVisibility);
     document.addEventListener('fullscreenchange', updateMobileControlsVisibility);
     document.addEventListener('fullscreenchange', updateHtmlFullscreenButton);
+    document.addEventListener('pointerdown', ensureMobileFullscreenFromGesture, { passive: true });
+    document.addEventListener('touchstart', ensureMobileFullscreenFromGesture, { passive: true });
 }
 
 function bindHtmlFullscreenButtonHandlers() {
