@@ -224,18 +224,10 @@ class Character extends MovableObject{
 
     /** Returns the sprite sequence for the current action state. */
     getCurrentActionImages() {
-        if (this.isHurt) {
-            return this.lastDamageType === 'electric' ? this.IMAGES_HURT : this.IMAGES_HURT_POISON;
-        }
-        if (this.isFinSlapping) {
-            return this.IMAGES_FIN_SLAP;
-        }
-        if (this.isAttacking) {
-            return this.IMAGES_ATTACK;
-        }
-        if (this.isSwimming) {
-            return this.IMAGES_SWIM;
-        }
+        if (this.isHurt) return this.lastDamageType === 'electric' ? this.IMAGES_HURT : this.IMAGES_HURT_POISON;
+        if (this.isFinSlapping) return this.IMAGES_FIN_SLAP;
+        if (this.isAttacking) return this.IMAGES_ATTACK;
+        if (this.isSwimming) return this.IMAGES_SWIM;
         return this.IMAGES_IDLE;
     }
 
@@ -373,19 +365,22 @@ class Character extends MovableObject{
 
     /** Keeps the character inside the playable world area. */
     clampToWorldBounds() {
-        const mapWidth = this.world && Number.isFinite(this.world.mapWidth) ? this.world.mapWidth : 960;
-        const rawGameHeight = this.world && Number.isFinite(this.world.GAME_HEIGHT) ? this.world.GAME_HEIGHT : 540;
-        const canvasHeight = Number.isFinite(rawGameHeight) && rawGameHeight > 0 ? rawGameHeight : 540;
+        const { minX, maxX, maxY } = this.getWorldBounds();
+        if (this.x < minX) this.x = minX;
+        if (this.x > maxX) this.x = maxX;
+        if (this.y < 0) this.y = 0;
+        if (this.y > maxY) this.y = maxY;
+    }
+
+    /** Computes world edge boundaries and locks player from entering boss zone. */
+    getWorldBounds() {
+        const mapWidth = this.world?.mapWidth ?? 960;
+        const gameHeight = this.world?.GAME_HEIGHT ?? 540;
         if (this.world && !this.world.bossLevelLocked && this.x >= this.world.bossZoneStart) {
             this.world.bossLevelLocked = true;
         }
-        const minX = this.world && this.world.bossLevelLocked ? this.world.bossZoneStart : 0;
-        const maxX = Math.max(0, mapWidth - this.width);
-        const maxY = Math.max(0, canvasHeight - this.height);
-        if (this.x < minX) { this.x = minX; }
-        if (this.x > maxX) { this.x = maxX; }
-        if (this.y < 0) { this.y = 0; }
-        if (this.y > maxY) { this.y = maxY; }
+        const minX = this.world?.bossLevelLocked ? this.world.bossZoneStart : 0;
+        return { minX, maxX: Math.max(0, mapWidth - this.width), maxY: Math.max(0, gameHeight - this.height) };
     }
 
 }

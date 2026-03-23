@@ -30,41 +30,45 @@ Object.assign(FinalBoss.prototype, {
     /** Recovers from stale transient states and sanitizes invalid coordinates. */
     recoverStuckTransientState() {
         const now = Date.now();
-
-        if (this.state === 'hurt' && now >= this.hurtUntil) {
-            this.isHurt = false;
-            this.state = 'floating';
-            this.currentImage = 0;
-            this.stateStartedAt = now;
-        }
-
-        if (this.state === 'hurt' && now - this.stateStartedAt > 1200) {
-            this.isHurt = false;
-            this.state = 'floating';
-            this.currentImage = 0;
-            this.stateStartedAt = now;
-        }
-
-        if (this.state === 'attacking' && now - this.stateStartedAt > 1800) {
-            this.isAttacking = false;
-            this.state = 'floating';
-            this.currentImage = 0;
-            this.stateStartedAt = now;
-        }
-
-        // Keep booleans aligned with the canonical state to avoid stale lockups.
+        this.recoverStuckHurt(now);
+        this.recoverStuckAttack(now);
         this.isHurt = this.state === 'hurt';
         this.isAttacking = this.state === 'attacking';
+        this.sanitizeBossCoordinates(now);
+    },
 
-        if (!Number.isFinite(this.x) || !Number.isFinite(this.y)) {
-            this.x = 6000;
-            this.y = 80;
-            this.state = 'floating';
+    /** Resets hurt state if it lasted beyond the allowed duration. */
+    recoverStuckHurt(now) {
+        if (this.state !== 'hurt') return;
+        if (now >= this.hurtUntil || now - this.stateStartedAt > 1200) {
             this.isHurt = false;
-            this.isAttacking = false;
+            this.state = 'floating';
             this.currentImage = 0;
             this.stateStartedAt = now;
         }
+    },
+
+    /** Resets attacking state if it lasted beyond the allowed duration. */
+    recoverStuckAttack(now) {
+        if (this.state !== 'attacking') return;
+        if (now - this.stateStartedAt > 1800) {
+            this.isAttacking = false;
+            this.state = 'floating';
+            this.currentImage = 0;
+            this.stateStartedAt = now;
+        }
+    },
+
+    /** Resets position and state if coordinates are non-finite. */
+    sanitizeBossCoordinates(now) {
+        if (Number.isFinite(this.x) && Number.isFinite(this.y)) return;
+        this.x = 6000;
+        this.y = 80;
+        this.state = 'floating';
+        this.isHurt = false;
+        this.isAttacking = false;
+        this.currentImage = 0;
+        this.stateStartedAt = now;
     },
 
     /** Returns the sprite sequence that matches the current boss state. */

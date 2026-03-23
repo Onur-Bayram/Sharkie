@@ -125,19 +125,20 @@ isCollidingCoin(obj) {
  * Gets coin hitbox.
  */
 getCoinHitbox(obj) {
-    const backInset = 36;
-    const frontInset = 52;
-    const insetY = 40;
-    const coinInset = 5;
-    const isFacingLeft = !!this.otherDirection;
-    const leftInset = isFacingLeft ? frontInset : backInset;
-    const rightInset = isFacingLeft ? backInset : frontInset;
+    const { leftInset, rightInset, insetY, coinInset } = this.getCoinInsets();
     return {
         left: Math.max(this.x + leftInset, obj.x + coinInset),
         right: Math.min(this.x + this.width - rightInset, obj.x + obj.width - coinInset),
         top: Math.max(this.y + insetY, obj.y + coinInset),
         bottom: Math.min(this.y + this.height - insetY, obj.y + obj.height - coinInset)
     };
+}
+
+/** Returns directional inset values for coin collision detection. */
+getCoinInsets() {
+    const back = 36, front = 52, insetY = 40, coinInset = 5;
+    const leftInset = !!this.otherDirection ? front : back;
+    return { leftInset, rightInset: leftInset === front ? back : front, insetY, coinInset };
 }
 
 /**

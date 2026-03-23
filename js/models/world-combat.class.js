@@ -22,49 +22,53 @@ checkCollisions() {
 },
 
 /**
- * Updates boss combat state.
+ * Updates boss combat state: zone lock, intro, bar, attack, and bottle drop.
  */
 updateBossCombatState() {
     if (!this.finalBoss) return;
-    if (!this.bossLevelLocked && this.character.x >= this.bossZoneStart) {
-        this.bossLevelLocked = true;
-    }
+    if (!this.bossLevelLocked && this.character.x >= this.bossZoneStart) this.bossLevelLocked = true;
     const hadStartedIntro = this.finalBoss.hasStartedIntro;
     this.finalBoss.checkVisibility(this.cameraX, this.GAME_WIDTH);
-    if (!hadStartedIntro && this.finalBoss.hasStartedIntro && !this.bossIntroSoundPlayed) {
-        this.audioManager.playBossIntroSound();
-        this.bossIntroSoundPlayed = true;
-    }
+    this.checkBossIntroSound(hadStartedIntro);
     if (this.finalBoss.isActive) this.bossBar.setPercentage(this.finalBoss.hp, this.finalBoss.maxHp);
     this.finalBoss.checkProximityAttack(this.character);
     this.spawnBossFightPoisonBottle();
 },
 
-/**
- * drop poison bottles during boss fight at random X positions around the character, but only if the boss fight has started and the boss is not dead.
- * also ensures that drops are not too frequent and that there are not too many active boss fight bottles at the same time.
- * @returns {void}
- */
+/** Plays the boss intro sound the first time the intro sequence starts. */
+checkBossIntroSound(hadStartedIntro) {
+    if (!hadStartedIntro && this.finalBoss.hasStartedIntro && !this.bossIntroSoundPlayed) {
+        this.audioManager.playBossIntroSound();
+        this.bossIntroSoundPlayed = true;
+    }
+},
+
+/** Spawns a poison bottle drop during the boss fight at a random position near the character. */
 spawnBossFightPoisonBottle() {
-    if (!this.finalBoss || this.finalBoss.isDead || !this.bossLevelLocked) return;
-    const now = Date.now();
-    if (now - this.lastBossBottleDropAt < this.bossBottleDropCooldown) return;
-
-    const activeBossDrops = this.animatedPoisonBottles.filter((bottle) => bottle.fromBossFight && !bottle.collected).length;
-    if (activeBossDrops >= this.maxBossFightBottles) return;
-
+    if (!this.canSpawnBossBottle()) return;
     const minX = this.bossZoneStart + 120;
     const maxX = this.mapWidth - 220;
     const spawnX = Math.max(minX, Math.min(maxX, this.character.x + (Math.random() * 420 - 210)));
-    const spawnY = -220 - Math.random() * 140;
+    this.animatedPoisonBottles.push(this.createBossBottle(spawnX, -220 - Math.random() * 140));
+    this.lastBossBottleDropAt = Date.now();
+},
+
+/** Returns true if conditions allow a new boss bottle to be spawned. */
+canSpawnBossBottle() {
+    if (!this.finalBoss || this.finalBoss.isDead || !this.bossLevelLocked) return false;
+    if (Date.now() - this.lastBossBottleDropAt < this.bossBottleDropCooldown) return false;
+    const active = this.animatedPoisonBottles.filter(b => b.fromBossFight && !b.collected).length;
+    return active < this.maxBossFightBottles;
+},
+
+/** Creates and configures a boss-fight poison bottle at the given position. */
+createBossBottle(spawnX, spawnY) {
     const bottle = new AnimatedPoisonBottle(spawnX, spawnY);
     bottle.maxY = 390;
     bottle.visibilityRange = 900;
     bottle.isVisible = true;
     bottle.fromBossFight = true;
-
-    this.animatedPoisonBottles.push(bottle);
-    this.lastBossBottleDropAt = now;
+    return bottle;
 },
 
 /**
@@ -106,33 +110,21 @@ checkBossBodyCollision() {
     this.statusBar.setPercentage(this.character.energy);
 },
 
-/**
- * Checks the boss bite hitbox so attacks can still connect near the upper screen edge.
- */
+/** Checks the boss bite hitbox so attacks connect near the upper screen edge. */
 isBossBiteHit(character, boss) {
     if (boss.state !== 'attacking') return false;
-    const characterBox = {
-        left: character.x + 42,
-        right: character.x + character.width - 42,
-        top: character.y + 42,
-        bottom: character.y + character.height - 42
-    };
-    const mouthBox = boss.facingLeft
-        ? {
-            left: boss.x + 44,
-            right: boss.x + 126,
-            top: boss.y + 126,
-            bottom: boss.y + 206
-        }
-        : {
-            left: boss.x + boss.width - 126,
-            right: boss.x + boss.width - 44,
-            top: boss.y + 126,
-            bottom: boss.y + 206
-        };
-    const overlapX = Math.min(characterBox.right, mouthBox.right) - Math.max(characterBox.left, mouthBox.left);
-    const overlapY = Math.min(characterBox.bottom, mouthBox.bottom) - Math.max(characterBox.top, mouthBox.top);
+    const cBox = { left: character.x + 42, right: character.x + character.width - 42, top: character.y + 42, bottom: character.y + character.height - 42 };
+    const mBox = this.getBossMouthBox(boss);
+    const overlapX = Math.min(cBox.right, mBox.right) - Math.max(cBox.left, mBox.left);
+    const overlapY = Math.min(cBox.bottom, mBox.bottom) - Math.max(cBox.top, mBox.top);
     return overlapX > 8 && overlapY > 8;
+},
+
+/** Returns the directional mouth hitbox rectangle for the boss. */
+getBossMouthBox(boss) {
+    return boss.facingLeft
+        ? { left: boss.x + 44, right: boss.x + 126, top: boss.y + 126, bottom: boss.y + 206 }
+        : { left: boss.x + boss.width - 126, right: boss.x + boss.width - 44, top: boss.y + 126, bottom: boss.y + 206 };
 },
 
 /**

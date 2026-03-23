@@ -42,7 +42,6 @@ class AudioManager {
             if (error && error.name === 'AbortError') {
                 return;
             }
-            console.error(error);
         });
     }
     

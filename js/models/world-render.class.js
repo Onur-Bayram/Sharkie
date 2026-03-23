@@ -240,20 +240,10 @@ resumeGame() {
  * @returns {boolean}
  */
 isCollidingBoss(character, boss) {
-    const characterBox = {
-        left: character.x + 42,
-        right: character.x + character.width - 42,
-        top: character.y + 42,
-        bottom: character.y + character.height - 42
-    };
-    const bossBodyBox = {
-        left: boss.x + 88,
-        right: boss.x + boss.width - 88,
-        top: boss.y + 238,
-        bottom: boss.y + boss.height - 44
-    };
-    const overlapX = Math.min(characterBox.right, bossBodyBox.right) - Math.max(characterBox.left, bossBodyBox.left);
-    const overlapY = Math.min(characterBox.bottom, bossBodyBox.bottom) - Math.max(characterBox.top, bossBodyBox.top);
+    const cBox = { left: character.x + 42, right: character.x + character.width - 42, top: character.y + 42, bottom: character.y + character.height - 42 };
+    const bBox = { left: boss.x + 88, right: boss.x + boss.width - 88, top: boss.y + 238, bottom: boss.y + boss.height - 44 };
+    const overlapX = Math.min(cBox.right, bBox.right) - Math.max(cBox.left, bBox.left);
+    const overlapY = Math.min(cBox.bottom, bBox.bottom) - Math.max(cBox.top, bBox.top);
     return overlapX > 10 && overlapY > 10;
 }
 });

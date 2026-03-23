@@ -24,19 +24,17 @@ class GameOverScreen {
      * @returns {void}
      */
     loadImages() {
-        const imagePaths = [
-            '6.Botones/Tittles/Game Over/Recurso 9.png',
-            '6.Botones/Tittles/Game Over/Recurso 10.png',
-            '6.Botones/Tittles/Game Over/Recurso 11.png',
-            '6.Botones/Tittles/Game Over/Recurso 12.png',
-            '6.Botones/Tittles/Game Over/Recurso 13.png'
-        ];
-
-        imagePaths.forEach(path => {
+        this.getGameOverImagePaths().forEach(path => {
             const img = new Image();
             img.src = encodeURI(path);
             this.gameOverImages.push(img);
         });
+    }
+
+    /** Returns the ordered list of game-over animation frame paths. */
+    getGameOverImagePaths() {
+        const base = '6.Botones/Tittles/Game Over';
+        return [9, 10, 11, 12, 13].map(n => `${base}/Recurso ${n}.png`);
     }
 
     /**

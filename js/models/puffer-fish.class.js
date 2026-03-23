@@ -39,10 +39,16 @@ class Pufferfish extends MovableObject{
         this.colorVariant = Math.floor(Math.random() * 3) + 1;
     }
 
-    /**
-     * Loads puffer images.
-     */
+    /** Assigns all image path arrays and pre-loads them into the cache. */
     loadPufferImages() {
+        this.buildPufferImagePaths();
+        this.loadImage(this.IMAGES_SWIM[0]);
+        [this.IMAGES_SWIM, this.IMAGES_TRANSITION, this.IMAGES_BUBBLESWIM, this.IMAGES_DEAD, this.IMAGES_DEAD_FINSLAP]
+            .forEach(seq => this.loadImages(seq));
+    }
+
+    /** Builds sprite path arrays for all puffer animation states. */
+    buildPufferImagePaths() {
         const v = this.colorVariant;
         const base = '2.Enemy/1.Puffer fish (3 color options)';
         this.IMAGES_SWIM = Array.from({length: 5}, (_, i) => `${base}/1.Swim/${v}.swim${i+1}.png`);
@@ -50,12 +56,6 @@ class Pufferfish extends MovableObject{
         this.IMAGES_BUBBLESWIM = Array.from({length: 5}, (_, i) => `${base}/3.Bubbleeswim/${v}.bubbleswim${i+1}.png`);
         this.IMAGES_DEAD = this.getDeadImages();
         this.IMAGES_DEAD_FINSLAP = this.getDeadImagesFinSlap();
-        this.loadImage(this.IMAGES_SWIM[0]);
-        this.loadImages(this.IMAGES_SWIM);
-        this.loadImages(this.IMAGES_TRANSITION);
-        this.loadImages(this.IMAGES_BUBBLESWIM);
-        this.loadImages(this.IMAGES_DEAD);
-        this.loadImages(this.IMAGES_DEAD_FINSLAP);
     }
 
     /**
@@ -225,19 +225,16 @@ class Pufferfish extends MovableObject{
      * @returns {string[]}
      */
     getCurrentImages() {
-        if (this.isDead) {
-            if (this.deadCause === 'finSlap' && this.IMAGES_DEAD_FINSLAP.length > 0) {
-                return this.IMAGES_DEAD_FINSLAP;
-            }
-            return this.IMAGES_DEAD;
-        }
-        if (this.state === 'bubble') {
-            return this.IMAGES_BUBBLESWIM;
-        }
-        if (this.isTransitionState()) {
-            return this.IMAGES_TRANSITION;
-        }
+        if (this.isDead) return this.getDeadImageSequence();
+        if (this.state === 'bubble') return this.IMAGES_BUBBLESWIM;
+        if (this.isTransitionState()) return this.IMAGES_TRANSITION;
         return this.IMAGES_SWIM;
+    }
+
+    /** Returns the correct dead image sequence based on death cause. */
+    getDeadImageSequence() {
+        return (this.deadCause === 'finSlap' && this.IMAGES_DEAD_FINSLAP.length > 0)
+            ? this.IMAGES_DEAD_FINSLAP : this.IMAGES_DEAD;
     }
 
     /**

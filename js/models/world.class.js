@@ -88,13 +88,21 @@ ctx;
         this.startWorld();
     }
 
-    /**
-     * Initializes world objects.
-     */
+    /** Initializes all world objects: character ref, background, and entities. */
     initWorldObjects() {
         this.character.world = this;
+        this.initBackground();
+        this.initEntities();
+    }
+
+    /** Assembles the background layer arrays from light and dark objects. */
+    initBackground() {
         this.backgroundObjects = [...this.backgroundObjectsLight, ...this.backgroundObjectsDark];
         this.lightLayers = this.backgroundObjectsLight.filter((bg, index) => index % 5 === 4);
+    }
+
+    /** Creates all entities (enemies, items, coins, boss) and initializes bars. */
+    initEntities() {
         this.enemies = this.createEnemies();
         this.jellyfishes = this.createJellyfishes();
         this.poisonBottles = this.createPoisonBottles();
