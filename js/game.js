@@ -187,16 +187,19 @@ function resetCanvasState() {
     resetCanvasRenderingState();
 }
 
+/** Ensures the global canvas reference points to the DOM canvas element. */
 function ensureCanvasElement() {
     if (!canvas) canvas = $('canvas');
     return !!canvas;
 }
 
+/** Restores the base internal canvas resolution. */
 function applyDefaultCanvasSize() {
     canvas.width = ORIGINAL_WIDTH;
     canvas.height = ORIGINAL_HEIGHT;
 }
 
+/** Resets canvas transform and clears previous frame content. */
 function resetCanvasRenderingState() {
     const ctx = canvas.getContext('2d');
     ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -213,6 +216,9 @@ function resetCanvasRenderingState() {
 function teardownCurrentGame() {
     if (world && typeof world.pauseGame === 'function') {
         world.pauseGame();
+    }
+    if (typeof stopAssetLoadingGate === 'function') {
+        stopAssetLoadingGate();
     }
 
     clearTrackedGameLoops();
@@ -250,6 +256,7 @@ function applyLanguage(lang) {
     setActiveLanguageButton(lang);
 }
 
+/** Applies translated text to all elements using data-i18n keys. */
 function applyTextTranslations(strings) {
     document.querySelectorAll('[data-i18n]').forEach((element) => {
         const key = element.dataset.i18n;
@@ -257,6 +264,7 @@ function applyTextTranslations(strings) {
     });
 }
 
+/** Applies translated title attributes to elements using data-i18n-title keys. */
 function applyTitleTranslations(strings) {
     document.querySelectorAll('[data-i18n-title]').forEach((element) => {
         const key = element.dataset.i18nTitle;
@@ -278,6 +286,7 @@ function updateCanvasResolution(isFullscreen) {
     ctx.imageSmoothingQuality = 'high';
 }
 
+/** Sets internal canvas resolution for normal or fullscreen rendering. */
 function setCanvasResolutionForMode(ctx, isFullscreen) {
     if (!isFullscreen) {
         canvas.width = ORIGINAL_WIDTH;
@@ -307,24 +316,28 @@ function showStartScreen() {
     registerGlobalGameActions();
 }
 
+/** Shows start UI shell and hides gameplay-only controls. */
 function showStartUiShell() {
     showEl('start-screen');
     hideEl('options-screen');
     hideMobileControls();
 }
 
+/** Synchronizes audio sliders with persisted settings values. */
 function syncAudioSliderValues() {
     if (!window.gameSettings) return;
     syncSingleSlider('music-slider', 'music-value', window.gameSettings.musicVolume);
     syncSingleSlider('sfx-slider', 'sfx-value', window.gameSettings.sfxVolume);
 }
 
+/** Applies a single slider value and updates its percentage label. */
 function syncSingleSlider(sliderId, labelId, value) {
     if (value === undefined) return;
     $(sliderId).value = value * 100;
     $(labelId).textContent = Math.round(value * 100) + '%';
 }
 
+/** Exposes start/restart handlers globally for UI actions. */
 function registerGlobalGameActions() {
     window.startGame = init;
     window.restartGame = restartGame;
@@ -343,6 +356,7 @@ function init() {
     applySavedAudioSettings();
 }
 
+/** Applies persisted music/SFX/mute settings to the active audio manager. */
 function applySavedAudioSettings() {
     if (!window.gameSettings || !world.audioManager) return;
     if (window.gameSettings.musicVolume !== undefined) {

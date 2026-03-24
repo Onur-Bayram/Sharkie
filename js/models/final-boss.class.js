@@ -52,6 +52,7 @@
         this.loadImages(this.IMAGES_HURT);
         this.loadImages(this.IMAGES_DEAD);
     }
+    /** Initializes base position, size, and floating targets. */
     initBossPosition(x, y) {
         this.x = x;
         this.y = y;
@@ -63,6 +64,7 @@
         this.lastStyleChangeTime = Date.now();
         this.stateStartedAt = Date.now();
     }
+    /** Starts animation and movement update loops. */
     animate() {
         setInterval(() => this.updateAnimationFrame(), 150);
         setInterval(() => this.updateMovementFrame(), 1000 / 60);
@@ -75,40 +77,48 @@
         this.playCurrentFrame(images);
         this.syncStateAfterFrame();
     }
+    /** Returns whether the boss should animate in the current frame. */
     canAnimateNow() {
         if (this.state === 'introduce' && !this.hasStartedIntro) return false;
         // Let transient states finish even if the boss is briefly outside the active range.
         if (this.isDead || this.state === 'hurt' || this.state === 'attacking') return true;
         return this.isActive;
     }
+    /** Keeps the final death frame visible after death animation ends. */
     renderDeadLastFrame(images) {
         if (!this.isDead || !this.deadAnimationFinished) return false;
         this.img = this.imageCache[images[images.length - 1]];
         return true;
     }
+    /** Draws the next frame from the current animation sequence. */
     playCurrentFrame(images) {
         const path = images[this.currentImage % images.length];
         this.img = this.imageCache[path];
         this.currentImage++;
     }
+    /** Applies post-frame state transition checks. */
     syncStateAfterFrame() {
         this.finishIntroIfNeeded();
         this.finishAttackIfNeeded();
         this.finishHurtIfNeeded();
         this.finishDeathIfNeeded();
     }
+    /** Ends intro and switches to floating state when intro frames are done. */
     finishIntroIfNeeded() {
         if (this.state !== 'introduce' || this.currentImage < this.IMAGES_INTRODUCE.length) return;
         this.introduced = true; this.state = 'floating'; this.currentImage = 0; this.stateStartedAt = Date.now();
     }
+    /** Ends attack and returns to floating state when attack frames finish. */
     finishAttackIfNeeded() {
         if (this.state !== 'attacking' || this.currentImage < this.IMAGES_ATTACK.length) return;
         this.isAttacking = false; this.state = 'floating'; this.currentImage = 0; this.stateStartedAt = Date.now();
     }
+    /** Ends hurt and returns to floating state when hurt frames finish. */
     finishHurtIfNeeded() {
         if (this.state !== 'hurt' || this.currentImage < this.IMAGES_HURT.length) return;
         this.isHurt = false; this.state = 'floating'; this.currentImage = 0; this.stateStartedAt = Date.now();
     }
+    /** Marks death animation as complete and pins last frame index. */
     finishDeathIfNeeded() {
         if (!this.isDead || this.currentImage < this.IMAGES_DEAD.length) return;
         this.deadAnimationFinished = true; this.currentImage = this.IMAGES_DEAD.length - 1;

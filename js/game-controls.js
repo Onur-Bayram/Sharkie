@@ -16,6 +16,11 @@ function getCanvasPointerPosition(clientX, clientY) {
     return toCanvasCoordinates(relativeX, relativeY, drawArea);
 }
 
+/**
+ * Calculates drawable canvas area inside the element box.
+ * @param {{width: number, height: number}} rect Bounding rectangle of the canvas.
+ * @returns {{drawWidth: number, drawHeight: number, offsetX: number, offsetY: number}} Draw area data.
+ */
 function getCanvasDrawArea(rect) {
     const canvasRatio = ORIGINAL_WIDTH / ORIGINAL_HEIGHT;
     const rectRatio = rect.width / rect.height;
@@ -27,10 +32,24 @@ function getCanvasDrawArea(rect) {
     return { drawWidth: rect.width, drawHeight, offsetX: 0, offsetY: (rect.height - drawHeight) / 2 };
 }
 
+/**
+ * Returns whether a pointer is inside the drawable game area.
+ * @param {number} relativeX Relative X in draw area space.
+ * @param {number} relativeY Relative Y in draw area space.
+ * @param {{drawWidth: number, drawHeight: number}} drawArea Draw area data.
+ * @returns {boolean} True when inside draw area.
+ */
 function isInsideDrawArea(relativeX, relativeY, drawArea) {
     return !(relativeX < 0 || relativeY < 0 || relativeX > drawArea.drawWidth || relativeY > drawArea.drawHeight);
 }
 
+/**
+ * Converts draw-area coordinates to game-world coordinates.
+ * @param {number} relativeX Relative X in draw area space.
+ * @param {number} relativeY Relative Y in draw area space.
+ * @param {{drawWidth: number, drawHeight: number}} drawArea Draw area data.
+ * @returns {{x: number, y: number}} Canvas/game coordinates.
+ */
 function toCanvasCoordinates(relativeX, relativeY, drawArea) {
     return {
         x: (relativeX / drawArea.drawWidth) * ORIGINAL_WIDTH,
@@ -47,15 +66,9 @@ function toCanvasCoordinates(relativeX, relativeY, drawArea) {
  * @returns {void}
  */
 function handleCanvasPointer(clientX, clientY) {
-    if (!canvas) {
-        return;
-    }
-
+    if (!canvas) return;
     const position = getCanvasPointerPosition(clientX, clientY);
-    if (!position) {
-        return;
-    }
-
+    if (!position) return;
     if (world && world.restartButton) {
         world.restartButton.handleClick(position.x, position.y);
     }
@@ -74,13 +87,12 @@ function resetKeyboardState() {
     keyboard.D = false;
     keyboard.F = false;
     keyboard.SPACE = false;
-
     activeMobilePointers.clear();
 }
 
 /**
- * Checks if the current device is a smartphone in portrait mode, in which
- * the game should be locked.
+ * Checks if the current device is a smartphone in portrait mode,
+ * where gameplay should be locked.
  *
  * @returns {boolean}
  */
@@ -89,8 +101,7 @@ function isPortraitPhoneLayout() {
 }
 
 /**
- * Applies orientation lock behavior and pauses or
- * resumes the game as needed.
+ * Applies orientation lock behavior and pauses or resumes the game.
  *
  * @returns {void}
  */
@@ -107,6 +118,10 @@ function updateOrientationLock() {
     updateMobileControlsVisibility();
 }
 
+/**
+ * Pauses gameplay and hides controls while portrait lock is active.
+ * @returns {void}
+ */
 function handleOrientationLockPause() {
     if (world && !isGamePaused && canvas && !canvas.classList.contains('hidden')) {
         if (typeof world.pauseGame === 'function') world.pauseGame();
@@ -116,11 +131,19 @@ function handleOrientationLockPause() {
     hideMobileControls();
 }
 
+/**
+ * Resumes gameplay if portrait-lock pause state allows it.
+ * @returns {void}
+ */
 function resumeIfPausedByOrientation() {
     if (!canResumeFromOrientationLock()) return;
     world.resumeGame();
 }
 
+/**
+ * Returns whether the game can resume after orientation lock.
+ * @returns {boolean}
+ */
 function canResumeFromOrientationLock() {
     if (!wasPausedByOrientation || !world || isGamePaused) return false;
     if (!$('options-screen').classList.contains('is-hidden')) return false;
@@ -138,17 +161,14 @@ function isResponsiveLayout() {
 }
 
 /**
- * Shows or hides the options back icon depending on the current state.
+ * Shows or hides the options back icon depending on current state.
  *
  * @returns {void}
  */
 function updateBackIconVisibility() {
     const optionsScreen = $('options-screen');
     const backIconButton = optionsScreen?.querySelector('.back-icon-button');
-    if (!optionsScreen || !backIconButton) {
-        return;
-    }
-
+    if (!optionsScreen || !backIconButton) return;
     if (optionsScreen.classList.contains('is-hidden')) {
         backIconButton.classList.remove('is-visible');
         return;
@@ -157,7 +177,7 @@ function updateBackIconVisibility() {
 }
 
 /**
- * Detects whether the current device is primarily controlled by touch.
+ * Detects whether the current device is primarily touch-driven.
  *
  * @returns {boolean}
  */
@@ -166,8 +186,7 @@ function isTouchGameplayDevice() {
 }
 
 /**
- * Updates the visibility of mobile controls and fullscreen button
- * based on current UI and device state.
+ * Updates visibility of mobile controls and fullscreen button.
  *
  * @returns {void}
  */
@@ -181,6 +200,10 @@ function updateMobileControlsVisibility() {
     enforceMobileFullscreen(baseGameplayVisible);
 }
 
+/**
+ * Returns whether core gameplay UI is currently visible.
+ * @returns {boolean}
+ */
 function isBaseGameplayVisible() {
     const isGameVisible = !canvas.classList.contains('hidden');
     const isStartHidden = $('start-screen').classList.contains('is-hidden');
@@ -188,11 +211,22 @@ function isBaseGameplayVisible() {
     return !isPortraitPhoneLayout() && isGameVisible && isStartHidden && isOptionsHidden;
 }
 
+/**
+ * Shows or hides mobile controls based on gameplay visibility.
+ * @param {boolean} baseGameplayVisible Core gameplay visibility flag.
+ * @returns {void}
+ */
 function toggleMobileControls(baseGameplayVisible) {
     if (isTouchGameplayDevice() && baseGameplayVisible) showMobileControls();
     else hideMobileControls();
 }
 
+/**
+ * Shows desktop fullscreen button only when relevant.
+ * @param {HTMLElement|null} button Fullscreen button element.
+ * @param {boolean} baseGameplayVisible Core gameplay visibility flag.
+ * @returns {void}
+ */
 function toggleHtmlFullscreenButton(button, baseGameplayVisible) {
     if (!button) return;
     if (isTouchGameplayDevice()) {
@@ -214,7 +248,7 @@ function enforceMobileFullscreen(baseGameplayVisible) {
 }
 
 /**
- * Requests fullscreen again from a user gesture if mobile gameplay is visible.
+ * Requests fullscreen again from a user gesture when gameplay is visible.
  * @returns {void}
  */
 function ensureMobileFullscreenFromGesture() {
@@ -225,7 +259,7 @@ function ensureMobileFullscreenFromGesture() {
 }
 
 /**
- * aktiv the mobile controls by adding the 'visible' class.
+ * Requests fullscreen mode on touch devices if currently not fullscreen.
  * @returns {void}
  */
 function requestTouchFullscreenIfNeeded() {
@@ -236,7 +270,7 @@ function requestTouchFullscreenIfNeeded() {
 }
 
 /**
- * Updates the icon and tooltip of the HTML fullscreen button.
+ * Updates icon and tooltip text of the HTML fullscreen button.
  *
  * @returns {void}
  */
@@ -248,8 +282,7 @@ function updateHtmlFullscreenButton() {
 }
 
 /**
- * Binds pointer-based mobile controls and synchronizes them with
- * keyboard state.
+ * Binds pointer-based mobile controls and syncs them with keyboard state.
  *
  * @returns {void}
  */
@@ -261,6 +294,11 @@ function bindMobileControls() {
     bindMobileSystemResetHandlers(controls);
 }
 
+/**
+ * Binds pointerdown handling for mobile control buttons.
+ * @param {HTMLElement} controls Mobile controls container.
+ * @returns {void}
+ */
 function bindMobilePointerDown(controls) {
     controls.addEventListener('pointerdown', (event) => {
         const button = event.target.closest('[data-key]');
@@ -271,6 +309,12 @@ function bindMobilePointerDown(controls) {
     });
 }
 
+/**
+ * Activates keyboard state for a touched mobile control button.
+ * @param {HTMLElement} button Button element with data-key.
+ * @param {number} pointerId Pointer identifier.
+ * @returns {void}
+ */
 function activateMobileKey(button, pointerId) {
     const key = button.dataset.key;
     if (!Object.prototype.hasOwnProperty.call(keyboard, key)) return;
@@ -278,6 +322,11 @@ function activateMobileKey(button, pointerId) {
     activeMobilePointers.set(pointerId, key);
 }
 
+/**
+ * Binds pointer release/cancel to clear active mobile key states.
+ * @param {HTMLElement} controls Mobile controls container.
+ * @returns {void}
+ */
 function bindMobilePointerRelease(controls) {
     const releasePointerKey = (event) => {
         const key = activeMobilePointers.get(event.pointerId);
@@ -289,6 +338,11 @@ function bindMobilePointerRelease(controls) {
     controls.addEventListener('pointercancel', releasePointerKey);
 }
 
+/**
+ * Binds system-level handlers to reset mobile input safely.
+ * @param {HTMLElement} controls Mobile controls container.
+ * @returns {void}
+ */
 function bindMobileSystemResetHandlers(controls) {
     controls.addEventListener('contextmenu', (event) => event.preventDefault());
     window.addEventListener('blur', resetKeyboardState);

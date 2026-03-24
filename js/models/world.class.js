@@ -138,7 +138,7 @@ ctx;
      * @returns {Pufferfish[]}
      */
     createEnemies() {
-        return this.createRandomActors(10, 200, 4500, 80, this.canvas.height - 120,
+        return this.createRandomActors(10, 700, 4500, 80, this.canvas.height - 120,
             (x, y) => new Pufferfish(x, y));
     }
 
@@ -147,7 +147,7 @@ ctx;
      * @returns {Jellyfish[]}
      */
     createJellyfishes() {
-        return this.createRandomActors(12, 200, 4500, 80, this.canvas.height - 120,
+        return this.createRandomActors(12, 700, 4500, 80, this.canvas.height - 120,
             (x, y) => new Jellyfish(x, y));
     }
 

@@ -9,10 +9,22 @@ function startGameFromHTML() {
         return;
     }
     hideEl('start-screen');
-    $('canvas').classList.remove('hidden');
-    showEl('game-menu-button');
+    $('canvas').classList.add('hidden');
+    hideEl('game-menu-button');
     init();
     requestTouchFullscreenIfNeeded();
+    if (typeof startAssetLoadingGate === 'function') startAssetLoadingGate(activateGameplayAfterLoading);
+    else activateGameplayAfterLoading();
+}
+
+/**
+ * Makes gameplay visible and interactive once loading has completed.
+ * @returns {void}
+ */
+function activateGameplayAfterLoading() {
+    $('canvas').classList.remove('hidden');
+    showEl('game-menu-button');
+    if (world && typeof world.resumeGame === 'function') world.resumeGame();
     updateMobileControlsVisibility();
 }
 
@@ -41,6 +53,7 @@ function updateBackButtons() {
     updateBackIconVisibility();
 }
 
+/** Updates back-button labels and visibility when the game is paused. */
 function updatePausedBackButtons(backToStartButton, returnToTitleButton) {
     const strings = getLanguageStrings(window.gameSettings.language || 'de');
     hideEl('back-to-start-button');
@@ -54,6 +67,7 @@ function updatePausedBackButtons(backToStartButton, returnToTitleButton) {
     else showEl('back-to-game-button');
 }
 
+/** Updates back-button state for non-paused screens. */
 function updateUnpausedBackButtons(backToStartButton) {
     showEl('back-to-start-button');
     hideEl('return-to-title-button');
@@ -75,6 +89,7 @@ function showOptionsSubmenu(submenu) {
     updateBackIconVisibility();
 }
 
+/** Hides all options submenus before showing a target submenu. */
 function hideAllOptionsSubmenus() {
     hideEl('options-menu');
     hideEl('options-language');
@@ -83,6 +98,7 @@ function hideAllOptionsSubmenus() {
     hideEl('options-impressum');
 }
 
+/** Shows exactly one options submenu by key. */
 function showRequestedOptionsSubmenu(submenu) {
     if (submenu === 'menu') showEl('options-menu');
     else if (submenu === 'language') showEl('options-language');
@@ -139,12 +155,13 @@ function restartGame() {
     teardownCurrentGame();
     hideEl('start-screen');
     hideEl('options-screen');
-    $('canvas').classList.remove('hidden');
-    showEl('game-menu-button');
+    $('canvas').classList.add('hidden');
+    hideEl('game-menu-button');
     init();
     requestTouchFullscreenIfNeeded();
+    if (typeof startAssetLoadingGate === 'function') startAssetLoadingGate(activateGameplayAfterLoading);
+    else activateGameplayAfterLoading();
     updateHtmlFullscreenButton();
-    updateMobileControlsVisibility();
 }
 
 /**
@@ -195,6 +212,7 @@ function bindUI() {
     bindMobileControls();
 }
 
+/** Binds global viewport/fullscreen listeners affecting UI state. */
 function bindGlobalViewportListeners() {
     window.addEventListener('resize', updateOrientationLock);
     window.addEventListener('orientationchange', updateOrientationLock);
@@ -208,6 +226,7 @@ function bindGlobalViewportListeners() {
     document.addEventListener('touchstart', ensureMobileFullscreenFromGesture, { passive: true });
 }
 
+/** Binds key and click handlers for the HTML fullscreen button. */
 function bindHtmlFullscreenButtonHandlers() {
     const htmlFsBtn = $('html-fullscreen-button');
     if (!htmlFsBtn) return;
@@ -215,6 +234,7 @@ function bindHtmlFullscreenButtonHandlers() {
     htmlFsBtn.addEventListener('click', handleFullscreenButtonClick);
 }
 
+/** Handles keyboard activation (Space/Enter) for fullscreen button. */
 function handleFullscreenButtonKeydown(e) {
     const isSpace = e.code === 'Space' || e.key === ' ';
     const isEnter = e.key === 'Enter';
@@ -224,6 +244,7 @@ function handleFullscreenButtonKeydown(e) {
     $('html-fullscreen-button')?.blur();
 }
 
+/** Toggles fullscreen mode from the HTML fullscreen button click. */
 function handleFullscreenButtonClick(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -234,6 +255,7 @@ function handleFullscreenButtonClick(e) {
     else document.exitFullscreen();
 }
 
+/** Binds click delegation for all elements with data-action attributes. */
 function bindActionClickRouter() {
     document.addEventListener('click', (event) => {
         const button = event.target.closest('[data-action]');
@@ -242,6 +264,7 @@ function bindActionClickRouter() {
     });
 }
 
+/** Routes a UI action string to the matching handler. */
 function routeAction(action, button) {
     if (action === 'start-game') startGameFromHTML();
     else if (action === 'open-options') showOptionsScreen();
@@ -254,6 +277,7 @@ function routeAction(action, button) {
     else if (action === 'toggle-mute') toggleMute();
 }
 
+/** Handles back navigation logic inside the options screen. */
 function handleBackOptionsAction() {
     const isInMainOptionsMenu = !$('options-menu').classList.contains('is-hidden');
     if (!isInMainOptionsMenu) backToOptionsMenu();
@@ -261,6 +285,7 @@ function handleBackOptionsAction() {
     else hideOptionsScreen();
 }
 
+/** Binds input listeners for music and SFX range sliders. */
 function bindAudioSliderHandlers() {
     const musicSlider = $('music-slider');
     if (musicSlider) musicSlider.addEventListener('input', (event) => updateMusicVolume(event.target.value));
@@ -282,11 +307,13 @@ function changeLanguage(lang, button) {
     updateMuteButtonLabel();
 }
 
+/** Resolves a valid language code with German fallback. */
 function resolveLanguageCode(lang) {
     if (TRANSLATIONS[lang]) return lang;
     return 'de';
 }
 
+/** Persists the selected language in settings and local storage. */
 function persistLanguageSetting(lang) {
     window.gameSettings = window.gameSettings || {};
     window.gameSettings.language = lang;
