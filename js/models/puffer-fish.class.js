@@ -8,7 +8,6 @@ class Pufferfish extends MovableObject{
     IMAGES_TRANSITION = [];
     IMAGES_BUBBLESWIM = [];
     IMAGES_DEAD = [];
-    IMAGES_DEAD_FINSLAP = [];
     hp = 30;
     isDead = false;
     state = 'swim';
@@ -47,7 +46,7 @@ class Pufferfish extends MovableObject{
     loadPufferImages() {
         this.buildPufferImagePaths();
         this.loadImage(this.IMAGES_SWIM[0]);
-        [this.IMAGES_SWIM, this.IMAGES_TRANSITION, this.IMAGES_BUBBLESWIM, this.IMAGES_DEAD, this.IMAGES_DEAD_FINSLAP]
+        [this.IMAGES_SWIM, this.IMAGES_TRANSITION, this.IMAGES_BUBBLESWIM, this.IMAGES_DEAD]
             .forEach(seq => this.loadImages(seq));
     }
 
@@ -62,7 +61,6 @@ class Pufferfish extends MovableObject{
         this.IMAGES_TRANSITION = Array.from({length: 5}, (_, i) => `${base}/2.transition/${v}.transition${i+1}.png`);
         this.IMAGES_BUBBLESWIM = Array.from({length: 5}, (_, i) => `${base}/3.Bubbleeswim/${v}.bubbleswim${i+1}.png`);
         this.IMAGES_DEAD = this.getDeadImages();
-        this.IMAGES_DEAD_FINSLAP = this.getDeadImagesFinSlap();
     }
 
     /**
@@ -257,12 +255,11 @@ class Pufferfish extends MovableObject{
     }
 
     /**
-     * Returns the correct dead image sequence based on death cause.
+     * Returns the dead image sequence.
      * @returns {string[]}
      */
     getDeadImageSequence() {
-        return (this.deadCause === 'finSlap' && this.IMAGES_DEAD_FINSLAP.length > 0)
-            ? this.IMAGES_DEAD_FINSLAP : this.IMAGES_DEAD;
+        return this.IMAGES_DEAD;
     }
 
     /**
@@ -270,14 +267,6 @@ class Pufferfish extends MovableObject{
      * @returns {string[]}
      */
     getDeadImages() {
-        return this.getPufferDeadImagesByVariant();
-    }
-
-    /**
-     * Returns death images for fin slap death.
-     * @returns {string[]}
-     */
-    getDeadImagesFinSlap() {
         return this.getPufferDeadImagesByVariant();
     }
 

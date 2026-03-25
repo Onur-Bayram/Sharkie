@@ -19,17 +19,16 @@ Object.assign(Character.prototype, {
 
     /**
      * Throws a normal bubble and starts the attack animation.
-     * @returns {BubbleAnimation|null} Created animation or null on cooldown.
+     * @returns {void}
      */
     throwNormalBubble() {
-        if (!this.canThrowNormalBubble()) return null;
+        if (!this.canThrowNormalBubble()) return;
         this.lastThrowTime = Date.now();
         this.startAttackState();
         const direction = this.otherDirection ? -1 : 1;
         const offsetX = this.otherDirection ? 0 : this.width;
         this.scheduleNormalBubble(offsetX, direction);
         this.scheduleAttackReset(800);
-        return null;
     },
 
     /**
@@ -82,10 +81,10 @@ Object.assign(Character.prototype, {
 
     /**
         * Throws a poison bubble (costs poisonPerShot points) and starts the attack animation.
-     * @returns {BubbleAnimation|null} Created animation or null on cooldown.
+     * @returns {void}
      */
     throwPoisonBubble() {
-        if (!this.canThrowPoisonBubble()) return null;
+        if (!this.canThrowPoisonBubble()) return;
         this.lastThrowTime = Date.now();
         this.deductPoison();
         this.startAttackState();
@@ -93,7 +92,6 @@ Object.assign(Character.prototype, {
         const offsetX = this.otherDirection ? 0 : this.width;
         this.schedulePoisonBubble(offsetX, direction);
         this.scheduleAttackReset(800);
-        return null;
     },
 
     /**
@@ -128,10 +126,10 @@ Object.assign(Character.prototype, {
 
     /**
      * Executes a fin slap and creates the FinSlap projectile.
-     * @returns {FinSlap|null} The created projectile or null on cooldown.
+     * @returns {void}
      */
     throwFinSlap() {
-        if (!this.canThrowFinSlap()) return null;
+        if (!this.canThrowFinSlap()) return;
         this.lastThrowTime = Date.now();
         this.isFinSlapping = true;
         this.currentImage = 0;
@@ -139,7 +137,6 @@ Object.assign(Character.prototype, {
         const offsetX = this.otherDirection ? 0 : 120;
         this.scheduleFinSlap(offsetX, direction);
         this.scheduleFinSlapReset(600);
-        return null;
     },
 
     /**
