@@ -120,7 +120,7 @@ class RestartButton {
     }
 
     /**
-     * Processes a click and triggers `window.restartGame()` if the button was hit.
+     * Processes a click and triggers `restartGame()` if the button was hit.
      * @param {number} x X-coordinate.
      * @param {number} y Y-coordinate.
      * @returns {boolean} true if the button was clicked.
@@ -130,8 +130,8 @@ class RestartButton {
             return false;
         }
         if (this.isButtonHovered(x, y)) {
-            if (typeof window.restartGame === 'function') {
-                window.restartGame();
+            if (typeof restartGame === 'function') {
+                restartGame();
             }
             return true;
         }

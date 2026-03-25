@@ -55,7 +55,7 @@ function updateBackButtons() {
 
 /** Updates back-button labels and visibility when the game is paused. */
 function updatePausedBackButtons(backToStartButton, returnToTitleButton) {
-    const strings = getLanguageStrings(window.gameSettings.language || 'de');
+    const strings = getLanguageStrings(gameSettings.language || 'de');
     hideEl('back-to-start-button');
     showEl('return-to-title-button');
     if (backToStartButton) {
@@ -73,7 +73,7 @@ function updateUnpausedBackButtons(backToStartButton) {
     hideEl('return-to-title-button');
     if (backToStartButton) {
         backToStartButton.dataset.i18n = 'back_start';
-        backToStartButton.textContent = getLanguageStrings(window.gameSettings.language || 'de').back_start;
+        backToStartButton.textContent = getLanguageStrings(gameSettings.language || 'de').back_start;
     }
     hideEl('back-to-game-button');
 }
@@ -214,12 +214,12 @@ function bindUI() {
 
 /** Binds global viewport/fullscreen listeners affecting UI state. */
 function bindGlobalViewportListeners() {
-    window.addEventListener('resize', updateOrientationLock);
-    window.addEventListener('orientationchange', updateOrientationLock);
-    window.addEventListener('resize', updateBackIconVisibility);
-    window.addEventListener('orientationchange', updateBackIconVisibility);
-    window.addEventListener('resize', updateMobileControlsVisibility);
-    window.addEventListener('orientationchange', updateMobileControlsVisibility);
+    addEventListener('resize', updateOrientationLock);
+    addEventListener('orientationchange', updateOrientationLock);
+    addEventListener('resize', updateBackIconVisibility);
+    addEventListener('orientationchange', updateBackIconVisibility);
+    addEventListener('resize', updateMobileControlsVisibility);
+    addEventListener('orientationchange', updateMobileControlsVisibility);
     document.addEventListener('fullscreenchange', updateMobileControlsVisibility);
     document.addEventListener('fullscreenchange', updateHtmlFullscreenButton);
     document.addEventListener('pointerdown', ensureMobileFullscreenFromGesture, { passive: true });
@@ -315,8 +315,8 @@ function resolveLanguageCode(lang) {
 
 /** Persists the selected language in settings and local storage. */
 function persistLanguageSetting(lang) {
-    window.gameSettings = window.gameSettings || {};
-    window.gameSettings.language = lang;
+    gameSettings = gameSettings || {};
+    gameSettings.language = lang;
     localStorage.setItem('sharkieLanguage', lang);
 }
 
@@ -330,10 +330,10 @@ function updateMuteButtonLabel() {
         return;
     }
 
-    const muted = !!window.gameSettings?.muted;
+    const muted = !!gameSettings?.muted;
     const i18nKey = muted ? 'audio_unmute' : 'audio_mute';
     muteButton.dataset.i18n = i18nKey;
-    muteButton.textContent = getLanguageStrings(window.gameSettings.language || 'de')[i18nKey];
+    muteButton.textContent = getLanguageStrings(gameSettings.language || 'de')[i18nKey];
 }
 
 /**
@@ -341,12 +341,12 @@ function updateMuteButtonLabel() {
  * @returns {void}
  */
 function toggleMute() {
-    window.gameSettings = window.gameSettings || {};
-    window.gameSettings.muted = !window.gameSettings.muted;
-    localStorage.setItem('sharkieMuted', String(window.gameSettings.muted));
+    gameSettings = gameSettings || {};
+    gameSettings.muted = !gameSettings.muted;
+    localStorage.setItem('sharkieMuted', String(gameSettings.muted));
 
     if (world && world.audioManager) {
-        world.audioManager.setMuted(window.gameSettings.muted);
+        world.audioManager.setMuted(gameSettings.muted);
     }
 
     updateMuteButtonLabel();
@@ -360,8 +360,8 @@ function toggleMute() {
 function updateMusicVolume(value) {
     $('music-value').textContent = value + '%';
     const volume = value / 100;
-    window.gameSettings = window.gameSettings || {};
-    window.gameSettings.musicVolume = volume;
+    gameSettings = gameSettings || {};
+    gameSettings.musicVolume = volume;
     if (world && world.audioManager) {
         world.audioManager.setMusicVolume(volume);
     }
@@ -375,8 +375,8 @@ function updateMusicVolume(value) {
 function updateSFXVolume(value) {
     $('sfx-value').textContent = value + '%';
     const volume = value / 100;
-    window.gameSettings = window.gameSettings || {};
-    window.gameSettings.sfxVolume = volume;
+    gameSettings = gameSettings || {};
+    gameSettings.sfxVolume = volume;
     if (world && world.audioManager) {
         world.audioManager.setSFXVolume(volume);
     }

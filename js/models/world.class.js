@@ -212,12 +212,12 @@ ctx;
      */
     tickThrowInput() {
         if (this.isPaused) return;
-        if (window.keyboard && window.keyboard.F) this.character.throwNormalBubble();
-        if (window.keyboard && window.keyboard.D) {
+        if (keyboard && keyboard.F) this.character.throwNormalBubble();
+        if (keyboard && keyboard.D) {
             this.character.throwPoisonBubble();
             this.poisonBar.setPercentage(this.character.poison);
         }
-        if (window.keyboard && window.keyboard.SPACE) this.character.throwFinSlap();
+        if (keyboard && keyboard.SPACE) this.character.throwFinSlap();
     }
 
 }

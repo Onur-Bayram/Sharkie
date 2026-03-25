@@ -1,12 +1,12 @@
 let canvas;
 let world;
 let character = new MovableObject();
-const nativeSetInterval = window.setInterval.bind(window);
-const nativeClearInterval = window.clearInterval.bind(window);
-const nativeSetTimeout = window.setTimeout.bind(window);
-const nativeClearTimeout = window.clearTimeout.bind(window);
-const nativeRequestAnimationFrame = window.requestAnimationFrame.bind(window);
-const nativeCancelAnimationFrame = window.cancelAnimationFrame.bind(window);
+const nativeSetInterval = setInterval;
+const nativeClearInterval = clearInterval;
+const nativeSetTimeout = setTimeout;
+const nativeClearTimeout = clearTimeout;
+const nativeRequestAnimationFrame = requestAnimationFrame;
+const nativeCancelAnimationFrame = cancelAnimationFrame;
 const trackedIntervals = new Set();
 const trackedTimeouts = new Set();
 const trackedAnimationFrames = new Set();
@@ -40,12 +40,11 @@ let isGamePaused = false;
 let wasPausedByOrientation = false;
 const activeMobilePointers = new Map();
 
-window.keyboard = keyboard;
-window.mousePos = { x: 0, y: 0 };
+let mousePos = { x: 0, y: 0 };
 
 const savedLanguage = localStorage.getItem('sharkieLanguage') || 'de';
 const savedMuted = localStorage.getItem('sharkieMuted') === 'true';
-window.gameSettings = {
+let gameSettings = {
     musicVolume: 0.3,
     sfxVolume: 0.5,
     language: savedLanguage,
@@ -107,18 +106,18 @@ const TRANSLATIONS = {
 const ORIGINAL_WIDTH = 800;
 const ORIGINAL_HEIGHT = 540;
 
-window.setInterval = (handler, timeout, ...args) => {
+setInterval = (handler, timeout, ...args) => {
     const intervalId = nativeSetInterval(handler, timeout, ...args);
     trackedIntervals.add(intervalId);
     return intervalId;
 };
 
-window.clearInterval = (intervalId) => {
+clearInterval = (intervalId) => {
     trackedIntervals.delete(intervalId);
     nativeClearInterval(intervalId);
 };
 
-window.setTimeout = (handler, timeout, ...args) => {
+setTimeout = (handler, timeout, ...args) => {
     const timeoutId = nativeSetTimeout(() => {
         trackedTimeouts.delete(timeoutId);
         if (typeof handler === 'function') {
@@ -131,12 +130,12 @@ window.setTimeout = (handler, timeout, ...args) => {
     return timeoutId;
 };
 
-window.clearTimeout = (timeoutId) => {
+clearTimeout = (timeoutId) => {
     trackedTimeouts.delete(timeoutId);
     nativeClearTimeout(timeoutId);
 };
 
-window.requestAnimationFrame = (callback) => {
+requestAnimationFrame = (callback) => {
     const frameId = nativeRequestAnimationFrame((timestamp) => {
         trackedAnimationFrames.delete(frameId);
         callback(timestamp);
@@ -145,7 +144,7 @@ window.requestAnimationFrame = (callback) => {
     return frameId;
 };
 
-window.cancelAnimationFrame = (frameId) => {
+cancelAnimationFrame = (frameId) => {
     trackedAnimationFrames.delete(frameId);
     nativeCancelAnimationFrame(frameId);
 };
@@ -226,7 +225,6 @@ function teardownCurrentGame() {
     resetCanvasState();
 
     world = null;
-    window.world = null;
     isGamePaused = false;
 }
 
@@ -293,7 +291,7 @@ function setCanvasResolutionForMode(ctx, isFullscreen) {
         canvas.height = ORIGINAL_HEIGHT;
         return;
     }
-    const scale = window.devicePixelRatio || 2;
+    const scale = devicePixelRatio || 2;
     const multiplier = Math.min(scale, 2);
     canvas.width = ORIGINAL_WIDTH * multiplier;
     canvas.height = ORIGINAL_HEIGHT * multiplier;
@@ -310,7 +308,7 @@ function showStartScreen() {
     showStartUiShell();
     syncAudioSliderValues();
     bindUI();
-    applyLanguage(window.gameSettings.language || 'de');
+    applyLanguage(gameSettings.language || 'de');
     updateMuteButtonLabel();
     updateOrientationLock();
     registerGlobalGameActions();
@@ -325,9 +323,9 @@ function showStartUiShell() {
 
 /** Synchronizes audio sliders with persisted settings values. */
 function syncAudioSliderValues() {
-    if (!window.gameSettings) return;
-    syncSingleSlider('music-slider', 'music-value', window.gameSettings.musicVolume);
-    syncSingleSlider('sfx-slider', 'sfx-value', window.gameSettings.sfxVolume);
+    if (!gameSettings) return;
+    syncSingleSlider('music-slider', 'music-value', gameSettings.musicVolume);
+    syncSingleSlider('sfx-slider', 'sfx-value', gameSettings.sfxVolume);
 }
 
 /** Applies a single slider value and updates its percentage label. */
@@ -339,8 +337,7 @@ function syncSingleSlider(sliderId, labelId, value) {
 
 /** Exposes start/restart handlers globally for UI actions. */
 function registerGlobalGameActions() {
-    window.startGame = init;
-    window.restartGame = restartGame;
+    return;
 }
 
 /**
@@ -352,20 +349,19 @@ function init() {
     teardownCurrentGame();
     ensureCanvasElement();
     world = new World(canvas);
-    window.world = world;
     applySavedAudioSettings();
 }
 
 /** Applies persisted music/SFX/mute settings to the active audio manager. */
 function applySavedAudioSettings() {
-    if (!window.gameSettings || !world.audioManager) return;
-    if (window.gameSettings.musicVolume !== undefined) {
-        world.audioManager.setMusicVolume(window.gameSettings.musicVolume);
+    if (!gameSettings || !world.audioManager) return;
+    if (gameSettings.musicVolume !== undefined) {
+        world.audioManager.setMusicVolume(gameSettings.musicVolume);
     }
-    if (window.gameSettings.sfxVolume !== undefined) {
-        world.audioManager.setSFXVolume(window.gameSettings.sfxVolume);
+    if (gameSettings.sfxVolume !== undefined) {
+        world.audioManager.setSFXVolume(gameSettings.sfxVolume);
     }
-    world.audioManager.setMuted(!!window.gameSettings.muted);
+    world.audioManager.setMuted(!!gameSettings.muted);
 }
 
 document.addEventListener('keydown', (e) => {
@@ -394,8 +390,8 @@ document.addEventListener('mousemove', (e) => {
         return;
     }
 
-    window.mousePos.x = position.x;
-    window.mousePos.y = position.y;
+    mousePos.x = position.x;
+    mousePos.y = position.y;
 
     if (world && world.restartButton) {
         world.restartButton.updateHoverState(position.x, position.y);

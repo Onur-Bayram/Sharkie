@@ -97,7 +97,7 @@ function resetKeyboardState() {
  * @returns {boolean}
  */
 function isPortraitPhoneLayout() {
-    return window.matchMedia('(max-width: 768px) and (orientation: portrait) and (hover: none) and (pointer: coarse)').matches;
+    return matchMedia('(max-width: 768px) and (orientation: portrait) and (hover: none) and (pointer: coarse)').matches;
 }
 
 /**
@@ -157,7 +157,7 @@ function canResumeFromOrientationLock() {
  * @returns {boolean}
  */
 function isResponsiveLayout() {
-    return window.matchMedia('(max-width: 1024px)').matches;
+    return matchMedia('(max-width: 1024px)').matches;
 }
 
 /**
@@ -182,7 +182,7 @@ function updateBackIconVisibility() {
  * @returns {boolean}
  */
 function isTouchGameplayDevice() {
-    return navigator.maxTouchPoints > 0 || window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+    return navigator.maxTouchPoints > 0 || matchMedia('(hover: none) and (pointer: coarse)').matches;
 }
 
 /**
@@ -345,7 +345,7 @@ function bindMobilePointerRelease(controls) {
  */
 function bindMobileSystemResetHandlers(controls) {
     controls.addEventListener('contextmenu', (event) => event.preventDefault());
-    window.addEventListener('blur', resetKeyboardState);
+    addEventListener('blur', resetKeyboardState);
     document.addEventListener('visibilitychange', () => {
         if (document.hidden) resetKeyboardState();
     });

@@ -331,16 +331,16 @@ class Character extends MovableObject{
     /** Applies directional movement keys and returns whether movement occurred. */
     applyDirectionalInput() {
         let moved = false;
-        if (window.keyboard && window.keyboard.RIGHT) { this.moveRight(); this.otherDirection = false; moved = true; }
-        if (window.keyboard && window.keyboard.LEFT) { this.moveLeft(); this.otherDirection = true; moved = true; }
-        if (window.keyboard && window.keyboard.UP) { this.moveUp(); moved = true; }
-        if (window.keyboard && window.keyboard.DOWN) { this.moveDown(); moved = true; }
+        if (keyboard && keyboard.RIGHT) { this.moveRight(); this.otherDirection = false; moved = true; }
+        if (keyboard && keyboard.LEFT) { this.moveLeft(); this.otherDirection = true; moved = true; }
+        if (keyboard && keyboard.UP) { this.moveUp(); moved = true; }
+        if (keyboard && keyboard.DOWN) { this.moveDown(); moved = true; }
         return moved;
     }
 
     /** Returns whether any action input is currently active. */
     isActionInputActive() {
-        return !!(window.keyboard && (window.keyboard.D || window.keyboard.F || window.keyboard.SPACE));
+        return !!(keyboard && (keyboard.D || keyboard.F || keyboard.SPACE));
     }
 
     /** Updates the swimming animation state from current movement/activity. */
