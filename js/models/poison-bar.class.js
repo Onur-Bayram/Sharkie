@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Player poison supply display as image bar (6 states from 0% to 100%).
  */
 class PoisonBar extends MovableObject {

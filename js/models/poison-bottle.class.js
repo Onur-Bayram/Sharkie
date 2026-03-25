@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Static poison bottle for collection - randomly selects variant (left/right, dark/light).
  */
 class PoisonBottle extends MovableObject {

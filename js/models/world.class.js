@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Main game world - initializes all game objects, manages state variables,
  * and starts the render and collision loop.
  */
@@ -79,7 +79,9 @@ ctx;
     
     /**
      * Creates the game world on the given canvas and starts the game loop.
+     *
      * @param {HTMLCanvasElement} canvas The target canvas element.
+     * @returns {void}
      */
     constructor(canvas) {
         this.canvas = canvas;
@@ -89,20 +91,32 @@ ctx;
         this.startWorld();
     }
 
-    /** Initializes all world objects: character ref, background, and entities. */
+    /**
+     * Initializes all world objects: character ref, background, and entities.
+     *
+     * @returns {void}
+     */
     initWorldObjects() {
         this.character.world = this;
         this.initBackground();
         this.initEntities();
     }
 
-    /** Assembles the background layer arrays from light and dark objects. */
+    /**
+     * Assembles the background layer arrays from light and dark objects.
+     *
+     * @returns {void}
+     */
     initBackground() {
         this.backgroundObjects = [...this.backgroundObjectsLight, ...this.backgroundObjectsDark];
         this.lightLayers = this.backgroundObjectsLight.filter((bg, index) => index % 5 === 4);
     }
 
-    /** Creates all entities (enemies, items, coins, boss) and initializes bars. */
+    /**
+     * Creates all entities (enemies, items, coins, boss) and initializes bars.
+     *
+     * @returns {void}
+     */
     initEntities() {
         this.enemies = this.createEnemies();
         this.jellyfishes = this.createJellyfishes();
@@ -118,6 +132,8 @@ ctx;
 
     /**
      * Initializes world screens.
+     *
+     * @returns {void}
      */
     initWorldScreens() {
         this.winScreen.hide();
@@ -127,6 +143,8 @@ ctx;
 
     /**
      * Starts world loop and audio.
+     *
+     * @returns {void}
      */
     startWorld() {
         this.handleThrow();
@@ -154,6 +172,14 @@ ctx;
 
     /**
      * Creates random actors.
+     *
+     * @param {number} count Number of actors to create.
+     * @param {number} minX Minimum X coordinate.
+     * @param {number} maxX Maximum X coordinate.
+     * @param {number} minY Minimum Y coordinate.
+     * @param {number} maxY Maximum Y coordinate.
+     * @param {Function} factory Factory function to create actors.
+     * @returns {any[]} Array of created actors.
      */
     createRandomActors(count, minX, maxX, minY, maxY, factory) {
         const safeMaxY = Math.max(minY, maxY);
@@ -213,6 +239,8 @@ ctx;
 
     /**
      * Processes throw input tick.
+     *
+     * @returns {void}
      */
     tickThrowInput() {
         if (this.isPaused) return;

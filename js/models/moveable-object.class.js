@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Base class for all movable game objects.
  * Manages position, image, shared image cache, and basic movement logic.
  */
@@ -123,6 +123,8 @@ isCollidingCoin(obj) {
 
 /**
  * Gets coin hitbox.
+ * @param {MovableObject} obj Coin to check against.
+ * @returns {Object}
  */
 getCoinHitbox(obj) {
     const { leftInset, rightInset, insetY, coinInset } = this.getCoinInsets();
@@ -134,7 +136,10 @@ getCoinHitbox(obj) {
     };
 }
 
-/** Returns directional inset values for coin collision detection. */
+/**
+ * Gets directional inset values for coin collision detection.
+ * @returns {Object}
+ */
 getCoinInsets() {
     const back = 36, front = 52, insetY = 40, coinInset = 5;
     const leftInset = !!this.otherDirection ? front : back;
@@ -143,6 +148,11 @@ getCoinInsets() {
 
 /**
  * Checks minimum overlap.
+ * @param {number} left Left boundary.
+ * @param {number} right Right boundary.
+ * @param {number} top Top boundary.
+ * @param {number} bottom Bottom boundary.
+ * @returns {boolean}
  */
 hasMinimumOverlap(left, right, top, bottom) {
     const minContactPixels = 4;

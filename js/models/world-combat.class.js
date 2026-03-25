@@ -1,4 +1,4 @@
-﻿Object.assign(World.prototype, {
+Object.assign(World.prototype, {
 SMALL_POISON_BOTTLE_VALUE: 20,
 LARGE_POISON_BOTTLE_VALUE: 40,
 
@@ -23,6 +23,7 @@ checkCollisions() {
 
 /**
  * Updates boss combat state: zone lock, intro, bar, attack, and bottle drop.
+ * @returns {void}
  */
 updateBossCombatState() {
     if (!this.finalBoss) return;
@@ -35,7 +36,11 @@ updateBossCombatState() {
     this.spawnBossFightPoisonBottle();
 },
 
-/** Plays the boss intro sound the first time the intro sequence starts. */
+/**
+ * Plays the boss intro sound the first time the intro sequence starts.
+ * @param {boolean} hadStartedIntro Whether the intro had already started.
+ * @returns {void}
+ */
 checkBossIntroSound(hadStartedIntro) {
     if (!hadStartedIntro && this.finalBoss.hasStartedIntro && !this.bossIntroSoundPlayed) {
         this.audioManager.playBossIntroSound();
@@ -43,7 +48,10 @@ checkBossIntroSound(hadStartedIntro) {
     }
 },
 
-/** Spawns a poison bottle drop during the boss fight at a random position near the character. */
+/**
+ * Spawns a poison bottle drop during the boss fight at a random position near the character.
+ * @returns {void}
+ */
 spawnBossFightPoisonBottle() {
     if (!this.canSpawnBossBottle()) return;
     const minX = this.bossZoneStart + 120;
@@ -53,7 +61,10 @@ spawnBossFightPoisonBottle() {
     this.lastBossBottleDropAt = Date.now();
 },
 
-/** Returns true if conditions allow a new boss bottle to be spawned. */
+/**
+ * Returns true if conditions allow a new boss bottle to be spawned.
+ * @returns {boolean}
+ */
 canSpawnBossBottle() {
     if (!this.finalBoss || this.finalBoss.isDead || !this.bossLevelLocked) return false;
     if (Date.now() - this.lastBossBottleDropAt < this.bossBottleDropCooldown) return false;
@@ -61,7 +72,12 @@ canSpawnBossBottle() {
     return active < this.maxBossFightBottles;
 },
 
-/** Creates and configures a boss-fight poison bottle at the given position. */
+/**
+ * Creates and configures a boss-fight poison bottle at the given position.
+ * @param {number} spawnX X-position to spawn at.
+ * @param {number} spawnY Y-position to spawn at.
+ * @returns {AnimatedPoisonBottle}
+ */
 createBossBottle(spawnX, spawnY) {
     const bottle = new AnimatedPoisonBottle(spawnX, spawnY);
     bottle.maxY = 390;
@@ -73,6 +89,7 @@ createBossBottle(spawnX, spawnY) {
 
 /**
  * Checks enemy body collisions.
+ * @returns {void}
  */
 checkEnemyBodyCollisions() {
     this.enemies.forEach((enemy) => {
@@ -85,6 +102,7 @@ checkEnemyBodyCollisions() {
 
 /**
  * Checks jellyfish body collisions.
+ * @returns {void}
  */
 checkJellyfishBodyCollisions() {
     this.jellyfishes.forEach((jellyfish) => {
@@ -98,6 +116,7 @@ checkJellyfishBodyCollisions() {
 
 /**
  * Checks boss body collision.
+ * @returns {void}
  */
 checkBossBodyCollision() {
     if (!this.finalBoss || this.finalBoss.isDead || this.character.isDead) return;
@@ -110,7 +129,12 @@ checkBossBodyCollision() {
     this.statusBar.setPercentage(this.character.energy);
 },
 
-/** Checks the boss bite hitbox so attacks connect near the upper screen edge. */
+/**
+ * Checks the boss bite hitbox so attacks connect near the upper screen edge.
+ * @param {Character} character Character object.
+ * @param {FinalBoss} boss Boss object.
+ * @returns {boolean}
+ */
 isBossBiteHit(character, boss) {
     if (boss.state !== 'attacking') return false;
     const cBox = { left: character.x + 42, right: character.x + character.width - 42, top: character.y + 42, bottom: character.y + character.height - 42 };
@@ -120,7 +144,11 @@ isBossBiteHit(character, boss) {
     return overlapX > 8 && overlapY > 8;
 },
 
-/** Returns the directional mouth hitbox rectangle for the boss. */
+/**
+ * Returns the directional mouth hitbox rectangle for the boss.
+ * @param {FinalBoss} boss Boss object.
+ * @returns {Object}
+ */
 getBossMouthBox(boss) {
     return boss.facingLeft
         ? { left: boss.x + 44, right: boss.x + 126, top: boss.y + 126, bottom: boss.y + 206 }
@@ -129,6 +157,7 @@ getBossMouthBox(boss) {
 
 /**
  * Determines whether character can take contact damage.
+ * @returns {boolean}
  */
 canCharacterTakeContactDamage() {
     const currentTime = Date.now();
@@ -137,6 +166,7 @@ canCharacterTakeContactDamage() {
 
 /**
  * Handles boss end state.
+ * @returns {void}
  */
 handleBossEndState() {
     if (!this.finalBoss || !this.finalBoss.isDead || !this.finalBoss.deadAnimationFinished) return;
@@ -147,6 +177,7 @@ handleBossEndState() {
 
 /**
  * Updates animated bottle visibility.
+ * @returns {void}
  */
 updateAnimatedBottleVisibility() {
     this.animatedPoisonBottles.forEach((bottle) => bottle.checkVisibility(this.character.x));
@@ -165,6 +196,7 @@ checkPoisonCollection() {
 
 /**
  * Collects static poison bottles.
+ * @returns {void}
  */
 collectStaticPoisonBottles() {
     for (let i = this.poisonBottles.length - 1; i >= 0; i--) {
@@ -179,6 +211,7 @@ collectStaticPoisonBottles() {
 
 /**
  * Collects animated poison bottles.
+ * @returns {void}
  */
 collectAnimatedPoisonBottles() {
     for (let i = this.animatedPoisonBottles.length - 1; i >= 0; i--) {
@@ -194,6 +227,7 @@ collectAnimatedPoisonBottles() {
 
 /**
  * Collects coins.
+ * @returns {void}
  */
 collectCoins() {
     for (let i = this.coins.length - 1; i >= 0; i--) {
@@ -242,6 +276,8 @@ checkBubbleCollisions() {
 
 /**
  * Handles poison bubble hit.
+ * @param {BubbleAnimation} bubble Bubble object.
+ * @returns {boolean}
  */
 handlePoisonBubbleHit(bubble) {
     const damage = 100;
@@ -255,6 +291,8 @@ handlePoisonBubbleHit(bubble) {
 
 /**
  * Handles normal bubble hit.
+ * @param {BubbleAnimation} bubble Bubble object.
+ * @returns {boolean}
  */
 handleNormalBubbleHit(bubble) {
     const damage = 50;
@@ -263,6 +301,11 @@ handleNormalBubbleHit(bubble) {
 
 /**
  * Handles enemy list hit with bubble.
+ * @param {MovableObject[]} list Enemy list.
+ * @param {BubbleAnimation} bubble Bubble object.
+ * @param {number} damage Damage amount.
+ * @param {Function} dieCallback Death callback function.
+ * @returns {boolean}
  */
 hitEnemyListWithBubble(list, bubble, damage, dieCallback) {
     for (let j = list.length - 1; j >= 0; j--) {
@@ -278,6 +321,10 @@ hitEnemyListWithBubble(list, bubble, damage, dieCallback) {
 
 /**
  * Cleans up dead target.
+ * @param {MovableObject[]} list Enemy list.
+ * @param {number} index Index in list.
+ * @param {MovableObject} target Target object.
+ * @returns {boolean}
  */
 cleanupIfDeadTarget(list, index, target) {
     if (!target.isDead) return false;
@@ -301,6 +348,8 @@ checkFinSlapCollisions() {
 
 /**
  * Handles fin slap hit.
+ * @param {FinSlap} finSlap Fin slap object.
+ * @returns {boolean}
  */
 handleFinSlapHit(finSlap) {
     if (this.hitEnemyListWithFinSlap(this.enemies, finSlap, (enemy) => enemy.die('finSlap', finSlap.direction))) return true;
@@ -313,6 +362,10 @@ handleFinSlapHit(finSlap) {
 
 /**
  * Handles enemy list hit with fin slap.
+ * @param {MovableObject[]} list Enemy list.
+ * @param {FinSlap} finSlap Fin slap object.
+ * @param {Function} dieCallback Death callback function.
+ * @returns {boolean}
  */
 hitEnemyListWithFinSlap(list, finSlap, dieCallback) {
     for (let j = list.length - 1; j >= 0; j--) {

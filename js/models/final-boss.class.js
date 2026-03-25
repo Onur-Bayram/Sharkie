@@ -1,4 +1,4 @@
-﻿class FinalBoss extends MovableObject {
+class FinalBoss extends MovableObject {
     IMAGES_FLOATING = FINAL_BOSS_IMAGES.FLOATING;
     IMAGES_INTRODUCE = FINAL_BOSS_IMAGES.INTRODUCE;
     IMAGES_ATTACK = FINAL_BOSS_IMAGES.ATTACK;
@@ -32,8 +32,10 @@
     attackMoveSpeed = 8;
     /**
      * Creates the boss and starts animation and movement loops.
+     *
      * @param {number} x Start position X.
      * @param {number} y Start position Y.
+     * @returns {void}
      */
     constructor(x, y) {
         super();
@@ -43,6 +45,7 @@
     }
     /**
      * Loads all image sequences for boss states.
+     * @returns {void} Return value.
      */
     loadBossImages() {
         this.loadImage(this.IMAGES_INTRODUCE[0]);
@@ -52,7 +55,7 @@
         this.loadImages(this.IMAGES_HURT);
         this.loadImages(this.IMAGES_DEAD);
     }
-    /** Initializes base position, size, and floating targets. */
+    /** Initializes base position, size, and floating targets.  @param {any} x Parameter. @param {any} y Parameter. @returns {void} Return value. */
     initBossPosition(x, y) {
         this.x = x;
         this.y = y;
@@ -64,12 +67,12 @@
         this.lastStyleChangeTime = Date.now();
         this.stateStartedAt = Date.now();
     }
-    /** Starts animation and movement update loops. */
+    /** Starts animation and movement update loops.  @returns {void} Return value. */
     animate() {
         setInterval(() => this.updateAnimationFrame(), 150);
         setInterval(() => this.updateMovementFrame(), 1000 / 60);
     }
-    /** Updates current animation frame based on boss state. */
+    /** Updates current animation frame based on boss state.  @returns {void} Return value. */
     updateAnimationFrame() {
         if (world && world.isPaused) return;
         if (!this.canAnimateNow()) return;
@@ -78,48 +81,48 @@
         this.playCurrentFrame(images);
         this.syncStateAfterFrame();
     }
-    /** Returns whether the boss should animate in the current frame. */
+    /** Returns whether the boss should animate in the current frame.  @returns {boolean} Return value. */
     canAnimateNow() {
         if (this.state === 'introduce' && !this.hasStartedIntro) return false;
         // Let transient states finish even if the boss is briefly outside the active range.
         if (this.isDead || this.state === 'hurt' || this.state === 'attacking') return true;
         return this.isActive;
     }
-    /** Keeps the final death frame visible after death animation ends. */
+    /** Keeps the final death frame visible after death animation ends.  @param {any} images Parameter. @returns {boolean} Return value. */
     renderDeadLastFrame(images) {
         if (!this.isDead || !this.deadAnimationFinished) return false;
         this.img = this.imageCache[images[images.length - 1]];
         return true;
     }
-    /** Draws the next frame from the current animation sequence. */
+    /** Draws the next frame from the current animation sequence.  @param {any} images Parameter. @returns {void} Return value. */
     playCurrentFrame(images) {
         const path = images[this.currentImage % images.length];
         this.img = this.imageCache[path];
         this.currentImage++;
     }
-    /** Applies post-frame state transition checks. */
+    /** Applies post-frame state transition checks.  @returns {void} Return value. */
     syncStateAfterFrame() {
         this.finishIntroIfNeeded();
         this.finishAttackIfNeeded();
         this.finishHurtIfNeeded();
         this.finishDeathIfNeeded();
     }
-    /** Ends intro and switches to floating state when intro frames are done. */
+    /** Ends intro and switches to floating state when intro frames are done.  @returns {void} Return value. */
     finishIntroIfNeeded() {
         if (this.state !== 'introduce' || this.currentImage < this.IMAGES_INTRODUCE.length) return;
         this.introduced = true; this.state = 'floating'; this.currentImage = 0; this.stateStartedAt = Date.now();
     }
-    /** Ends attack and returns to floating state when attack frames finish. */
+    /** Ends attack and returns to floating state when attack frames finish.  @returns {void} Return value. */
     finishAttackIfNeeded() {
         if (this.state !== 'attacking' || this.currentImage < this.IMAGES_ATTACK.length) return;
         this.isAttacking = false; this.state = 'floating'; this.currentImage = 0; this.stateStartedAt = Date.now();
     }
-    /** Ends hurt and returns to floating state when hurt frames finish. */
+    /** Ends hurt and returns to floating state when hurt frames finish.  @returns {void} Return value. */
     finishHurtIfNeeded() {
         if (this.state !== 'hurt' || this.currentImage < this.IMAGES_HURT.length) return;
         this.isHurt = false; this.state = 'floating'; this.currentImage = 0; this.stateStartedAt = Date.now();
     }
-    /** Marks death animation as complete and pins last frame index. */
+    /** Marks death animation as complete and pins last frame index.  @returns {void} Return value. */
     finishDeathIfNeeded() {
         if (!this.isDead || this.currentImage < this.IMAGES_DEAD.length) return;
         this.deadAnimationFinished = true; this.currentImage = this.IMAGES_DEAD.length - 1;

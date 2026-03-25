@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Animated (falling) poison bottle - becomes visible when character is nearby,
  * then falls slowly downward and can be collected.
  */

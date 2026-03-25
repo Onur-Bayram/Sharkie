@@ -140,7 +140,11 @@ class Character extends MovableObject{
         '1.Sharkie/4.Attack/Fin slap/8.png'
     ];
     
-    /** Creates the character, loads sprites, and starts animation/input loops. */
+    /**
+     * Creates the character, loads sprites, and starts animation/input loops.
+     *
+     * @returns {void}
+     */
     constructor() {
         super();
         this.loadCharacterImages();
@@ -149,7 +153,11 @@ class Character extends MovableObject{
         this.handleKeyboard();
     }
 
-    /** Loads all sprite sequences used by the character. */
+    /**
+     * Loads all sprite sequences used by the character.
+     *
+     * @returns {void}
+     */
     loadCharacterImages() {
         this.loadImage('1.Sharkie/1.IDLE/1.png');
         this.loadImages(this.IMAGES_IDLE);
@@ -164,19 +172,31 @@ class Character extends MovableObject{
         this.loadImages(this.IMAGES_FIN_SLAP);
     }
 
-    /** Initializes character size and base movement speed. */
+    /**
+     * Initializes character size and base movement speed.
+     *
+     * @returns {void}
+     */
     initCharacterSize() {
         this.width = 200;
         this.height = 140;
         this.speed = 5;
     }
 
-    /** Starts the main character animation loop. */
+    /**
+     * Starts the main character animation loop.
+     *
+     * @returns {void}
+     */
     animate() {
         setInterval(() => this.updateAnimationFrame(), 100);
     }
 
-    /** Updates the active animation frame for the current state. */
+    /**
+     * Updates the active animation frame for the current state.
+     *
+     * @returns {void}
+     */
     updateAnimationFrame() {
         if (this.renderDeathFrame()) {
             return;
@@ -188,7 +208,11 @@ class Character extends MovableObject{
         this.playImageSequence(this.getCurrentActionImages());
     }
 
-    /** Renders the death animation or keeps its last frame visible. */
+    /**
+     * Renders the death animation or keeps its last frame visible.
+     *
+     * @returns {boolean} True if death animation is being shown.
+     */
     renderDeathFrame() {
         if (!this.isDead) return false;
         const images = this.getDeathImages();
@@ -200,7 +224,12 @@ class Character extends MovableObject{
         return true;
     }
 
-    /** Advances the death animation and finalizes its last frame. */
+    /**
+     * Advances the death animation and finalizes its last frame.
+     *
+     * @param {string[]} images The death animation frames.
+     * @returns {void}
+     */
     advanceDeathFrame(images) {
         this.playImageSequence(images);
         if (this.currentImage >= images.length) {
@@ -209,7 +238,11 @@ class Character extends MovableObject{
         }
     }
 
-    /** Renders long-idle and sleep-loop frames. */
+    /**
+     * Renders long-idle and sleep-loop frames.
+     *
+     * @returns {void}
+     */
     renderLongIdleFrame() {
         let path = '';
         if (this.currentImage < this.IMAGES_LONG_IDLE.length) {
@@ -222,7 +255,11 @@ class Character extends MovableObject{
         this.currentImage++;
     }
 
-    /** Returns the sprite sequence for the current action state. */
+    /**
+     * Returns the sprite sequence for the current action state.
+     *
+     * @returns {string[]} Array of image paths for the current action.
+     */
     getCurrentActionImages() {
         if (this.isHurt) return this.lastDamageType === 'electric' ? this.IMAGES_HURT : this.IMAGES_HURT_POISON;
         if (this.isFinSlapping) return this.IMAGES_FIN_SLAP;
@@ -231,14 +268,25 @@ class Character extends MovableObject{
         return this.IMAGES_IDLE;
     }
 
-    /** Draws the next image from the given sequence. */
+    /**
+     * Draws the next image from the given sequence.
+     *
+     * @param {string[]} images The image sequence to playback.
+     * @returns {void}
+     */
     playImageSequence(images) {
         const path = images[this.currentImage % images.length];
         this.img = this.imageCache[path];
         this.currentImage++;
     }
 
-    /** Applies incoming damage and enters hurt or death state. */
+    /**
+     * Applies incoming damage and enters hurt or death state.
+     *
+     * @param {string} damageType The type of damage ('poison' or 'electric').
+     * @param {number} damage The damage amount to apply.
+     * @returns {void}
+     */
     hit(damageType, damage = 10) {
         if (this.shouldIgnoreHit()) {
             return;
@@ -254,7 +302,11 @@ class Character extends MovableObject{
         this.scheduleHurtRecovery();
     }
 
-    /** Returns whether the current hit should be ignored. */
+    /**
+     * Returns whether the current hit should be ignored.
+     *
+     * @returns {boolean} True if hit should be ignored.
+     */
     shouldIgnoreHit() {
         if (this.isDead) {
             return true;
@@ -266,21 +318,34 @@ class Character extends MovableObject{
         return true;
     }
 
-    /** Stores the last damage type for state-specific reactions. */
+    /**
+     * Stores the last damage type for state-specific reactions.
+     *
+     * @param {string} damageType The damage type to store.
+     * @returns {void}
+     */
     applyHitType(damageType) {
         if (damageType) {
             this.lastDamageType = damageType;
         }
     }
 
-    /** Starts the hurt state and resets the hurt animation. */
+    /**
+     * Starts the hurt state and resets the hurt animation.
+     *
+     * @returns {void}
+     */
     startHurtState() {
         this.isHurt = true;
         this.lastHitTime = Date.now();
         this.currentImage = 0;
     }
 
-    /** Plays the matching hurt sound effect. */
+    /**
+     * Plays the matching hurt sound effect.
+     *
+     * @returns {void}
+     */
     playHitSound() {
         if (!this.world || !this.world.audioManager) {
             return;
@@ -292,7 +357,12 @@ class Character extends MovableObject{
         this.world.audioManager.playHurtSound();
     }
 
-    /** Reduces character energy and clamps it at zero. */
+    /**
+     * Reduces character energy and clamps it at zero.
+     *
+     * @param {number} damage The damage amount to reduce energy by.
+     * @returns {void}
+     */
     applyDamage(damage) {
         this.energy -= damage;
         if (this.energy < 0) {
@@ -300,7 +370,11 @@ class Character extends MovableObject{
         }
     }
 
-    /** Ends the hurt state after a short delay if still alive. */
+    /**
+     * Ends the hurt state after a short delay if still alive.
+     *
+     * @returns {void}
+     */
     scheduleHurtRecovery() {
         setTimeout(() => {
             if (this.isDead) {
@@ -311,12 +385,20 @@ class Character extends MovableObject{
         }, 500);
     }
 
-    /** Starts the high-frequency input processing loop. */
+    /**
+     * Starts the high-frequency input processing loop.
+     *
+     * @returns {void}
+     */
     handleKeyboard() {
         setInterval(() => this.updateMovementFromInput(), 1000 / 60);
     }
 
-    /** Updates movement, state, and bounds from current input. */
+    /**
+     * Updates movement, state, and bounds from current input.
+     *
+     * @returns {void}
+     */
     updateMovementFromInput() {
         if (this.isDead) {
             return;
@@ -328,7 +410,11 @@ class Character extends MovableObject{
         this.clampToWorldBounds();
     }
 
-    /** Applies directional movement keys and returns whether movement occurred. */
+    /**
+     * Applies directional movement keys and returns whether movement occurred.
+     *
+     * @returns {boolean} True if any directional movement was applied.
+     */
     applyDirectionalInput() {
         let moved = false;
         if (keyboard && keyboard.RIGHT) { this.moveRight(); this.otherDirection = false; moved = true; }
@@ -338,12 +424,21 @@ class Character extends MovableObject{
         return moved;
     }
 
-    /** Returns whether any action input is currently active. */
+    /**
+     * Returns whether any action input is currently active.
+     *
+     * @returns {boolean} True if any action keys are pressed.
+     */
     isActionInputActive() {
         return !!(keyboard && (keyboard.D || keyboard.F || keyboard.SPACE));
     }
 
-    /** Updates the swimming animation state from current movement/activity. */
+    /**
+     * Updates the swimming animation state from current movement/activity.
+     *
+     * @param {boolean} moved Whether the character moved this frame.
+     * @returns {void}
+     */
     updateSwimmingState(moved) {
         const wasSwimming = this.isSwimming;
         this.isSwimming = moved && !this.isAttacking && !this.isFinSlapping && !this.isHurt;
@@ -352,7 +447,12 @@ class Character extends MovableObject{
         }
     }
 
-    /** Tracks idle duration and switches to long-idle when appropriate. */
+    /**
+     * Tracks idle duration and switches to long-idle when appropriate.
+     *
+     * @param {boolean} moved Whether the character moved this frame.
+     * @returns {void}
+     */
     updateIdleState(moved) {
         if (moved) {
             this.lastActivity = Date.now();
@@ -363,7 +463,11 @@ class Character extends MovableObject{
         this.isLongIdle = idleTime > 5000;
     }
 
-    /** Keeps the character inside the playable world area. */
+    /**
+     * Keeps the character inside the playable world area.
+     *
+     * @returns {void}
+     */
     clampToWorldBounds() {
         const { minX, maxX, maxY } = this.getWorldBounds();
         if (this.x < minX) this.x = minX;
@@ -372,7 +476,11 @@ class Character extends MovableObject{
         if (this.y > maxY) this.y = maxY;
     }
 
-    /** Computes world edge boundaries and locks player from entering boss zone. */
+    /**
+     * Computes world edge boundaries and locks player from entering boss zone.
+     *
+     * @returns {{minX: number, maxX: number, maxY: number}} World boundary coordinates.
+     */
     getWorldBounds() {
         const mapWidth = this.world?.mapWidth ?? 960;
         const gameHeight = this.world?.GAME_HEIGHT ?? 540;

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Fin slap projectile - brief melee animation, runs once through the image sequence.
  */
 class FinSlap extends MovableObject {

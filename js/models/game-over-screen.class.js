@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Game-over screen - displays after player death with fade-in animation.
  */
 class GameOverScreen {
@@ -31,7 +31,10 @@ class GameOverScreen {
         });
     }
 
-    /** Returns the ordered list of game-over animation frame paths. */
+    /**
+     * Returns the ordered list of game-over animation frame paths.
+     * @returns {string[]}
+     */
     getGameOverImagePaths() {
         const base = '6.Botones/Tittles/Game Over';
         return [9, 10, 11, 12, 13].map(n => `${base}/Recurso ${n}.png`);
@@ -54,6 +57,7 @@ class GameOverScreen {
 
     /**
      * Advances game-over fade.
+     * @returns {void}
      */
     advanceGameOverFade() {
         if (this.opacity < 1) {
@@ -63,6 +67,8 @@ class GameOverScreen {
 
     /**
      * Renders game-over background.
+     * @param {CanvasRenderingContext2D} ctx Drawing context.
+     * @returns {void}
      */
     renderGameOverBackground(ctx) {
         ctx.fillStyle = 'black';
@@ -71,6 +77,8 @@ class GameOverScreen {
 
     /**
      * Renders game-over image.
+     * @param {CanvasRenderingContext2D} ctx Drawing context.
+     * @returns {void}
      */
     renderGameOverImage(ctx) {
         const currentImg = this.gameOverImages[this.currentImage];

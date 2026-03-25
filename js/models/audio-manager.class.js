@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Manages all audio resources of the game - background music, sound effects,
  * volume settings, and muting.
  */
@@ -57,6 +57,7 @@ class AudioManager {
 
     /**
      * Loads music tracks.
+     * @returns {void}
      */
     loadMusicTracks() {
         this.bgMusic.src = 'audio/Super Mario 64 Soundtrack - Dire, Dire Docks.mp3';
@@ -66,6 +67,7 @@ class AudioManager {
 
     /**
      * Loads SFX tracks.
+     * @returns {void}
      */
     loadSfxTracks() {
         this.coinSound.src = 'audio/Gold.mp3';
@@ -82,6 +84,7 @@ class AudioManager {
 
     /**
      * Applies SFX volumes.
+     * @returns {void}
      */
     applySfxVolumes() {
         const sfx = [this.coinSound, this.failSound, this.potionSound, this.victorySound,
@@ -92,6 +95,7 @@ class AudioManager {
 
     /**
      * Loads voice tracks.
+     * @returns {void}
      */
     loadVoiceTracks() {
         this.darkZoneVoiceSound.src = 'audio/DU KANNST NICHT VORBEI!!!.mp3';

@@ -183,19 +183,31 @@ function resetCanvasState() {
     resetCanvasRenderingState();
 }
 
-/** Ensures the global canvas reference points to the DOM canvas element. */
+/**
+ * Ensures the global canvas reference points to the DOM canvas element.
+ *
+ * @returns {boolean} Canvas element exists and is valid.
+ */
 function ensureCanvasElement() {
     if (!canvas) canvas = $('canvas');
     return !!canvas;
 }
 
-/** Restores the base internal canvas resolution. */
+/**
+ * Restores the base internal canvas resolution.
+ *
+ * @returns {void}
+ */
 function applyDefaultCanvasSize() {
     canvas.width = ORIGINAL_WIDTH;
     canvas.height = ORIGINAL_HEIGHT;
 }
 
-/** Resets canvas transform and clears previous frame content. */
+/**
+ * Resets canvas transform and clears previous frame content.
+ *
+ * @returns {void}
+ */
 function resetCanvasRenderingState() {
     const ctx = canvas.getContext('2d');
     ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -251,7 +263,12 @@ function applyLanguage(lang) {
     setActiveLanguageButton(lang);
 }
 
-/** Applies translated text to all elements using data-i18n keys. */
+/**
+ * Applies translated text to all elements using data-i18n keys.
+ *
+ * @param {Record<string, string>} strings The language strings object.
+ * @returns {void}
+ */
 function applyTextTranslations(strings) {
     document.querySelectorAll('[data-i18n]').forEach((element) => {
         const key = element.dataset.i18n;
@@ -259,7 +276,12 @@ function applyTextTranslations(strings) {
     });
 }
 
-/** Applies translated title attributes to elements using data-i18n-title keys. */
+/**
+ * Applies translated title attributes to elements using data-i18n-title keys.
+ *
+ * @param {Record<string, string>} strings The language strings object.
+ * @returns {void}
+ */
 function applyTitleTranslations(strings) {
     document.querySelectorAll('[data-i18n-title]').forEach((element) => {
         const key = element.dataset.i18nTitle;
@@ -281,7 +303,13 @@ function updateCanvasResolution(isFullscreen) {
     ctx.imageSmoothingQuality = 'high';
 }
 
-/** Sets internal canvas resolution for normal or fullscreen rendering. */
+/**
+ * Sets internal canvas resolution for normal or fullscreen rendering.
+ *
+ * @param {CanvasRenderingContext2D} ctx The 2D rendering context.
+ * @param {boolean} isFullscreen Indicates whether the game is running in fullscreen.
+ * @returns {void}
+ */
 function setCanvasResolutionForMode(ctx, isFullscreen) {
     if (!isFullscreen) {
         canvas.width = ORIGINAL_WIDTH;
@@ -310,21 +338,36 @@ function showStartScreen() {
     updateOrientationLock();
 }
 
-/** Shows start UI shell and hides gameplay-only controls. */
+/**
+ * Shows start UI shell and hides gameplay-only controls.
+ *
+ * @returns {void}
+ */
 function showStartUiShell() {
     showEl('start-screen');
     hideEl('options-screen');
     hideMobileControls();
 }
 
-/** Synchronizes audio sliders with persisted settings values. */
+/**
+ * Synchronizes audio sliders with persisted settings values.
+ *
+ * @returns {void}
+ */
 function syncAudioSliderValues() {
     if (!gameSettings) return;
     syncSingleSlider('music-slider', 'music-value', gameSettings.musicVolume);
     syncSingleSlider('sfx-slider', 'sfx-value', gameSettings.sfxVolume);
 }
 
-/** Applies a single slider value and updates its percentage label. */
+/**
+ * Applies a single slider value and updates its percentage label.
+ *
+ * @param {string} sliderId The slider element ID.
+ * @param {string} labelId The label element ID.
+ * @param {number} value The value to apply.
+ * @returns {void}
+ */
 function syncSingleSlider(sliderId, labelId, value) {
     if (value === undefined) return;
     $(sliderId).value = value * 100;
@@ -343,7 +386,11 @@ function init() {
     applySavedAudioSettings();
 }
 
-/** Applies persisted music/SFX/mute settings to the active audio manager. */
+/**
+ * Applies persisted music/SFX/mute settings to the active audio manager.
+ *
+ * @returns {void}
+ */
 function applySavedAudioSettings() {
     if (!gameSettings || !world.audioManager) return;
     if (gameSettings.musicVolume !== undefined) {

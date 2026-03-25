@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Jellyfish enemy - randomly created as 'regular' (yellow/purple) or 'dangerous' (green/pink).
  * Dangerous jellyfish cause electric damage.
  */
@@ -29,6 +29,7 @@ class Jellyfish extends MovableObject {
 
     /**
      * Initializes jellyfish type.
+     * @returns {void}
      */
     initJellyfishType() {
         this.type = Math.random() > 0.7 ? 'dangerous' : 'regular';
@@ -45,6 +46,7 @@ class Jellyfish extends MovableObject {
 
     /**
      * Initializes jellyfish images.
+     * @returns {void}
      */
     initJellyfishImages() {
         this.loadSwimImages();
@@ -56,6 +58,9 @@ class Jellyfish extends MovableObject {
 
     /**
      * Initializes jellyfish position.
+     * @param {number|null} x X-start position.
+     * @param {number|null} y Y-start position.
+     * @returns {void}
      */
     initJellyfishPosition(x, y) {
         this.x = x !== null ? x : 200 + Math.random() * 300;
@@ -66,6 +71,7 @@ class Jellyfish extends MovableObject {
 
     /**
      * Initializes jellyfish physics.
+     * @returns {void}
      */
     initJellyfishPhysics() {
         this.speed = 0.15 + Math.random() * 0.2;
@@ -174,6 +180,7 @@ class Jellyfish extends MovableObject {
 
     /**
      * Runs jellyfish animation loop.
+     * @returns {void}
      */
     runJellyfishAnimationLoop() {
         setInterval(() => this.tickJellyfishAnimation(), 150);
@@ -181,6 +188,7 @@ class Jellyfish extends MovableObject {
 
     /**
      * Processes jellyfish animation tick.
+     * @returns {void}
      */
     tickJellyfishAnimation() {
         if (world && world.isPaused) return;
@@ -199,6 +207,7 @@ class Jellyfish extends MovableObject {
 
     /**
      * Runs jellyfish movement loop.
+     * @returns {void}
      */
     runJellyfishMovementLoop() {
         setInterval(() => this.tickJellyfishMovement(), 1000 / 60);
@@ -206,6 +215,7 @@ class Jellyfish extends MovableObject {
 
     /**
      * Processes jellyfish movement tick.
+     * @returns {void}
      */
     tickJellyfishMovement() {
         if (world && world.isPaused) return;
@@ -218,6 +228,7 @@ class Jellyfish extends MovableObject {
 
     /**
      * Runs jellyfish target loop.
+     * @returns {void}
      */
     runJellyfishTargetLoop() {
         setInterval(() => {

@@ -3,7 +3,9 @@
  * Extends FinalBoss prototype with AI, movement, targeting, damage, and visibility logic.
  */
 Object.assign(FinalBoss.prototype, {
-    /** Updates movement and handles attack dash separately. */
+    /** Updates movement and handles attack dash separately.
+     * @returns {void} Return value.
+     */
     updateMovementFrame() {
         if (world && world.isPaused) return;
         this.recoverStuckTransientState();
@@ -15,7 +17,7 @@ Object.assign(FinalBoss.prototype, {
         this.updateFloatingBehavior();
     },
 
-    /** Moves the boss toward the current attack target during dash state. */
+    /** Moves the boss toward the current attack target during dash state.  @returns {void} Return value. */
     updateAttackMovement() {
         const distX = this.attackTargetX - this.x;
         const distY = this.attackTargetY - this.y;
@@ -28,7 +30,7 @@ Object.assign(FinalBoss.prototype, {
         this.clampPositionToBossArea();
     },
 
-    /** Recovers from stale transient states and sanitizes invalid coordinates. */
+    /** Recovers from stale transient states and sanitizes invalid coordinates.  @returns {void} Return value. */
     recoverStuckTransientState() {
         const now = Date.now();
         this.recoverStuckHurt(now);
@@ -38,7 +40,7 @@ Object.assign(FinalBoss.prototype, {
         this.sanitizeBossCoordinates(now);
     },
 
-    /** Resets hurt state if it lasted beyond the allowed duration. */
+    /** Resets hurt state if it lasted beyond the allowed duration.  @param {any} now Parameter. @returns {void} Return value. */
     recoverStuckHurt(now) {
         if (this.state !== 'hurt') return;
         if (now >= this.hurtUntil || now - this.stateStartedAt > 1200) {
@@ -49,7 +51,7 @@ Object.assign(FinalBoss.prototype, {
         }
     },
 
-    /** Resets attacking state if it lasted beyond the allowed duration. */
+    /** Resets attacking state if it lasted beyond the allowed duration.  @param {any} now Parameter. @returns {void} Return value. */
     recoverStuckAttack(now) {
         if (this.state !== 'attacking') return;
         if (now - this.stateStartedAt > 1800) {
@@ -60,7 +62,7 @@ Object.assign(FinalBoss.prototype, {
         }
     },
 
-    /** Resets position and state if coordinates are non-finite. */
+    /** Resets position and state if coordinates are non-finite.  @param {any} now Parameter. @returns {void} Return value. */
     sanitizeBossCoordinates(now) {
         if (Number.isFinite(this.x) && Number.isFinite(this.y)) return;
         this.x = 6000;
@@ -72,7 +74,7 @@ Object.assign(FinalBoss.prototype, {
         this.stateStartedAt = now;
     },
 
-    /** Returns the sprite sequence that matches the current boss state. */
+    /** Returns the sprite sequence that matches the current boss state.  @returns {string[]} Return value. */
     getCurrentImages() {
         if (this.isDead) return this.IMAGES_DEAD;
         if (this.state === 'introduce') return this.IMAGES_INTRODUCE;
@@ -81,7 +83,7 @@ Object.assign(FinalBoss.prototype, {
         return this.IMAGES_FLOATING;
     },
 
-    /** Updates floating AI state and movement while not attacking/hurt. */
+    /** Updates floating AI state and movement while not attacking/hurt.  @returns {void} Return value. */
     updateFloatingBehavior() {
         if (this.isAttacking || this.isHurt) return;
         this.updateSwimStyle();
@@ -89,7 +91,7 @@ Object.assign(FinalBoss.prototype, {
         this.applyMovement();
     },
 
-    /** Switches swim style at a fixed interval for varied boss behavior. */
+    /** Switches swim style at a fixed interval for varied boss behavior.  @returns {void} Return value. */
     updateSwimStyle() {
         const currentTime = Date.now();
         if (currentTime - this.lastStyleChangeTime <= this.styleChangeDuration) return;
@@ -98,7 +100,7 @@ Object.assign(FinalBoss.prototype, {
         this.lastStyleChangeTime = currentTime;
     },
 
-    /** Derives movement speed from the currently active swim style. */
+    /** Derives movement speed from the currently active swim style.  @returns {void} Return value. */
     updateFloatingSpeed() {
         if (this.swimStyle === 'aggressive') this.floatingSpeed = 2.8;
         else if (this.swimStyle === 'defensive') this.floatingSpeed = 1.9;
@@ -106,7 +108,7 @@ Object.assign(FinalBoss.prototype, {
         else this.floatingSpeed = 2.1;
     },
 
-    /** Applies movement relative to character position or idle drift fallback. */
+    /** Applies movement relative to character position or idle drift fallback.  @returns {void} Return value. */
     applyMovement() {
         if (!this.character || !Number.isFinite(this.character.x) || !Number.isFinite(this.character.y)) {
             this.applyIdleDriftMovement();
@@ -118,19 +120,19 @@ Object.assign(FinalBoss.prototype, {
         this.clampPositionToBossArea();
     },
 
-    /** Updates facing direction based on horizontal distance to the target. */
+    /** Updates facing direction based on horizontal distance to the target.  @param {any} distX Parameter. @returns {void} Return value. */
     updateFacingDirectionFromX(distX) {
         if (Math.abs(distX) < 2) return;
         this.facingLeft = distX < 0;
     },
 
-    /** Applies a simple vertical idle drift when no character target is valid. */
+    /** Applies a simple vertical idle drift when no character target is valid.  @returns {void} Return value. */
     applyIdleDriftMovement() {
         const direction = Math.random() > 0.5 ? 1 : -1;
         this.y += this.floatingSpeed * 0.9 * direction;
     },
 
-    /** Builds normalized distance data from boss to character. */
+    /** Builds normalized distance data from boss to character.  @returns {{distX: number, distY: number, distance: number}} Return value. */
     getCharacterVector() {
         const distX = this.character.x - this.x;
         const distY = this.character.y - this.y;
@@ -138,7 +140,7 @@ Object.assign(FinalBoss.prototype, {
         return { distX, distY, distance };
     },
 
-    /** Selects movement logic based on swim style. */
+    /** Selects movement logic based on swim style.  @param {any} vector Parameter. @returns {void} Return value. */
     applyStyleMovement(vector) {
         if (this.swimStyle === 'aggressive') this.applyAggressiveMovement(vector);
         else if (this.swimStyle === 'defensive') this.applyDefensiveMovement(vector);
@@ -147,7 +149,7 @@ Object.assign(FinalBoss.prototype, {
         this.applyVerticalTracking(vector);
     },
 
-    /** Adds vertical tracking so the boss keeps pressure on player altitude. */
+    /** Adds vertical tracking so the boss keeps pressure on player altitude.  @param {any} vector Parameter. @returns {void} Return value. */
     applyVerticalTracking(vector) {
         const verticalDistance = Math.abs(vector.distY);
         if (verticalDistance < 20) return;
@@ -156,7 +158,7 @@ Object.assign(FinalBoss.prototype, {
         this.y += Math.sign(vector.distY) * verticalStep;
     },
 
-    /** Aggressive style: pressure the player with close-range pursuit/wobble. */
+    /** Aggressive style: pressure the player with close-range pursuit/wobble.  @param {any} vector Parameter. @returns {void} Return value. */
     applyAggressiveMovement(vector) {
         const desiredDistance = 220;
         if (vector.distance < desiredDistance) {
@@ -169,7 +171,7 @@ Object.assign(FinalBoss.prototype, {
         this.y += (vector.distY / vector.distance) * this.floatingSpeed + wobble;
     },
 
-    /** Defensive style: retreat at short range and re-approach from distance. */
+    /** Defensive style: retreat at short range and re-approach from distance.  @param {any} vector Parameter. @returns {void} Return value. */
     applyDefensiveMovement(vector) {
         if (vector.distance < 800) {
             this.x -= (vector.distX / vector.distance) * this.floatingSpeed;
@@ -179,7 +181,7 @@ Object.assign(FinalBoss.prototype, {
         this.x += (vector.distX / vector.distance) * this.floatingSpeed * 1.1;
     },
 
-    /** Circle style: orbit around the character using a moving target point. */
+    /** Circle style: orbit around the character using a moving target point.  @param {any} vector Parameter. @returns {void} Return value. */
     applyCircleMovement(vector) {
         const angle = Math.atan2(vector.distY, vector.distX);
         const desiredDistance = 600;
@@ -188,7 +190,11 @@ Object.assign(FinalBoss.prototype, {
         this.moveToFloatingTarget();
     },
 
-    /** Moves the boss toward the current floating target. */
+    /**
+     * Moves the boss toward the current floating target.
+     *
+     * @returns {void}
+     */
     moveToFloatingTarget() {
         const targetDistX = this.floatingTargetX - this.x;
         const targetDistY = this.floatingTargetY - this.y;
@@ -198,7 +204,12 @@ Object.assign(FinalBoss.prototype, {
         this.y += (targetDistY / targetDist) * this.floatingSpeed;
     },
 
-    /** Normal style: approach when far, retreat when too close, idle bob in mid-range. */
+    /**
+     * Normal style: approach when far, retreat when too close, idle bob in mid-range.
+     *
+     * @param {{distX: number, distY: number, distance: number}} vector Movement vector.
+     * @returns {void}
+     */
     applyNormalMovement(vector) {
         if (vector.distance > 460) {
             this.x += (vector.distX / vector.distance) * this.floatingSpeed * 1.1;
@@ -213,7 +224,11 @@ Object.assign(FinalBoss.prototype, {
         this.y += Math.sin(Date.now() * 0.009) * 0.7;
     },
 
-    /** Clamps boss coordinates to the defined boss arena. */
+    /**
+     * Clamps boss coordinates to the defined boss arena.
+     *
+     * @returns {void}
+     */
     clampPositionToBossArea() {
         const mapBounds = 6720;
         const minY = -55;
@@ -223,7 +238,12 @@ Object.assign(FinalBoss.prototype, {
         if (this.y > 540 - this.height) this.y = 540 - this.height;
     },
 
-    /** Checks distance and cooldown to trigger boss attack. */
+    /**
+     * Checks distance and cooldown to trigger boss attack.
+     *
+     * @param {Character} character The character to check proximity to.
+     * @returns {void}
+     */
     checkProximityAttack(character) {
         this.character = character;
         if (this.isDead || !this.isActive || !this.introduced || this.isAttacking || this.isHurt) {
@@ -238,7 +258,11 @@ Object.assign(FinalBoss.prototype, {
         }
     },
 
-    /** Switches to attack state and sets dash target. */
+    /**
+     * Switches to attack state and sets dash target.
+     *
+     * @returns {void}
+     */
     attack() {
         this.isAttacking = true;
         this.state = 'attacking';
@@ -250,7 +274,11 @@ Object.assign(FinalBoss.prototype, {
         this.attackTargetY = this.getAttackTargetY();
     },
 
-    /** Calculates vertical target position of boss mouth for bite. */
+    /**
+     * Calculates vertical target position of boss mouth for bite.
+     *
+     * @returns {number} The calculated Y coordinate.
+     */
     getAttackTargetY() {
         if (!this.character) return this.y;
         const characterCenterY = this.character.y + this.character.height / 2;
@@ -261,7 +289,12 @@ Object.assign(FinalBoss.prototype, {
         return Math.max(minY, Math.min(maxY, rawTargetY));
     },
 
-    /** Processes damage and switches to hurt or dead state. */
+    /**
+     * Processes damage and switches to hurt or dead state.
+     *
+     * @param {number} damage The damage amount to apply.
+     * @returns {void}
+     */
     hit(damage) {
         if (this.isDead) return;
         if (!this.introduced || this.state === 'introduce') return;
@@ -274,7 +307,11 @@ Object.assign(FinalBoss.prototype, {
         }
     },
 
-    /** Applies hurt state timing and resets state animation frame. */
+    /**
+     * Applies hurt state timing and resets state animation frame.
+     *
+     * @returns {void}
+     */
     applyBossHurt() {
         this.isHurt = true;
         this.state = 'hurt';
@@ -283,7 +320,11 @@ Object.assign(FinalBoss.prototype, {
         this.hurtUntil = this.stateStartedAt + 550;
     },
 
-    /** Starts death sequence once and pins dead animation state. */
+    /**
+     * Starts death sequence once and pins dead animation state.
+     *
+     * @returns {void}
+     */
     die() {
         if (this.isDead) return;
         this.isDead = true;
@@ -293,7 +334,13 @@ Object.assign(FinalBoss.prototype, {
         this.stateStartedAt = Date.now();
     },
 
-    /** Updates boss visibility/activity relative to camera and starts intro on first sight. */
+    /**
+     * Updates boss visibility/activity relative to camera and starts intro on first sight.
+     *
+     * @param {number} cameraX The current camera X position.
+     * @param {number} canvasWidth The canvas width for visibility calculation.
+     * @returns {void}
+     */
     checkVisibility(cameraX, canvasWidth = 960) {
         const bossRightEdge = this.x + this.width;
         const cameraRight = cameraX + canvasWidth;

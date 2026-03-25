@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Player health display as image bar (6 states from 0% to 100%).
  */
 class StatusBar extends MovableObject {

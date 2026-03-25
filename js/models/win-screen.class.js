@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Win screen - displayed after boss death with fade-in effect.
  */
 class WinScreen {
@@ -36,6 +36,7 @@ class WinScreen {
 
     /**
      * Advances fade-in.
+     * @returns {void}
      */
     advanceFadeIn() {
         if (this.opacity < 1) {
@@ -45,6 +46,8 @@ class WinScreen {
 
     /**
      * Renders win background.
+     * @param {CanvasRenderingContext2D} ctx Drawing context.
+     * @returns {void}
      */
     renderWinBackground(ctx) {
         ctx.fillStyle = 'black';
@@ -53,6 +56,8 @@ class WinScreen {
 
     /**
      * Renders win image.
+     * @param {CanvasRenderingContext2D} ctx Drawing context.
+     * @returns {void}
      */
     renderWinImage(ctx) {
         if (!this.youWinImg || !this.youWinImg.complete) return;

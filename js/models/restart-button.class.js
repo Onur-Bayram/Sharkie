@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Restart button - shown after game-over or victory, with hover and float animation.
  */
 class RestartButton {
@@ -58,6 +58,7 @@ class RestartButton {
 
     /**
      * Updates float and scale.
+     * @returns {void}
      */
     updateFloatAndScale() {
         this.animationTime += 0.05;
@@ -68,6 +69,8 @@ class RestartButton {
 
     /**
      * Applies button glow.
+     * @param {CanvasRenderingContext2D} ctx Drawing context.
+     * @returns {void}
      */
     applyButtonGlow(ctx) {
         if (!this.isHovered) return;
@@ -77,6 +80,8 @@ class RestartButton {
 
     /**
      * Renders button image.
+     * @param {CanvasRenderingContext2D} ctx Drawing context.
+     * @returns {void}
      */
     renderButtonImage(ctx) {
         const centerX = this.buttonX + this.buttonWidth / 2;

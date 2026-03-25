@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Pufferfish enemy - alternates between swimming, transition, and inflated states.
  * Can be killed by bubbles or fin slap; knockback is triggered by fin slap.
  */
@@ -34,12 +34,16 @@ class Pufferfish extends MovableObject{
 
     /**
      * Randomizes puffer color variant.
+     * @returns {void}
      */
     randomizePufferColor() {
         this.colorVariant = Math.floor(Math.random() * 3) + 1;
     }
 
-    /** Assigns all image path arrays and pre-loads them into the cache. */
+    /**
+     * Loads all image path arrays and pre-loads them into the cache.
+     * @returns {void}
+     */
     loadPufferImages() {
         this.buildPufferImagePaths();
         this.loadImage(this.IMAGES_SWIM[0]);
@@ -47,7 +51,10 @@ class Pufferfish extends MovableObject{
             .forEach(seq => this.loadImages(seq));
     }
 
-    /** Builds sprite path arrays for all puffer animation states. */
+    /**
+     * Builds sprite path arrays for all puffer animation states.
+     * @returns {void}
+     */
     buildPufferImagePaths() {
         const v = this.colorVariant;
         const base = '2.Enemy/1.Puffer fish (3 color options)';
@@ -60,6 +67,9 @@ class Pufferfish extends MovableObject{
 
     /**
      * Initializes puffer position.
+     * @param {number|null} x X-start position.
+     * @param {number|null} y Y-start position.
+     * @returns {void}
      */
     initPufferPosition(x, y) {
         this.x = x !== null ? x : 200 + Math.random() * 300;
@@ -70,6 +80,7 @@ class Pufferfish extends MovableObject{
 
     /**
      * Initializes puffer physics.
+     * @returns {void}
      */
     initPufferPhysics() {
         this.speed = 0.15 + Math.random() * 0.2;
@@ -90,6 +101,7 @@ class Pufferfish extends MovableObject{
 
     /**
      * Runs puffer animation loop.
+     * @returns {void}
      */
     runPufferAnimationLoop() {
         setInterval(() => this.tickPufferAnimation(), 150);
@@ -97,6 +109,7 @@ class Pufferfish extends MovableObject{
 
     /**
      * Processes puffer animation tick.
+     * @returns {void}
      */
     tickPufferAnimation() {
         if (world && world.isPaused) return;
@@ -109,6 +122,8 @@ class Pufferfish extends MovableObject{
 
     /**
      * Shows final dead puffer frame.
+     * @param {string[]} images Image array.
+     * @returns {boolean}
      */
     showDeadLastPufferFrame(images) {
         if (!this.isDead || !this.deadAnimationFinished) return false;
@@ -118,6 +133,8 @@ class Pufferfish extends MovableObject{
 
     /**
      * Checks dead and transition states.
+     * @param {string[]} images Image array.
+     * @returns {void}
      */
     checkPufferDeadOrTransition(images) {
         if (this.isDead && this.currentImage >= images.length) {
@@ -132,6 +149,7 @@ class Pufferfish extends MovableObject{
 
     /**
      * Runs puffer movement loop.
+     * @returns {void}
      */
     runPufferMovementLoop() {
         setInterval(() => this.tickPufferMovement(), 1000 / 60);
@@ -139,6 +157,7 @@ class Pufferfish extends MovableObject{
 
     /**
      * Processes puffer movement tick.
+     * @returns {void}
      */
     tickPufferMovement() {
         if (world && world.isPaused) return;
@@ -154,6 +173,7 @@ class Pufferfish extends MovableObject{
 
     /**
      * Runs puffer target loop.
+     * @returns {void}
      */
     runPufferTargetLoop() {
         setInterval(() => {
@@ -173,6 +193,7 @@ class Pufferfish extends MovableObject{
 
     /**
      * Processes bubble cycle tick.
+     * @returns {void}
      */
     tickBubbleCycle() {
         if (world && world.isPaused) return;
@@ -235,7 +256,10 @@ class Pufferfish extends MovableObject{
         return this.IMAGES_SWIM;
     }
 
-    /** Returns the correct dead image sequence based on death cause. */
+    /**
+     * Returns the correct dead image sequence based on death cause.
+     * @returns {string[]}
+     */
     getDeadImageSequence() {
         return (this.deadCause === 'finSlap' && this.IMAGES_DEAD_FINSLAP.length > 0)
             ? this.IMAGES_DEAD_FINSLAP : this.IMAGES_DEAD;
@@ -259,6 +283,7 @@ class Pufferfish extends MovableObject{
 
     /**
      * Gets dead images by variant.
+     * @returns {string[]}
      */
     getPufferDeadImagesByVariant() {
         const base = '2.Enemy/1.Puffer fish (3 color options)/4.DIE';

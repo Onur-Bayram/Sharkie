@@ -1,4 +1,4 @@
-﻿Object.assign(World.prototype, {
+Object.assign(World.prototype, {
 /**
  * Renders the entire game frame, updates camera position, draws all objects
  * and schedules the next frame via requestAnimationFrame.
@@ -15,6 +15,7 @@ draw() {
 
 /**
  * Updates frame state.
+ * @returns {void}
  */
 updateFrameState() {
     this.checkCollisions();
@@ -24,6 +25,7 @@ updateFrameState() {
 
 /**
  * Updates camera X.
+ * @returns {void}
  */
 updateCameraX() {
     this.cameraX = this.character.x - this.GAME_WIDTH / 2 + this.character.width / 2;
@@ -33,6 +35,7 @@ updateCameraX() {
 
 /**
  * Handles dark zone audio.
+ * @returns {void}
  */
 handleDarkZoneAudio() {
     if (this.darkZoneVoicePlayed || this.character.x < this.bossZoneStart) return;
@@ -43,6 +46,8 @@ handleDarkZoneAudio() {
 
 /**
  * Renders world layer.
+ * @param {number} now Current timestamp.
+ * @returns {void}
  */
 renderWorldLayer(now) {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -56,6 +61,8 @@ renderWorldLayer(now) {
 
 /**
  * Draws background.
+ * @param {number} now Current timestamp.
+ * @returns {void}
  */
 drawBackground(now) {
     this.backgroundObjects.forEach((background) => {
@@ -68,6 +75,7 @@ drawBackground(now) {
 
 /**
  * Draws character.
+ * @returns {void}
  */
 drawCharacter() {
     if (!this.canDrawSprite(this.character)) return;
@@ -84,6 +92,7 @@ drawCharacter() {
 
 /**
  * Draws world actors.
+ * @returns {void}
  */
 drawWorldActors() {
     this.drawSpriteList(this.enemies);
@@ -98,6 +107,7 @@ drawWorldActors() {
 
 /**
  * Draws final boss and flips sprite based on movement direction.
+ * @returns {void}
  */
 drawFinalBoss() {
     const shouldFlip = this.finalBoss.facingLeft === false;
@@ -114,6 +124,8 @@ drawFinalBoss() {
 
 /**
  * Draws sprite list.
+ * @param {Object[]} list List to draw.
+ * @returns {void}
  */
 drawSpriteList(list) {
     list.forEach((item) => {
@@ -124,6 +136,8 @@ drawSpriteList(list) {
 
 /**
  * Determines whether sprite can be drawn.
+ * @param {Object} item Item to check.
+ * @returns {boolean}
  */
 canDrawSprite(item) {
     return !!(item && item.img && item.img.complete && item.img.naturalHeight !== 0);
@@ -131,6 +145,7 @@ canDrawSprite(item) {
 
 /**
  * Renders effects and UI.
+ * @returns {void}
  */
 renderEffectsAndUi() {
     this.drawBubbleEffects();
@@ -142,6 +157,7 @@ renderEffectsAndUi() {
 
 /**
  * Draws bubble effects.
+ * @returns {void}
  */
 drawBubbleEffects() {
     this.bubbleAnimations.forEach((bubble) => bubble.draw(this.ctx, this.cameraX));
@@ -149,6 +165,7 @@ drawBubbleEffects() {
 
 /**
  * Draws fin slap effects.
+ * @returns {void}
  */
 drawFinSlapEffects() {
     this.finSlaps.forEach((finSlap) => {
@@ -159,6 +176,7 @@ drawFinSlapEffects() {
 
 /**
  * Draws HUD bars.
+ * @returns {void}
  */
 drawHudBars() {
     this.drawHudBar(this.statusBar);
@@ -168,6 +186,8 @@ drawHudBars() {
 
 /**
  * Draws HUD bar.
+ * @param {StatusBar} bar Bar to draw.
+ * @returns {void}
  */
 drawHudBar(bar) {
     if (!this.canDrawSprite(bar)) return;
@@ -176,6 +196,7 @@ drawHudBar(bar) {
 
 /**
  * Draws boss bar.
+ * @returns {void}
  */
 drawBossBar() {
     if (this.finalBoss && this.finalBoss.isActive) this.bossBar.draw(this.ctx);
@@ -183,6 +204,7 @@ drawBossBar() {
 
 /**
  * Draws end screens.
+ * @returns {void}
  */
 drawEndScreens() {
     if (this.character.isDead) {
@@ -198,6 +220,7 @@ drawEndScreens() {
 
 /**
  * Schedules next frame.
+ * @returns {void}
  */
 scheduleNextFrame() {
     this.animationFrameId = requestAnimationFrame(() => this.draw());

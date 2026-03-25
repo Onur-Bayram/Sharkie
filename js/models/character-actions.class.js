@@ -1,4 +1,4 @@
-﻿Object.assign(Character.prototype, {
+Object.assign(Character.prototype, {
     /**
      * Checks if a normal bubble can be thrown (cooldown and no current attack).
      * @returns {boolean}
@@ -34,6 +34,9 @@
 
     /**
      * Schedules normal bubble.
+     * @param {any} offsetX Parameter.
+     * @param {any} direction Parameter.
+     * @returns {void} Return value.
      */
     scheduleNormalBubble(offsetX, direction) {
         setTimeout(() => {
@@ -44,6 +47,9 @@
 
     /**
      * Registers bubble in world.
+     * @param {any} bubble Parameter.
+     * @param {any} isPoison Parameter.
+     * @returns {void} Return value.
      */
     registerBubbleInWorld(bubble, isPoison) {
         if (!this.world) return;
@@ -55,6 +61,8 @@
 
     /**
      * Schedules attack reset.
+     * @param {any} delay Parameter.
+     * @returns {void} Return value.
      */
     scheduleAttackReset(delay) {
         setTimeout(() => {
@@ -65,6 +73,7 @@
 
     /**
      * Starts attack state.
+     * @returns {void} Return value.
      */
     startAttackState() {
         this.isAttacking = true;
@@ -89,6 +98,7 @@
 
     /**
      * Deducts poison.
+     * @returns {void} Return value.
      */
     deductPoison() {
         this.poison = Math.max(0, this.poison - this.poisonPerShot);
@@ -96,6 +106,9 @@
 
     /**
      * Schedules poison bubble.
+     * @param {any} offsetX Parameter.
+     * @param {any} direction Parameter.
+     * @returns {void} Return value.
      */
     schedulePoisonBubble(offsetX, direction) {
         setTimeout(() => {
@@ -131,6 +144,9 @@
 
     /**
      * Schedules fin slap.
+     * @param {any} offsetX Parameter.
+     * @param {any} direction Parameter.
+     * @returns {void} Return value.
      */
     scheduleFinSlap(offsetX, direction) {
         setTimeout(() => {
@@ -144,6 +160,8 @@
 
     /**
      * Schedules fin slap reset.
+     * @param {any} delay Parameter.
+     * @returns {void} Return value.
      */
     scheduleFinSlapReset(delay) {
         setTimeout(() => {
@@ -179,6 +197,7 @@
 
     /**
      * Triggers death screens.
+     * @returns {void} Return value.
      */
     triggerDeathScreens() {
         if (this.world && this.world.gameOverScreen) {

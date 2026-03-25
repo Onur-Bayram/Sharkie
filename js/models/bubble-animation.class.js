@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Bubble as projectile - flies in one direction and pulses visually.
  * Can be normal (blue) or poisonous (purple).
  */
@@ -21,6 +21,11 @@ class BubbleAnimation extends MovableObject {
 
     /**
      * Initializes bubble params.
+     * @param {any} x Parameter.
+     * @param {any} y Parameter.
+     * @param {any} direction Parameter.
+     * @param {any} isPoison Parameter.
+     * @returns {void}
      */
     initBubbleParams(x, y, direction, isPoison) {
         this.x = x;
@@ -36,6 +41,8 @@ class BubbleAnimation extends MovableObject {
 
     /**
      * Loads bubble image.
+     * @param {any} isPoison Parameter.
+     * @returns {void}
      */
     loadBubbleImage(isPoison) {
         const path = isPoison

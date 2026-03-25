@@ -53,7 +53,13 @@ function updateBackButtons() {
     updateBackIconVisibility();
 }
 
-/** Updates back-button labels and visibility when the game is paused. */
+/**
+ * Updates back-button labels and visibility when the game is paused.
+ *
+ * @param {HTMLElement} backToStartButton The button element.
+ * @param {HTMLElement} returnToTitleButton The button element.
+ * @returns {void}
+ */
 function updatePausedBackButtons(backToStartButton, returnToTitleButton) {
     const strings = getLanguageStrings(gameSettings.language || 'de');
     hideEl('back-to-start-button');
@@ -67,7 +73,12 @@ function updatePausedBackButtons(backToStartButton, returnToTitleButton) {
     else showEl('back-to-game-button');
 }
 
-/** Updates back-button state for non-paused screens. */
+/**
+ * Updates back-button state for non-paused screens.
+ *
+ * @param {HTMLElement} backToStartButton The button element.
+ * @returns {void}
+ */
 function updateUnpausedBackButtons(backToStartButton) {
     showEl('back-to-start-button');
     hideEl('return-to-title-button');
@@ -89,7 +100,11 @@ function showOptionsSubmenu(submenu) {
     updateBackIconVisibility();
 }
 
-/** Hides all options submenus before showing a target submenu. */
+/**
+ * Hides all options submenus before showing a target submenu.
+ *
+ * @returns {void}
+ */
 function hideAllOptionsSubmenus() {
     hideEl('options-menu');
     hideEl('options-language');
@@ -98,7 +113,12 @@ function hideAllOptionsSubmenus() {
     hideEl('options-impressum');
 }
 
-/** Shows exactly one options submenu by key. */
+/**
+ * Shows exactly one options submenu by key.
+ *
+ * @param {string} submenu The submenu key to display.
+ * @returns {void}
+ */
 function showRequestedOptionsSubmenu(submenu) {
     if (submenu === 'menu') showEl('options-menu');
     else if (submenu === 'language') showEl('options-language');
@@ -214,7 +234,11 @@ function bindUI() {
     bindMobileControls();
 }
 
-/** Binds global viewport/fullscreen listeners affecting UI state. */
+/**
+ * Binds global viewport/fullscreen listeners affecting UI state.
+ *
+ * @returns {void}
+ */
 function bindGlobalViewportListeners() {
     addEventListener('resize', updateOrientationLock);
     addEventListener('orientationchange', updateOrientationLock);
@@ -228,7 +252,11 @@ function bindGlobalViewportListeners() {
     document.addEventListener('touchstart', ensureMobileFullscreenFromGesture, { passive: true });
 }
 
-/** Binds key and click handlers for the HTML fullscreen button. */
+/**
+ * Binds key and click handlers for the HTML fullscreen button.
+ *
+ * @returns {void}
+ */
 function bindHtmlFullscreenButtonHandlers() {
     const htmlFsBtn = $('html-fullscreen-button');
     if (!htmlFsBtn) return;
@@ -236,7 +264,12 @@ function bindHtmlFullscreenButtonHandlers() {
     htmlFsBtn.addEventListener('click', handleFullscreenButtonClick);
 }
 
-/** Handles keyboard activation (Space/Enter) for fullscreen button. */
+/**
+ * Handles keyboard activation (Space/Enter) for fullscreen button.
+ *
+ * @param {KeyboardEvent} e The keyboard event.
+ * @returns {void}
+ */
 function handleFullscreenButtonKeydown(e) {
     const isSpace = e.code === 'Space' || e.key === ' ';
     const isEnter = e.key === 'Enter';
@@ -246,7 +279,12 @@ function handleFullscreenButtonKeydown(e) {
     $('html-fullscreen-button')?.blur();
 }
 
-/** Toggles fullscreen mode from the HTML fullscreen button click. */
+/**
+ * Toggles fullscreen mode from the HTML fullscreen button click.
+ *
+ * @param {Event} e The click event.
+ * @returns {void}
+ */
 function handleFullscreenButtonClick(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -264,7 +302,11 @@ function handleFullscreenButtonClick(e) {
     }
 }
 
-/** Binds click delegation for all elements with data-action attributes. */
+/**
+ * Binds click delegation for all elements with data-action attributes.
+ *
+ * @returns {void}
+ */
 function bindActionClickRouter() {
     document.addEventListener('click', (event) => {
         const button = event.target.closest('[data-action]');
@@ -273,7 +315,13 @@ function bindActionClickRouter() {
     });
 }
 
-/** Routes a UI action string to the matching handler. */
+/**
+ * Routes a UI action string to the matching handler.
+ *
+ * @param {string} action The action key to route.
+ * @param {HTMLElement} button The element triggering the action.
+ * @returns {void}
+ */
 function routeAction(action, button) {
     if (action === 'start-game') startGameFromHTML();
     else if (action === 'open-options') showOptionsScreen();
@@ -286,7 +334,11 @@ function routeAction(action, button) {
     else if (action === 'toggle-mute') toggleMute();
 }
 
-/** Handles back navigation logic inside the options screen. */
+/**
+ * Handles back navigation logic inside the options screen.
+ *
+ * @returns {void}
+ */
 function handleBackOptionsAction() {
     const isInMainOptionsMenu = !$('options-menu').classList.contains('is-hidden');
     if (!isInMainOptionsMenu) backToOptionsMenu();
@@ -294,7 +346,11 @@ function handleBackOptionsAction() {
     else hideOptionsScreen();
 }
 
-/** Binds input listeners for music and SFX range sliders. */
+/**
+ * Binds input listeners for music and SFX range sliders.
+ *
+ * @returns {void}
+ */
 function bindAudioSliderHandlers() {
     const musicSlider = $('music-slider');
     if (musicSlider) musicSlider.addEventListener('input', (event) => updateMusicVolume(event.target.value));
@@ -316,13 +372,23 @@ function changeLanguage(lang, button) {
     updateMuteButtonLabel();
 }
 
-/** Resolves a valid language code with German fallback. */
+/**
+ * Resolves a valid language code with German fallback.
+ *
+ * @param {string} lang The language code to validate.
+ * @returns {string} Valid language code ('de' or 'en').
+ */
 function resolveLanguageCode(lang) {
     if (TRANSLATIONS[lang]) return lang;
     return 'de';
 }
 
-/** Persists the selected language in settings and local storage. */
+/**
+ * Persists the selected language in settings and local storage.
+ *
+ * @param {string} lang The language code to persist.
+ * @returns {void}
+ */
 function persistLanguageSetting(lang) {
     gameSettings = gameSettings || {};
     gameSettings.language = lang;
