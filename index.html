@@ -50,7 +50,7 @@
         <div class="loading-card">
             <h2>Loading Game...</h2>
             <div class="loading-bar-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-                <div id="loading-bar-fill" class="loading-bar-fill"></div>
+                <progress id="loading-bar-fill" class="loading-bar-fill" max="100" value="0">0%</progress>
             </div>
             <p id="loading-bar-text" class="loading-bar-text">0%</p>
         </div>
@@ -75,7 +75,7 @@
         </button>
 
         <!-- HTML Fullscreen Button (Touch Devices) -->
-        <button id="html-fullscreen-button" class="html-fullscreen-button" aria-label="Fullscreen">⛶</button>
+        <button id="html-fullscreen-button" class="html-fullscreen-button is-hidden" aria-label="Fullscreen">⛶</button>
 
         <!-- Mobile Controls Overlay -->
         <div id="mobile-controls" class="mobile-controls is-hidden">

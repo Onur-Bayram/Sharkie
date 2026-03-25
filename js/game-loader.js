@@ -110,7 +110,7 @@ function renderLoadingProgress(progress) {
     const fill = $('loading-bar-fill');
     const text = $('loading-bar-text');
     const track = document.querySelector('.loading-bar-track');
-    if (fill) fill.style.width = percent + '%';
+    if (fill) fill.value = percent;
     if (text) text.textContent = percent + '%';
     if (track) track.setAttribute('aria-valuenow', String(percent));
 }

@@ -230,10 +230,10 @@ function toggleMobileControls(baseGameplayVisible) {
 function toggleHtmlFullscreenButton(button, baseGameplayVisible) {
     if (!button) return;
     if (isTouchGameplayDevice()) {
-        button.style.display = 'none';
+        button.classList.add('is-hidden');
         return;
     }
-    button.style.display = baseGameplayVisible ? 'flex' : 'none';
+    button.classList.toggle('is-hidden', !baseGameplayVisible);
 }
 
 /**

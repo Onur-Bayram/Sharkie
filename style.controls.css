@@ -40,7 +40,7 @@
     margin-left: 15px;
 }
 
-/* Impressumsbereich */
+/* Impressum */
 .impressum-content {
     background: rgba(0, 0, 0, 0.3);
     border-radius: 10px;
@@ -65,9 +65,9 @@
     color: #00d4ff;
 }
 
-/* HTML-Vollbild-Button (nur auf Touch-Geräten sichtbar) */
+/* HTML-Fullscreen-Button */
 .html-fullscreen-button {
-    display: none;
+    display: flex;
     position: absolute;
     bottom: 12px;
     right: 12px;
@@ -88,7 +88,7 @@
     padding: 0;
 }
 
-/* Menübutton im Spiel */
+/* Game Menu Button */
 .game-menu-button {
     position: absolute;
     top: 12px;
@@ -168,7 +168,7 @@
 }
 
 
-/* Mobile Touch-Steuerung */
+/* Mobile Touch Controls */
 
 .mobile-controls {
     position: absolute;
@@ -176,7 +176,7 @@
     left: 0;
     right: 0;
     width: 100%;
-    display: none;
+    display: flex;
     justify-content: space-between;
     align-items: flex-end;
     padding: 6px clamp(10px, 4vw, 26px) calc(6px + env(safe-area-inset-bottom));

@@ -26,13 +26,11 @@ const hideMobileControls = () => {
     const controls = $('mobile-controls');
     if (!controls) return;
     controls.classList.add('is-hidden');
-    controls.style.display = 'none';
 };
 const showMobileControls = () => {
     const controls = $('mobile-controls');
     if (!controls) return;
     controls.classList.remove('is-hidden');
-    controls.style.display = 'flex';
 };
 let uiBound = false;
 let isGamePaused = false;
