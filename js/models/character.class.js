@@ -351,10 +351,10 @@ class Character extends MovableObject{
             return;
         }
         if (this.lastDamageType === 'electric') {
-            this.world.audioManager.playElectricSound();
+            this.world.audioManager.playSfx('electric');
             return;
         }
-        this.world.audioManager.playHurtSound();
+        this.world.audioManager.playSfx('hurt');
     }
 
     /**

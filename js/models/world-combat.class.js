@@ -43,7 +43,7 @@ updateBossCombatState() {
  */
 checkBossIntroSound(hadStartedIntro) {
     if (!hadStartedIntro && this.finalBoss.hasStartedIntro && !this.bossIntroSoundPlayed) {
-        this.audioManager.playBossIntroSound();
+        this.audioManager.playSfx('bossIntro');
         this.bossIntroSoundPlayed = true;
     }
 },
@@ -204,7 +204,7 @@ collectStaticPoisonBottles() {
         if (!this.character.isCollidingCollect(bottle)) continue;
         this.character.poison = Math.min(this.character.poison + this.SMALL_POISON_BOTTLE_VALUE, this.character.maxPoison);
         this.poisonBar.setPercentage(this.character.poison);
-        this.audioManager.playPotionSound();
+        this.audioManager.playSfx('potion');
         this.poisonBottles.splice(i, 1);
     }
 },
@@ -220,7 +220,7 @@ collectAnimatedPoisonBottles() {
         bottle.collected = true;
         this.character.poison = Math.min(this.character.poison + this.LARGE_POISON_BOTTLE_VALUE, this.character.maxPoison);
         this.poisonBar.setPercentage(this.character.poison);
-        this.audioManager.playPotionSound();
+        this.audioManager.playSfx('potion');
         this.animatedPoisonBottles.splice(i, 1);
     }
 },
@@ -236,7 +236,7 @@ collectCoins() {
         coin.collected = true;
         this.collectedCoins++;
         this.coinBar.setPercentage(this.collectedCoins, this.totalCoins);
-        this.audioManager.playCoinSound();
+        this.audioManager.playSfx('coin');
         this.coins.splice(i, 1);
     }
 },

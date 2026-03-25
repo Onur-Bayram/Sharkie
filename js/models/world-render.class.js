@@ -40,7 +40,7 @@ updateCameraX() {
 handleDarkZoneAudio() {
     if (this.darkZoneVoicePlayed || this.character.x < this.bossZoneStart) return;
     this.audioManager.setBackgroundMusicEnabled(false);
-    this.audioManager.playDarkZoneVoiceSound();
+    this.audioManager.playSfx('darkZoneVoice');
     this.darkZoneVoicePlayed = true;
 },
 

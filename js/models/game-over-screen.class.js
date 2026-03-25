@@ -102,7 +102,7 @@ class GameOverScreen {
             this.opacity = 0;
             this.soundPlayed = true;
             if (audioManager) {
-                audioManager.playFailSound();
+                audioManager.playSfx('fail');
             }
         }
         this.isVisible = true;

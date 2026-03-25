@@ -54,8 +54,8 @@ Object.assign(Character.prototype, {
         if (!this.world) return;
         this.world.bubbleAnimations.push(bubble);
         if (!this.world.audioManager) return;
-        if (isPoison) this.world.audioManager.playPoisonShootSound();
-        else this.world.audioManager.playBubbleShootSound();
+        if (isPoison) this.world.audioManager.playSfx('poisonShoot');
+        else this.world.audioManager.playSfx('bubbleShoot');
     },
 
     /**
@@ -150,7 +150,7 @@ Object.assign(Character.prototype, {
             const finSlap = new FinSlap(this.x + offsetX, this.y + 50, direction);
             if (this.world) {
                 this.world.finSlaps.push(finSlap);
-                if (this.world.audioManager) this.world.audioManager.playFinSlapSound();
+                if (this.world.audioManager) this.world.audioManager.playSfx('finSlap');
             }
         }, 300);
     },
@@ -204,7 +204,7 @@ Object.assign(Character.prototype, {
             this.world.restartButton.show();
         }
         if (this.world && this.world.audioManager) {
-            this.world.audioManager.playFailSound();
+            this.world.audioManager.playSfx('fail');
         }
     }
 });

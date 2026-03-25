@@ -80,7 +80,7 @@ class WinScreen {
             this.opacity = 0;
             this.soundPlayed = true;
             if (audioManager) {
-                audioManager.playVictorySound();
+                audioManager.playSfx('victory');
             }
         }
         this.isVisible = true;

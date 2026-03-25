@@ -87,10 +87,51 @@ class AudioManager {
      * @returns {void}
      */
     applySfxVolumes() {
-        const sfx = [this.coinSound, this.failSound, this.potionSound, this.victorySound,
-            this.finSlapSound, this.electricSound, this.hurtSound,
-            this.bubbleShootSound, this.poisonShootSound];
-        sfx.forEach(s => { s.volume = this.sfxVolume; });
+        this.getSfxSounds().forEach((sound) => {
+            sound.volume = this.sfxVolume;
+        });
+    }
+
+    /**
+     * Returns all sound effect audio elements.
+     * @returns {HTMLAudioElement[]}
+     */
+    getSfxSounds() {
+        return [
+            this.coinSound,
+            this.failSound,
+            this.potionSound,
+            this.victorySound,
+            this.finSlapSound,
+            this.electricSound,
+            this.hurtSound,
+            this.bubbleShootSound,
+            this.poisonShootSound,
+            this.darkZoneVoiceSound,
+            this.bossIntroSound
+        ];
+    }
+
+    /**
+     * Returns a sound element by logical key.
+     * @param {string} name Logical SFX name.
+     * @returns {HTMLAudioElement|null}
+     */
+    getSfxSoundByName(name) {
+        const soundMap = {
+            coin: this.coinSound,
+            fail: this.failSound,
+            potion: this.potionSound,
+            victory: this.victorySound,
+            finSlap: this.finSlapSound,
+            electric: this.electricSound,
+            hurt: this.hurtSound,
+            bubbleShoot: this.bubbleShootSound,
+            poisonShoot: this.poisonShootSound,
+            darkZoneVoice: this.darkZoneVoiceSound,
+            bossIntro: this.bossIntroSound
+        };
+        return soundMap[name] || null;
     }
 
     /**
@@ -186,137 +227,32 @@ class AudioManager {
      */
     setSFXVolume(volume) {
         this.sfxVolume = Math.max(0, Math.min(1, volume));
-        this.coinSound.volume = this.sfxVolume;
-        this.failSound.volume = this.sfxVolume;
-        this.potionSound.volume = this.sfxVolume;
-        this.victorySound.volume = this.sfxVolume;
-        this.finSlapSound.volume = this.sfxVolume;
-        this.electricSound.volume = this.sfxVolume;
-        this.hurtSound.volume = this.sfxVolume;
-        this.bossIntroSound.volume = this.sfxVolume;
-        this.bubbleShootSound.volume = this.sfxVolume;
-        this.poisonShootSound.volume = this.sfxVolume;
-        this.darkZoneVoiceSound.volume = this.sfxVolume;
+        this.getSfxSounds().forEach((sound) => {
+            sound.volume = this.sfxVolume;
+        });
     }
 
     /**
-     * Plays the coin sound (cloned so overlapping is possible).
+     * Plays a cloned SFX instance so overlapping playback is possible.
+     * @param {HTMLAudioElement} sound Source sound element.
      * @returns {void}
      */
-    playCoinSound() {
+    playClonedSfx(sound) {
         if (this.isMuted) return;
-        const coin = this.coinSound.cloneNode();
-        coin.volume = this.sfxVolume;
-        this.playAudio(coin);
+        const clone = sound.cloneNode();
+        clone.volume = this.sfxVolume;
+        this.playAudio(clone);
     }
 
     /**
-     * Plays the fail sound when the player dies.
+     * Plays a SFX by logical key.
+     *
+     * @param {'coin'|'fail'|'potion'|'victory'|'finSlap'|'electric'|'hurt'|'bubbleShoot'|'poisonShoot'|'darkZoneVoice'|'bossIntro'} name Sound key.
      * @returns {void}
      */
-    playFailSound() {
-        if (this.isMuted) return;
-        const fail = this.failSound.cloneNode();
-        fail.volume = this.sfxVolume;
-        this.playAudio(fail);
-    }
-
-    /**
-     * Plays the potion sound when collecting a poison bottle.
-     * @returns {void}
-     */
-    playPotionSound() {
-        if (this.isMuted) return;
-        const potion = this.potionSound.cloneNode();
-        potion.volume = this.sfxVolume;
-        this.playAudio(potion);
-    }
-
-    /**
-     * Plays the victory sound when defeating the boss.
-     * @returns {void}
-     */
-    playVictorySound() {
-        if (this.isMuted) return;
-        const victory = this.victorySound.cloneNode();
-        victory.volume = this.sfxVolume;
-        this.playAudio(victory);
-    }
-
-    /**
-     * Plays the fin slap sound.
-     * @returns {void}
-     */
-    playFinSlapSound() {
-        if (this.isMuted) return;
-        const fin = this.finSlapSound.cloneNode();
-        fin.volume = this.sfxVolume;
-        this.playAudio(fin);
-    }
-
-    /**
-     * Plays the electric shock sound (hit by electric jellyfish).
-     * @returns {void}
-     */
-    playElectricSound() {
-        if (this.isMuted) return;
-        const elec = this.electricSound.cloneNode();
-        elec.volume = this.sfxVolume;
-        this.playAudio(elec);
-    }
-
-    /**
-     * Plays the hurt sound for normal poison attacks.
-     * @returns {void}
-     */
-    playHurtSound() {
-        if (this.isMuted) return;
-        const hurt = this.hurtSound.cloneNode();
-        hurt.volume = this.sfxVolume;
-        this.playAudio(hurt);
-    }
-
-    /**
-     * Plays the sound when firing a normal bubble.
-     * @returns {void}
-     */
-    playBubbleShootSound() {
-        if (this.isMuted) return;
-        const bubble = this.bubbleShootSound.cloneNode();
-        bubble.volume = this.sfxVolume;
-        this.playAudio(bubble);
-    }
-
-    /**
-     * Plays the sound when firing a poison bubble.
-     * @returns {void}
-     */
-    playPoisonShootSound() {
-        if (this.isMuted) return;
-        const poison = this.poisonShootSound.cloneNode();
-        poison.volume = this.sfxVolume;
-        this.playAudio(poison);
-    }
-
-    /**
-     * Plays voice output when entering the dark boss zone.
-     * @returns {void}
-     */
-    playDarkZoneVoiceSound() {
-        if (this.isMuted) return;
-        const voice = this.darkZoneVoiceSound.cloneNode();
-        voice.volume = this.sfxVolume;
-        this.playAudio(voice);
-    }
-
-    /**
-     * Plays the boss intro sound when the boss first appears.
-     * @returns {void}
-     */
-    playBossIntroSound() {
-        if (this.isMuted) return;
-        const intro = this.bossIntroSound.cloneNode();
-        intro.volume = this.sfxVolume;
-        this.playAudio(intro);
+    playSfx(name) {
+        const sound = this.getSfxSoundByName(name);
+        if (!sound) return;
+        this.playClonedSfx(sound);
     }
 }
