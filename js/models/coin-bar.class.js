@@ -18,7 +18,8 @@ class CoinBar extends ImageBar {
      * Creates the coin bar and loads all images.
      */
     constructor() {
-        super(10, 150, 200, 56, 0);
+        super(10, 150, 200, 56);
+        this.initializeBar(0);
     }
 
     /**

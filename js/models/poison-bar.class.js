@@ -15,6 +15,7 @@ class PoisonBar extends ImageBar {
      * Creates the poison bar and positions it below the health display.
      */
     constructor() {
-        super(10, 80, 200, 60, 100);
+        super(10, 80, 200, 60);
+        this.initializeBar(100);
     }
 }

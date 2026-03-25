@@ -15,6 +15,7 @@ class StatusBar extends ImageBar {
      * Creates the status bar and positions it in the top left.
      */
     constructor() {
-        super(10, 10, 200, 60, 100);
+        super(10, 10, 200, 60);
+        this.initializeBar(100);
     }
 }

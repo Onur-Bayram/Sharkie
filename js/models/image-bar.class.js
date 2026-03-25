@@ -13,14 +13,22 @@ class ImageBar extends MovableObject {
      * @param {number} y Vertical position.
      * @param {number} width Render width.
      * @param {number} height Render height.
-     * @param {number} [initialPercentage=0] Initial percentage value.
      */
-    constructor(x, y, width, height, initialPercentage = 0) {
+    constructor(x, y, width, height) {
         super();
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
+    }
+
+    /**
+     * Initializes image resources and the initial frame after subclass fields exist.
+     *
+     * @param {number} [initialPercentage=0] Initial percentage value.
+     * @returns {void}
+     */
+    initializeBar(initialPercentage = 0) {
         this.loadImages(this.IMAGES);
         this.setPercentage(initialPercentage);
     }
