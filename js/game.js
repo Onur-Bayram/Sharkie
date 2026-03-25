@@ -1,6 +1,5 @@
 let canvas;
 let world;
-let character = new MovableObject();
 const nativeSetInterval = setInterval;
 const nativeClearInterval = clearInterval;
 const nativeSetTimeout = setTimeout;
@@ -311,7 +310,6 @@ function showStartScreen() {
     applyLanguage(gameSettings.language || 'de');
     updateMuteButtonLabel();
     updateOrientationLock();
-    registerGlobalGameActions();
 }
 
 /** Shows start UI shell and hides gameplay-only controls. */
@@ -333,11 +331,6 @@ function syncSingleSlider(sliderId, labelId, value) {
     if (value === undefined) return;
     $(sliderId).value = value * 100;
     $(labelId).textContent = Math.round(value * 100) + '%';
-}
-
-/** Exposes start/restart handlers globally for UI actions. */
-function registerGlobalGameActions() {
-    return;
 }
 
 /**

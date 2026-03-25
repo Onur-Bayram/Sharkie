@@ -266,7 +266,9 @@ function requestTouchFullscreenIfNeeded() {
     if (!isTouchGameplayDevice() || document.fullscreenElement) return;
     const container = document.body;
     if (!container || typeof container.requestFullscreen !== 'function') return;
-    container.requestFullscreen().catch(() => {});
+    container.requestFullscreen().catch((error) => {
+        console.warn('Fullscreen request failed:', error);
+    });
 }
 
 /**

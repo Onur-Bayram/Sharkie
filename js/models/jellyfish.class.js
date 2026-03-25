@@ -183,6 +183,7 @@ class Jellyfish extends MovableObject {
      * Processes jellyfish animation tick.
      */
     tickJellyfishAnimation() {
+        if (world && world.isPaused) return;
         const images = this.getCurrentImages();
         if (this.isDead && this.deadAnimationFinished) {
             this.img = this.imageCache[images[images.length - 1]];
@@ -207,6 +208,7 @@ class Jellyfish extends MovableObject {
      * Processes jellyfish movement tick.
      */
     tickJellyfishMovement() {
+        if (world && world.isPaused) return;
         if (this.isDead) return;
         this.moveLeft();
         if (Math.abs(this.y - this.targetY) > 1) {
@@ -219,6 +221,7 @@ class Jellyfish extends MovableObject {
      */
     runJellyfishTargetLoop() {
         setInterval(() => {
+            if (world && world.isPaused) return;
             if (!this.isDead) this.targetY = 50 + Math.random() * 400;
         }, 3000);
     }

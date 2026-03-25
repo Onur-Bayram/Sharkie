@@ -71,6 +71,7 @@
     }
     /** Updates current animation frame based on boss state. */
     updateAnimationFrame() {
+        if (world && world.isPaused) return;
         if (!this.canAnimateNow()) return;
         const images = this.getCurrentImages();
         if (this.renderDeadLastFrame(images)) return;

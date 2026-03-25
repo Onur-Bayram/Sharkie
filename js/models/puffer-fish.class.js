@@ -99,6 +99,7 @@ class Pufferfish extends MovableObject{
      * Processes puffer animation tick.
      */
     tickPufferAnimation() {
+        if (world && world.isPaused) return;
         const images = this.getCurrentImages();
         if (this.showDeadLastPufferFrame(images)) return;
         this.img = this.imageCache[images[this.currentImage % images.length]];
@@ -140,6 +141,7 @@ class Pufferfish extends MovableObject{
      * Processes puffer movement tick.
      */
     tickPufferMovement() {
+        if (world && world.isPaused) return;
         if (this.isDead) {
             if (this.deadCause === 'finSlap') this.applyFinSlapKnockback();
             return;
@@ -155,6 +157,7 @@ class Pufferfish extends MovableObject{
      */
     runPufferTargetLoop() {
         setInterval(() => {
+            if (world && world.isPaused) return;
             if (!this.isDead) this.targetY = 50 + Math.random() * 400;
         }, 3000);
     }
@@ -172,6 +175,7 @@ class Pufferfish extends MovableObject{
      * Processes bubble cycle tick.
      */
     tickBubbleCycle() {
+        if (world && world.isPaused) return;
         if (this.isDead) return;
         if (this.state === 'swim') {
             this.startTransitionToBubble();

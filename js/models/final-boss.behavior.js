@@ -5,6 +5,7 @@
 Object.assign(FinalBoss.prototype, {
     /** Updates movement and handles attack dash separately. */
     updateMovementFrame() {
+        if (world && world.isPaused) return;
         this.recoverStuckTransientState();
         if (!this.isActive || !this.introduced || this.isDead) return;
         if (this.state === 'attacking') {

@@ -135,7 +135,9 @@ function hideOptionsScreen() {
  */
 function returnToTitle() {
     if (document.fullscreenElement) {
-        document.exitFullscreen().catch(() => {});
+        document.exitFullscreen().catch((error) => {
+            console.warn('Fullscreen exit failed:', error);
+        });
     }
 
     teardownCurrentGame();
@@ -251,8 +253,15 @@ function handleFullscreenButtonClick(e) {
     $('html-fullscreen-button')?.blur();
     const container = document.body;
     if (!container) return;
-    if (!document.fullscreenElement) container.requestFullscreen();
-    else document.exitFullscreen();
+    if (!document.fullscreenElement) {
+        container.requestFullscreen().catch((error) => {
+            console.warn('Fullscreen request failed:', error);
+        });
+    } else {
+        document.exitFullscreen().catch((error) => {
+            console.warn('Fullscreen exit failed:', error);
+        });
+    }
 }
 
 /** Binds click delegation for all elements with data-action attributes. */
