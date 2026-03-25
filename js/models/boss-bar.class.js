@@ -36,7 +36,7 @@ class BossBar {
 
     /**
      * Draws bar background.
-     * @param {any} ctx Parameter.
+        * @param {CanvasRenderingContext2D} ctx Drawing context.
      * @returns {void}
      */
     drawBarBackground(ctx) {
@@ -46,7 +46,7 @@ class BossBar {
 
     /**
      * Draws bar border.
-     * @param {any} ctx Parameter.
+        * @param {CanvasRenderingContext2D} ctx Drawing context.
      * @returns {void}
      */
     drawBarBorder(ctx) {
@@ -58,8 +58,8 @@ class BossBar {
 
     /**
      * Draws bar fill.
-     * @param {any} ctx Parameter.
-     * @param {any} percentage Parameter.
+        * @param {CanvasRenderingContext2D} ctx Drawing context.
+        * @param {number} percentage Fill ratio in range 0-1.
      * @returns {void}
      */
     drawBarFill(ctx, percentage) {
@@ -75,7 +75,7 @@ class BossBar {
 
     /**
      * Draws bar text.
-     * @param {any} ctx Parameter.
+        * @param {CanvasRenderingContext2D} ctx Drawing context.
      * @returns {void}
      */
     drawBarText(ctx) {
