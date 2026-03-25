@@ -28,6 +28,7 @@ class World {
  finSlaps = [];
  isPaused = false;
  animationFrameId = null;
+ throwIntervalId = null;
  darkZoneVoicePlayed = false;
  bossIntroSoundPlayed = false;
  bossLevelLocked = false;
@@ -204,7 +205,10 @@ ctx;
      * @returns {void}
      */
     handleThrow() {
-        setInterval(() => this.tickThrowInput(), 100);
+        if (this.throwIntervalId) {
+            clearInterval(this.throwIntervalId);
+        }
+        this.throwIntervalId = setInterval(() => this.tickThrowInput(), 100);
     }
 
     /**

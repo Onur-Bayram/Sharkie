@@ -213,6 +213,10 @@ pauseGame() {
         cancelAnimationFrame(this.animationFrameId);
         this.animationFrameId = null;
     }
+    if (this.throwIntervalId) {
+        clearInterval(this.throwIntervalId);
+        this.throwIntervalId = null;
+    }
     if (this.audioManager) {
         this.audioManager.pause();
     }
@@ -227,6 +231,7 @@ resumeGame() {
         return;
     }
     this.isPaused = false;
+    this.handleThrow();
     if (this.audioManager) {
         this.audioManager.play();
     }
