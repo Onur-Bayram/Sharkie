@@ -2,7 +2,7 @@
  * Shared base class for image-based HUD bars.
  * Handles image loading and percentage-to-frame mapping.
  */
-class ImageBar extends MovableObject {
+class StatusBar extends MovableObject {
     percentage = 0;
     IMAGES = [];
 

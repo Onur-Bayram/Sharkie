@@ -186,7 +186,7 @@ drawHudBars() {
 
 /**
  * Draws HUD bar.
- * @param {StatusBar} bar Bar to draw.
+ * @param {HealthBar|CoinBar|PoisonBar} bar Bar to draw.
  * @returns {void}
  */
 drawHudBar(bar) {

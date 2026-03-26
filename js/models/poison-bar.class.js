@@ -1,7 +1,7 @@
 /**
  * Player poison supply display as image bar (6 states from 0% to 100%).
  */
-class PoisonBar extends ImageBar {
+class PoisonBar extends StatusBar {
     IMAGES = [
         '4. Marcadores/green/poisoned bubbles/0_ copia 2.png',
         '4. Marcadores/green/poisoned bubbles/20_ copia 3.png',

@@ -1,7 +1,7 @@
 /**
  * Player health display as image bar (6 states from 0% to 100%).
  */
-class StatusBar extends ImageBar {
+class HealthBar extends StatusBar {
     IMAGES = [
         '4. Marcadores/green/Life/0_  copia 3.png',
         '4. Marcadores/green/Life/20_ copia 4.png',

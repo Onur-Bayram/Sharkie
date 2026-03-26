@@ -12,7 +12,6 @@ function startGameFromHTML() {
     $('canvas').classList.add('hidden');
     hideEl('game-menu-button');
     init();
-    requestTouchFullscreenIfNeeded();
     if (typeof startAssetLoadingGate === 'function') startAssetLoadingGate(activateGameplayAfterLoading);
     else activateGameplayAfterLoading();
 }
@@ -180,7 +179,6 @@ function restartGame() {
     $('canvas').classList.add('hidden');
     hideEl('game-menu-button');
     init();
-    requestTouchFullscreenIfNeeded();
     if (typeof startAssetLoadingGate === 'function') startAssetLoadingGate(activateGameplayAfterLoading);
     else activateGameplayAfterLoading();
     updateHtmlFullscreenButton();
@@ -195,7 +193,6 @@ function backToGame() {
     $('options-screen').querySelector('.back-icon-button')?.classList.remove('is-visible');
     $('canvas').classList.remove('hidden');
     showEl('game-menu-button');
-    requestTouchFullscreenIfNeeded();
     updateMobileControlsVisibility();
     if (world && typeof world.resumeGame === 'function') {
         world.resumeGame();
@@ -248,8 +245,6 @@ function bindGlobalViewportListeners() {
     addEventListener('orientationchange', updateMobileControlsVisibility);
     document.addEventListener('fullscreenchange', updateMobileControlsVisibility);
     document.addEventListener('fullscreenchange', updateHtmlFullscreenButton);
-    document.addEventListener('pointerdown', ensureMobileFullscreenFromGesture, { passive: true });
-    document.addEventListener('touchstart', ensureMobileFullscreenFromGesture, { passive: true });
 }
 
 /**

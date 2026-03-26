@@ -16,7 +16,7 @@ class World {
  totalCoins = 0;
  collectedCoins = 0;
  finalBoss = null;
- statusBar = new StatusBar();
+ statusBar = new HealthBar();
  poisonBar = new PoisonBar();
  coinBar = new CoinBar();
  bossBar = new BossBar();

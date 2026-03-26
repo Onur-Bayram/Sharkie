@@ -1,7 +1,7 @@
 /**
  * Coin collection display as image bar (6 states proportional to collected coins).
  */
-class CoinBar extends ImageBar {
+class CoinBar extends StatusBar {
     IMAGES = [
         '4. Marcadores/green/Coin/0_  copia 4.png',
         '4. Marcadores/green/Coin/20_  copia 2.png',
