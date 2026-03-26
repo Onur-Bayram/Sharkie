@@ -1,0 +1,152 @@
+@media (max-width: 768px) and (orientation: portrait) and (hover: none) and (pointer: coarse) {
+  body {
+    min-height: 100vh;
+    height: 100vh;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  h1,
+  .game-panel,
+  .screen-overlay {
+    display: none !important;
+  }
+
+  .rotate-device-notice {
+    display: flex;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 520px) and (hover: none) and (pointer: coarse) {
+  body {
+    min-height: 100vh;
+    height: 100vh;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  h1 {
+    display: none;
+  }
+
+  .game-panel {
+    height: 97vh;
+    width: auto;
+    max-width: 100vw;
+    aspect-ratio: 800 / 540;
+    margin: 0 auto;
+  }
+
+  .game-panel:fullscreen {
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
+    max-height: 100vh;
+    aspect-ratio: unset;
+  }
+
+  .game-panel:fullscreen canvas {
+    width: 100%;
+    height: 100%;
+  }
+
+  canvas {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .screen-overlay {
+    width: 90vw;
+    max-width: 560px;
+    height: 88vh;
+    max-height: 360px;
+    padding: 5px;
+  }
+
+  .screen-content {
+    padding: 6px;
+    gap: 4px;
+  }
+
+  #options-screen .screen-content {
+    justify-content: flex-start;
+  }
+
+  .options-container,
+  .options-submenu {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  #options-help,
+  #options-audio,
+  #options-impressum {
+    flex: 1;
+    min-height: 0;
+  }
+
+  .help-content,
+  .audio-controls,
+  .impressum-content {
+    width: 100%;
+    max-width: 100%;
+    flex: 1;
+    min-height: 0;
+    max-height: 100%;
+    margin-bottom: 4px;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+  }
+
+  .mobile-controls {
+    padding: 2px 8px calc(2px + env(safe-area-inset-bottom));
+    column-gap: clamp(14px, 7vw, 48px);
+  }
+
+  .action-buttons {
+    margin-right: 0;
+    width: 124px;
+    height: 92px;
+  }
+
+  .dpad-button {
+    width: 38px;
+    height: 38px;
+    font-size: 14px;
+  }
+
+  .dpad {
+    grid-template-columns: 52px 52px 52px;
+    grid-template-rows: 46px 46px 46px;
+  }
+
+  .dpad-left,
+  .dpad-right {
+    width: 44px;
+    height: 38px;
+    border-radius: 12px;
+  }
+
+  .action-button {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+
+  .action-button:nth-child(2) {
+    width: 46px;
+    height: 46px;
+    font-size: 18px;
+    left: 38px;
+    bottom: 34px;
+  }
+
+  .option-button,
+  .game-button,
+  .lang-button {
+    font-size: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+}
