@@ -1,14 +1,30 @@
+/** @type {HTMLCanvasElement} Reference to the main canvas element. */
 let canvas;
+
+/** @type {World} The active game world instance. */
 let world;
+
+/** Native timer functions saved before patching to allow cleanup tracking. */
 const nativeSetInterval = setInterval;
 const nativeClearInterval = clearInterval;
 const nativeSetTimeout = setTimeout;
 const nativeClearTimeout = clearTimeout;
 const nativeRequestAnimationFrame = requestAnimationFrame;
 const nativeCancelAnimationFrame = cancelAnimationFrame;
+
+/** @type {Set<number>} All active setInterval IDs for later cleanup. */
 const trackedIntervals = new Set();
+
+/** @type {Set<number>} All active setTimeout IDs for later cleanup. */
 const trackedTimeouts = new Set();
+
+/** @type {Set<number>} All active requestAnimationFrame IDs for later cleanup. */
 const trackedAnimationFrames = new Set();
+
+/**
+ * Keyboard state of the player.
+ * Each property corresponds to a control key (true = pressed).
+ */
 let keyboard = {
     LEFT: false,
     RIGHT: false,
@@ -19,28 +35,51 @@ let keyboard = {
     SPACE: false
 };
 
+/** Returns a DOM element by its ID. @param {string} id @returns {HTMLElement} */
 const $ = (id) => document.getElementById(id);
+
+/** Shows an element by removing the 'is-hidden' class. @param {string} id */
 const showEl = (id) => $(id).classList.remove('is-hidden');
+
+/** Hides an element by adding the 'is-hidden' class. @param {string} id */
 const hideEl = (id) => $(id).classList.add('is-hidden');
+
+/** Hides the mobile on-screen controls. */
 const hideMobileControls = () => {
     const controls = $('mobile-controls');
     if (!controls) return;
     controls.classList.add('is-hidden');
 };
+
+/** Shows the mobile on-screen controls. */
 const showMobileControls = () => {
     const controls = $('mobile-controls');
     if (!controls) return;
     controls.classList.remove('is-hidden');
 };
+
+/** @type {boolean} Guards against binding UI event listeners more than once. */
 let uiBound = false;
+
+/** @type {boolean} Whether the game is currently paused. */
 let isGamePaused = false;
+
+/** @type {boolean} Whether the game was paused due to a device orientation change. */
 let wasPausedByOrientation = false;
+
+/** @type {Map<number, string>} Maps active pointer IDs to their corresponding control keys (mobile). */
 const activeMobilePointers = new Map();
 
+/** @type {{x: number, y: number}} Current mouse position in the viewport. */
 let mousePos = { x: 0, y: 0 };
 
 const savedLanguage = localStorage.getItem('sharkieLanguage') || 'de';
 const savedMuted = localStorage.getItem('sharkieMuted') === 'true';
+
+/**
+ * Global game settings (volume, language, mute state).
+ * Loaded from localStorage on startup.
+ */
 let gameSettings = {
     musicVolume: 0.3,
     sfxVolume: 0.5,
@@ -100,20 +139,39 @@ const TRANSLATIONS = {
         back: 'Back'
     }
 };
+/** @type {number} Original game width in pixels. */
 const ORIGINAL_WIDTH = 800;
+
+/** @type {number} Original game height in pixels. */
 const ORIGINAL_HEIGHT = 540;
 
+/**
+ * Overrides setInterval to track all IDs centrally for later cleanup.
+ * @param {Function|string} handler Callback function or code string.
+ * @param {number} timeout Interval duration in milliseconds.
+ * @returns {number} ID of the created interval.
+ */
 setInterval = (handler, timeout, ...args) => {
     const intervalId = nativeSetInterval(handler, timeout, ...args);
     trackedIntervals.add(intervalId);
     return intervalId;
 };
 
+/**
+ * Overrides clearInterval and removes the ID from the tracking set.
+ * @param {number} intervalId The ID of the interval to clear.
+ */
 clearInterval = (intervalId) => {
     trackedIntervals.delete(intervalId);
     nativeClearInterval(intervalId);
 };
 
+/**
+ * Overrides setTimeout to track all IDs centrally for later cleanup.
+ * @param {Function|string} handler Callback function or code string.
+ * @param {number} timeout Delay in milliseconds.
+ * @returns {number} ID of the created timeout.
+ */
 setTimeout = (handler, timeout, ...args) => {
     const timeoutId = nativeSetTimeout(() => {
         trackedTimeouts.delete(timeoutId);
@@ -127,11 +185,20 @@ setTimeout = (handler, timeout, ...args) => {
     return timeoutId;
 };
 
+/**
+ * Overrides clearTimeout and removes the ID from the tracking set.
+ * @param {number} timeoutId The ID of the timeout to clear.
+ */
 clearTimeout = (timeoutId) => {
     trackedTimeouts.delete(timeoutId);
     nativeClearTimeout(timeoutId);
 };
 
+/**
+ * Overrides requestAnimationFrame to track all frame IDs centrally.
+ * @param {FrameRequestCallback} callback Callback for the next animation frame.
+ * @returns {number} ID of the created animation frame.
+ */
 requestAnimationFrame = (callback) => {
     const frameId = nativeRequestAnimationFrame((timestamp) => {
         trackedAnimationFrames.delete(frameId);
@@ -141,6 +208,10 @@ requestAnimationFrame = (callback) => {
     return frameId;
 };
 
+/**
+ * Overrides cancelAnimationFrame and removes the frame ID from the tracking set.
+ * @param {number} frameId The ID of the animation frame to cancel.
+ */
 cancelAnimationFrame = (frameId) => {
     trackedAnimationFrames.delete(frameId);
     nativeCancelAnimationFrame(frameId);
