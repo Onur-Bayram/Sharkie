@@ -1,12 +1,12 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" translate="no">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="google" content="notranslate">
-    <link rel="stylesheet" href="style.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="google" content="notranslate" />
+    <link rel="stylesheet" href="style.css" />
     <title>Sharkie</title>
-    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="icon" type="image/png" href="favicon.png" />
     <script src="js/models/moveable-object.class.js"></script>
     <script src="js/models/character.class.js"></script>
     <script src="js/models/character-motion.class.js"></script>
@@ -28,7 +28,7 @@
     <script src="js/models/coin-bar.class.js"></script>
     <script src="js/models/boss-bar.class.js"></script>
     <script src="js/models/audio-manager.class.js"></script>
-        <script src="js/models/restart-button.class.js"></script>
+    <script src="js/models/restart-button.class.js"></script>
     <script src="js/models/win-screen.class.js"></script>
     <script src="js/models/game-over-screen.class.js"></script>
     <script src="js/models/world.class.js"></script>
@@ -42,8 +42,8 @@
     <script src="js/game-controls.js"></script>
     <script src="js/game-ui.js"></script>
     <script src="js/game-ui-settings.js"></script>
-</head>
-<body onload="showStartScreen()">
+  </head>
+  <body onload="showStartScreen()">
     <div class="light-rays"></div>
     <div class="bubble bubble1"></div>
     <div class="bubble bubble2"></div>
@@ -52,174 +52,363 @@
     <div class="bubble bubble5"></div>
     <div class="bubble bubble6"></div>
 
-    <div id="loading-overlay" class="loading-overlay is-hidden" aria-live="polite" aria-label="Game is loading">
-        <div class="loading-card">
-            <h2>Loading Game...</h2>
-            <div class="loading-bar-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-                <progress id="loading-bar-fill" class="loading-bar-fill" max="100" value="0">0%</progress>
-            </div>
-            <p id="loading-bar-text" class="loading-bar-text">0%</p>
+    <div
+      id="loading-overlay"
+      class="loading-overlay is-hidden"
+      aria-live="polite"
+      aria-label="Game is loading"
+    >
+      <div class="loading-card">
+        <h2>Loading Game...</h2>
+        <div
+          class="loading-bar-track"
+          role="progressbar"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="0"
+        >
+          <progress
+            id="loading-bar-fill"
+            class="loading-bar-fill"
+            max="100"
+            value="0"
+          >
+            0%
+          </progress>
         </div>
+        <p id="loading-bar-text" class="loading-bar-text">0%</p>
+      </div>
     </div>
 
-    <div id="rotate-device-notice" class="rotate-device-notice" aria-live="polite">
-        <div class="rotate-device-card">
-            <div class="rotate-device-icon">📱↻</div>
-            <h2>Bitte Gerät drehen</h2>
-            <p>Sharkie läuft auf Smartphones nur im Querformat.</p>
-        </div>
+    <div
+      id="rotate-device-notice"
+      class="rotate-device-notice"
+      aria-live="polite"
+    >
+      <div class="rotate-device-card">
+        <div class="rotate-device-icon">📱↻</div>
+        <h2>Bitte Gerät drehen</h2>
+        <p>Sharkie läuft auf Smartphones nur im Querformat.</p>
+      </div>
     </div>
-    
+
     <h1>Sharkie</h1>
 
     <div class="game-panel">
-        <canvas id="canvas" width="800" height="540" class="hidden"></canvas>
+      <canvas id="canvas" width="800" height="540" class="hidden"></canvas>
 
-        <!-- In-Game Menu Button -->
-        <button id="game-menu-button" class="game-menu-button is-hidden" data-action="game-menu">
-            <span>⏸ MENU</span>
-        </button>
+      <!-- In-Game Menu Button -->
+      <button
+        id="game-menu-button"
+        class="game-menu-button is-hidden"
+        data-action="game-menu"
+      >
+        <span>⏸ MENU</span>
+      </button>
 
-        <!-- HTML Fullscreen Button (Touch Devices) -->
-        <button id="html-fullscreen-button" class="html-fullscreen-button is-hidden" aria-label="Fullscreen">⛶</button>
+      <!-- HTML Fullscreen Button (Touch Devices) -->
+      <button
+        id="html-fullscreen-button"
+        class="html-fullscreen-button is-hidden"
+        aria-label="Fullscreen"
+      >
+        ⛶
+      </button>
 
-        <!-- Mobile Controls Overlay -->
-        <div id="mobile-controls" class="mobile-controls is-hidden">
-            <div class="dpad">
-                <button class="dpad-button" data-key="UP" aria-label="Hoch">▲</button>
-                <div class="dpad-horizontal">
-                    <button class="dpad-button dpad-left" data-key="LEFT" aria-label="Links">◀</button>
-                    <button class="dpad-button dpad-right" data-key="RIGHT" aria-label="Rechts">▶</button>
-                </div>
-                <button class="dpad-button dpad-down" data-key="DOWN" aria-label="Runter">▼</button>
-            </div>
-
-            <div class="action-buttons">
-                <button class="action-button" data-key="F" aria-label="Normale Blase" title="Normale Blase">O</button>
-                <button class="action-button" data-key="D" aria-label="Giftblase" title="Giftblase">☣</button>
-                <button class="action-button" data-key="SPACE" aria-label="Flossenschlag" title="Flossenschlag">✦</button>
-            </div>
+      <!-- Mobile Controls Overlay -->
+      <div id="mobile-controls" class="mobile-controls is-hidden">
+        <div class="dpad">
+          <button class="dpad-button" data-key="UP" aria-label="Hoch">▲</button>
+          <div class="dpad-horizontal">
+            <button
+              class="dpad-button dpad-left"
+              data-key="LEFT"
+              aria-label="Links"
+            >
+              ◀
+            </button>
+            <button
+              class="dpad-button dpad-right"
+              data-key="RIGHT"
+              aria-label="Rechts"
+            >
+              ▶
+            </button>
+          </div>
+          <button
+            class="dpad-button dpad-down"
+            data-key="DOWN"
+            aria-label="Runter"
+          >
+            ▼
+          </button>
         </div>
+
+        <div class="action-buttons">
+          <button
+            class="action-button"
+            data-key="F"
+            aria-label="Normale Blase"
+            title="Normale Blase"
+          >
+            O
+          </button>
+          <button
+            class="action-button"
+            data-key="D"
+            aria-label="Giftblase"
+            title="Giftblase"
+          >
+            ☣
+          </button>
+          <button
+            class="action-button"
+            data-key="SPACE"
+            aria-label="Flossenschlag"
+            title="Flossenschlag"
+          >
+            ✦
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Start Screen -->
     <div id="start-screen" class="screen-overlay">
-        <div class="screen-content">
-            <button class="game-button primary-button" data-action="start-game"><span data-i18n="start">START</span></button>
-            <button class="game-button secondary-button" data-action="open-options"><span data-i18n="options">OPTIONS</span></button>
-        </div>
+      <div class="screen-content">
+        <button class="game-button primary-button" data-action="start-game">
+          <span data-i18n="start">START</span>
+        </button>
+        <button class="game-button secondary-button" data-action="open-options">
+          <span data-i18n="options">OPTIONS</span>
+        </button>
+      </div>
     </div>
 
     <!-- Options Screen -->
     <div id="options-screen" class="screen-overlay is-hidden">
-        <div class="screen-content">
-            <!-- Main Menu -->
-            <div id="options-menu" class="options-container">
-                <button class="game-button option-button" data-action="open-submenu" data-target="language">
-                    <span class="button-icon">🌍</span><span data-i18n="menu_languages">SPRACHEN</span>
-                </button>
-                <button class="game-button option-button" data-action="open-submenu" data-target="help">
-                    <span class="button-icon">❓</span><span data-i18n="menu_help">HILFE</span>
-                </button>
-                <button class="game-button option-button" data-action="open-submenu" data-target="audio">
-                    <span class="button-icon">🔊</span><span data-i18n="menu_audio">AUDIO</span>
-                </button>
-                <button class="game-button option-button" data-action="open-submenu" data-target="impressum">
-                    <span class="button-icon">ℹ️</span><span data-i18n="menu_impressum">IMPRESSUM</span>
-                </button>
-                <button class="game-button option-button is-hidden" id="return-to-title-button" data-action="back-start" data-i18n="to_title">ZUM TITEL</button>
-            </div>
-            <button class="game-button back-button below-panel" id="back-to-start-button" data-action="back-start" data-i18n="back_start">ZURÜCK ZUM START</button>
-            <button class="game-button back-button below-panel is-hidden" id="back-to-game-button" data-action="back-game" data-i18n="back_game">ZURÜCK ZUM SPIEL</button>
-
-            <!-- Language Submenu -->
-            <div id="options-language" class="options-submenu is-hidden">
-                <h3 class="submenu-title" data-i18n="submenu_languages">SPRACHEN</h3>
-                <div class="language-options">
-                    <button class="game-button lang-button active" data-action="set-language" data-lang="de">🇩🇪 Deutsch</button>
-                    <button class="game-button lang-button" data-action="set-language" data-lang="en">🇬🇧 Englisch</button>
-                </div>
-            </div>
-
-            <!-- Help Submenu -->
-            <div id="options-help" class="options-submenu is-hidden">
-                <h3 class="submenu-title" data-i18n="submenu_controls">STEUERUNG</h3>
-                <div class="help-content">
-                    <div class="control-item">
-                        <span class="control-key">← → ↑ ↓</span>
-                        <span class="control-desc" data-i18n="help_move">Sharkie bewegen</span>
-                    </div>
-                    <div class="control-item">
-                        <span class="control-key">F</span>
-                        <span class="control-desc" data-i18n="help_bubble">Normale Blasen werfen</span>
-                    </div>
-                    <div class="control-item">
-                        <span class="control-key">D</span>
-                        <span class="control-desc" data-i18n="help_poison">Gift-Blasen werfen</span>
-                    </div>
-                    <div class="control-item">
-                        <span class="control-key">SPACE</span>
-                        <span class="control-desc" data-i18n="help_attack">Flossen-Schlag Angriff</span>
-                    </div>
-                    <p class="help-tip" data-i18n="help_tip">Sammle Münzen • Weiche Feinden aus • Besiege den Boss!</p>
-                </div>
-            </div>
-
-            <!-- Audio Submenu -->
-            <div id="options-audio" class="options-submenu is-hidden">
-                <h3 class="submenu-title" data-i18n="submenu_audio">AUDIO</h3>
-                <div class="audio-controls">
-                    <div class="slider-container">
-                        <label for="music-slider">🎵 <span data-i18n="audio_music">Hintergrundmusik</span></label>
-                        <input type="range" id="music-slider" min="0" max="100" value="30">
-                        <span id="music-value" class="volume-value">30%</span>
-                    </div>
-                    <div class="slider-container">
-                        <label for="sfx-slider">🔔 <span data-i18n="audio_sfx">Sound-Effekte</span></label>
-                        <input type="range" id="sfx-slider" min="0" max="100" value="50">
-                        <span id="sfx-value" class="volume-value">50%</span>
-                    </div>
-                    <button id="mute-toggle-button" class="game-button" data-action="toggle-mute" data-i18n="audio_mute">🔇 STUMM SCHALTEN</button>
-                </div>
-            </div>
-
-            <!-- Impressum Submenu -->
-            <div id="options-impressum" class="options-submenu is-hidden">
-                <h3 class="submenu-title" data-i18n="submenu_impressum">IMPRESSUM</h3>
-                <div class="impressum-content">
-                    <p class="impressum-line"><strong>Angaben gemäß § 5 DDG</strong></p>
-                    <p class="impressum-line">
-                        Bodo Schwammkeks<br>
-                        Ananasallee 7,<br>
-                        42424 Bikinihafen
-                    </p>
-                    <p class="impressum-line">
-                        <strong>Vertreten durch:</strong><br>
-                        Bodo Schwammkeks
-                    </p>
-                    <p class="impressum-line">
-                        <strong>Kontakt:</strong><br>
-                        Telefon: 0555-424242<br>
-                        E-Mail: <a href="mailto:hallo@schwammkeks-studio.de">hallo@schwammkeks-studio.de</a>
-                    </p>
-                    <p class="impressum-line">
-                        <strong>Verbraucherstreitbeilegung / Universalschlichtungsstelle</strong><br>
-                        Wir nehmen nicht an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teil und sind dazu auch nicht verpflichtet.
-                    </p>
-                    <p class="impressum-line">
-                        Erstellt mit <a href="https://impressum-generator.de" rel="dofollow" target="_blank">Impressum-Generator.de</a>,
-                        dem Tool für Impressum und
-                        <a href="https://impressum-generator.de/datenschutz-generator" rel="dofollow" target="_blank">Datenschutz-Erklärung</a>.
-                        Nach einer Vorlage der
-                        <a href="https://www.kanzlei-hasselbach.de/" rel="dofollow" target="_blank">Kanzlei Hasselbach</a>.
-                    </p>
-                </div>
-            </div>
-            
-            <!-- Back Icon Button für Submenüs -->
-            <button class="back-icon-button" data-action="back-options" data-i18n-title="back" title="Zurück">↩️</button>
+      <div class="screen-content">
+        <!-- Main Menu -->
+        <div id="options-menu" class="options-container">
+          <button
+            class="game-button option-button"
+            data-action="open-submenu"
+            data-target="language"
+          >
+            <span class="button-icon">🌍</span
+            ><span data-i18n="menu_languages">SPRACHEN</span>
+          </button>
+          <button
+            class="game-button option-button"
+            data-action="open-submenu"
+            data-target="help"
+          >
+            <span class="button-icon">❓</span
+            ><span data-i18n="menu_help">HILFE</span>
+          </button>
+          <button
+            class="game-button option-button"
+            data-action="open-submenu"
+            data-target="audio"
+          >
+            <span class="button-icon">🔊</span
+            ><span data-i18n="menu_audio">AUDIO</span>
+          </button>
+          <button
+            class="game-button option-button"
+            data-action="open-submenu"
+            data-target="impressum"
+          >
+            <span class="button-icon">ℹ️</span
+            ><span data-i18n="menu_impressum">IMPRESSUM</span>
+          </button>
+          <button
+            class="game-button option-button is-hidden"
+            id="return-to-title-button"
+            data-action="back-start"
+            data-i18n="to_title"
+          >
+            ZUM TITEL
+          </button>
         </div>
-    </div>
+        <button
+          class="game-button back-button below-panel"
+          id="back-to-start-button"
+          data-action="back-start"
+          data-i18n="back_start"
+        >
+          ZURÜCK ZUM START
+        </button>
+        <button
+          class="game-button back-button below-panel is-hidden"
+          id="back-to-game-button"
+          data-action="back-game"
+          data-i18n="back_game"
+        >
+          ZURÜCK ZUM SPIEL
+        </button>
 
-</body>
+        <!-- Language Submenu -->
+        <div id="options-language" class="options-submenu is-hidden">
+          <h3 class="submenu-title" data-i18n="submenu_languages">SPRACHEN</h3>
+          <div class="language-options">
+            <button
+              class="game-button lang-button active"
+              data-action="set-language"
+              data-lang="de"
+            >
+              🇩🇪 Deutsch
+            </button>
+            <button
+              class="game-button lang-button"
+              data-action="set-language"
+              data-lang="en"
+            >
+              🇬🇧 Englisch
+            </button>
+          </div>
+        </div>
+
+        <!-- Help Submenu -->
+        <div id="options-help" class="options-submenu is-hidden">
+          <h3 class="submenu-title" data-i18n="submenu_controls">STEUERUNG</h3>
+          <div class="help-content">
+            <div class="control-item">
+              <span class="control-key">← → ↑ ↓</span>
+              <span class="control-desc" data-i18n="help_move"
+                >Sharkie bewegen</span
+              >
+            </div>
+            <div class="control-item">
+              <span class="control-key">F</span>
+              <span class="control-desc" data-i18n="help_bubble"
+                >Normale Blasen werfen</span
+              >
+            </div>
+            <div class="control-item">
+              <span class="control-key">D</span>
+              <span class="control-desc" data-i18n="help_poison"
+                >Gift-Blasen werfen</span
+              >
+            </div>
+            <div class="control-item">
+              <span class="control-key">SPACE</span>
+              <span class="control-desc" data-i18n="help_attack"
+                >Flossen-Schlag Angriff</span
+              >
+            </div>
+            <p class="help-tip" data-i18n="help_tip">
+              Sammle Münzen • Weiche Feinden aus • Besiege den Boss!
+            </p>
+          </div>
+        </div>
+
+        <!-- Audio Submenu -->
+        <div id="options-audio" class="options-submenu is-hidden">
+          <h3 class="submenu-title" data-i18n="submenu_audio">AUDIO</h3>
+          <div class="audio-controls">
+            <div class="slider-container">
+              <label for="music-slider"
+                >🎵 <span data-i18n="audio_music">Hintergrundmusik</span></label
+              >
+              <input
+                type="range"
+                id="music-slider"
+                min="0"
+                max="100"
+                value="30"
+              />
+              <span id="music-value" class="volume-value">30%</span>
+            </div>
+            <div class="slider-container">
+              <label for="sfx-slider"
+                >🔔 <span data-i18n="audio_sfx">Sound-Effekte</span></label
+              >
+              <input
+                type="range"
+                id="sfx-slider"
+                min="0"
+                max="100"
+                value="50"
+              />
+              <span id="sfx-value" class="volume-value">50%</span>
+            </div>
+            <button
+              id="mute-toggle-button"
+              class="game-button"
+              data-action="toggle-mute"
+              data-i18n="audio_mute"
+            >
+              🔇 STUMM SCHALTEN
+            </button>
+          </div>
+        </div>
+
+        <!-- Impressum Submenu -->
+        <div id="options-impressum" class="options-submenu is-hidden">
+          <h3 class="submenu-title" data-i18n="submenu_impressum">IMPRESSUM</h3>
+          <div class="impressum-content">
+            <p class="impressum-line"><strong>Angaben gemäß § 5 DDG</strong></p>
+            <p class="impressum-line">
+              Bodo Schwammkeks<br />
+              Ananasallee 7,<br />
+              42424 Bikinihafen
+            </p>
+            <p class="impressum-line">
+              <strong>Vertreten durch:</strong><br />
+              Bodo Schwammkeks
+            </p>
+            <p class="impressum-line">
+              <strong>Kontakt:</strong><br />
+              Telefon: 0555-424242<br />
+              E-Mail:
+              <a href="mailto:hallo@schwammkeks-studio.de"
+                >hallo@schwammkeks-studio.de</a
+              >
+            </p>
+            <p class="impressum-line">
+              <strong
+                >Verbraucherstreitbeilegung /
+                Universalschlichtungsstelle</strong
+              ><br />
+              Wir nehmen nicht an Streitbeilegungsverfahren vor einer
+              Verbraucherschlichtungsstelle teil und sind dazu auch nicht
+              verpflichtet.
+            </p>
+            <p class="impressum-line">
+              Erstellt mit
+              <a
+                href="https://impressum-generator.de"
+                rel="dofollow"
+                target="_blank"
+                >Impressum-Generator.de</a
+              >, dem Tool für Impressum und
+              <a
+                href="https://impressum-generator.de/datenschutz-generator"
+                rel="dofollow"
+                target="_blank"
+                >Datenschutz-Erklärung</a
+              >. Nach einer Vorlage der
+              <a
+                href="https://www.kanzlei-hasselbach.de/"
+                rel="dofollow"
+                target="_blank"
+                >Kanzlei Hasselbach</a
+              >.
+            </p>
+          </div>
+        </div>
+
+        <!-- Back Icon Button für Submenüs -->
+        <button
+          class="back-icon-button"
+          data-action="back-options"
+          data-i18n-title="back"
+          title="Zurück"
+        >
+          ↩️
+        </button>
+      </div>
+    </div>
+  </body>
 </html>

@@ -4,10 +4,16 @@
  * @returns {void}
  */
 function bindAudioSliderHandlers() {
-    const musicSlider = $('music-slider');
-    if (musicSlider) musicSlider.addEventListener('input', (event) => updateMusicVolume(event.target.value));
-    const sfxSlider = $('sfx-slider');
-    if (sfxSlider) sfxSlider.addEventListener('input', (event) => updateSFXVolume(event.target.value));
+  const musicSlider = $("music-slider");
+  if (musicSlider)
+    musicSlider.addEventListener("input", (event) =>
+      updateMusicVolume(event.target.value),
+    );
+  const sfxSlider = $("sfx-slider");
+  if (sfxSlider)
+    sfxSlider.addEventListener("input", (event) =>
+      updateSFXVolume(event.target.value),
+    );
 }
 
 /**
@@ -17,11 +23,11 @@ function bindAudioSliderHandlers() {
  * @returns {void}
  */
 function changeLanguage(lang, button) {
-    const nextLang = resolveLanguageCode(lang);
-    if (button) setActiveLanguageButton(nextLang);
-    persistLanguageSetting(nextLang);
-    applyLanguage(nextLang);
-    updateMuteButtonLabel();
+  const nextLang = resolveLanguageCode(lang);
+  if (button) setActiveLanguageButton(nextLang);
+  persistLanguageSetting(nextLang);
+  applyLanguage(nextLang);
+  updateMuteButtonLabel();
 }
 
 /**
@@ -31,8 +37,8 @@ function changeLanguage(lang, button) {
  * @returns {string} Valid language code ('de' or 'en').
  */
 function resolveLanguageCode(lang) {
-    if (TRANSLATIONS[lang]) return lang;
-    return 'de';
+  if (TRANSLATIONS[lang]) return lang;
+  return "de";
 }
 
 /**
@@ -42,9 +48,9 @@ function resolveLanguageCode(lang) {
  * @returns {void}
  */
 function persistLanguageSetting(lang) {
-    gameSettings = gameSettings || {};
-    gameSettings.language = lang;
-    localStorage.setItem('sharkieLanguage', lang);
+  gameSettings = gameSettings || {};
+  gameSettings.language = lang;
+  localStorage.setItem("sharkieLanguage", lang);
 }
 
 /**
@@ -52,15 +58,17 @@ function persistLanguageSetting(lang) {
  * @returns {void}
  */
 function updateMuteButtonLabel() {
-    const muteButton = $('mute-toggle-button');
-    if (!muteButton) {
-        return;
-    }
+  const muteButton = $("mute-toggle-button");
+  if (!muteButton) {
+    return;
+  }
 
-    const muted = !!gameSettings?.muted;
-    const i18nKey = muted ? 'audio_unmute' : 'audio_mute';
-    muteButton.dataset.i18n = i18nKey;
-    muteButton.textContent = getLanguageStrings(gameSettings.language || 'de')[i18nKey];
+  const muted = !!gameSettings?.muted;
+  const i18nKey = muted ? "audio_unmute" : "audio_mute";
+  muteButton.dataset.i18n = i18nKey;
+  muteButton.textContent = getLanguageStrings(gameSettings.language || "de")[
+    i18nKey
+  ];
 }
 
 /**
@@ -68,15 +76,15 @@ function updateMuteButtonLabel() {
  * @returns {void}
  */
 function toggleMute() {
-    gameSettings = gameSettings || {};
-    gameSettings.muted = !gameSettings.muted;
-    localStorage.setItem('sharkieMuted', String(gameSettings.muted));
+  gameSettings = gameSettings || {};
+  gameSettings.muted = !gameSettings.muted;
+  localStorage.setItem("sharkieMuted", String(gameSettings.muted));
 
-    if (world && world.audioManager) {
-        world.audioManager.setMuted(gameSettings.muted);
-    }
+  if (world && world.audioManager) {
+    world.audioManager.setMuted(gameSettings.muted);
+  }
 
-    updateMuteButtonLabel();
+  updateMuteButtonLabel();
 }
 
 /**
@@ -85,13 +93,13 @@ function toggleMute() {
  * @returns {void}
  */
 function updateMusicVolume(value) {
-    $('music-value').textContent = value + '%';
-    const volume = value / 100;
-    gameSettings = gameSettings || {};
-    gameSettings.musicVolume = volume;
-    if (world && world.audioManager) {
-        world.audioManager.setMusicVolume(volume);
-    }
+  $("music-value").textContent = value + "%";
+  const volume = value / 100;
+  gameSettings = gameSettings || {};
+  gameSettings.musicVolume = volume;
+  if (world && world.audioManager) {
+    world.audioManager.setMusicVolume(volume);
+  }
 }
 
 /**
@@ -100,11 +108,11 @@ function updateMusicVolume(value) {
  * @returns {void}
  */
 function updateSFXVolume(value) {
-    $('sfx-value').textContent = value + '%';
-    const volume = value / 100;
-    gameSettings = gameSettings || {};
-    gameSettings.sfxVolume = volume;
-    if (world && world.audioManager) {
-        world.audioManager.setSFXVolume(volume);
-    }
+  $("sfx-value").textContent = value + "%";
+  const volume = value / 100;
+  gameSettings = gameSettings || {};
+  gameSettings.sfxVolume = volume;
+  if (world && world.audioManager) {
+    world.audioManager.setSFXVolume(volume);
+  }
 }

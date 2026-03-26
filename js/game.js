@@ -26,36 +26,36 @@ const trackedAnimationFrames = new Set();
  * Each property corresponds to a control key (true = pressed).
  */
 let keyboard = {
-    LEFT: false,
-    RIGHT: false,
-    UP: false,
-    DOWN: false,
-    D: false,
-    F: false,
-    SPACE: false
+  LEFT: false,
+  RIGHT: false,
+  UP: false,
+  DOWN: false,
+  D: false,
+  F: false,
+  SPACE: false,
 };
 
 /** Returns a DOM element by its ID. @param {string} id @returns {HTMLElement} */
 const $ = (id) => document.getElementById(id);
 
 /** Shows an element by removing the 'is-hidden' class. @param {string} id */
-const showEl = (id) => $(id).classList.remove('is-hidden');
+const showEl = (id) => $(id).classList.remove("is-hidden");
 
 /** Hides an element by adding the 'is-hidden' class. @param {string} id */
-const hideEl = (id) => $(id).classList.add('is-hidden');
+const hideEl = (id) => $(id).classList.add("is-hidden");
 
 /** Hides the mobile on-screen controls. */
 const hideMobileControls = () => {
-    const controls = $('mobile-controls');
-    if (!controls) return;
-    controls.classList.add('is-hidden');
+  const controls = $("mobile-controls");
+  if (!controls) return;
+  controls.classList.add("is-hidden");
 };
 
 /** Shows the mobile on-screen controls. */
 const showMobileControls = () => {
-    const controls = $('mobile-controls');
-    if (!controls) return;
-    controls.classList.remove('is-hidden');
+  const controls = $("mobile-controls");
+  if (!controls) return;
+  controls.classList.remove("is-hidden");
 };
 
 /** @type {boolean} Guards against binding UI event listeners more than once. */
@@ -73,71 +73,71 @@ const activeMobilePointers = new Map();
 /** @type {{x: number, y: number}} Current mouse position in the viewport. */
 let mousePos = { x: 0, y: 0 };
 
-const savedLanguage = localStorage.getItem('sharkieLanguage') || 'de';
-const savedMuted = localStorage.getItem('sharkieMuted') === 'true';
+const savedLanguage = localStorage.getItem("sharkieLanguage") || "de";
+const savedMuted = localStorage.getItem("sharkieMuted") === "true";
 
 /**
  * Global game settings (volume, language, mute state).
  * Loaded from localStorage on startup.
  */
 let gameSettings = {
-    musicVolume: 0.3,
-    sfxVolume: 0.5,
-    language: savedLanguage,
-    muted: savedMuted
+  musicVolume: 0.3,
+  sfxVolume: 0.5,
+  language: savedLanguage,
+  muted: savedMuted,
 };
 
 const TRANSLATIONS = {
-    de: {
-        start: 'START',
-        options: 'OPTIONEN',
-        menu_languages: 'SPRACHEN',
-        menu_help: 'HILFE',
-        menu_audio: 'AUDIO',
-        menu_impressum: 'IMPRESSUM',
-        back_start: 'ZURÜCK ZUM START',
-        to_title: 'ZUM TITEL',
-        back_game: 'ZURÜCK ZUM SPIEL',
-        submenu_languages: 'SPRACHEN',
-        submenu_controls: 'STEUERUNG',
-        submenu_audio: 'AUDIO',
-        submenu_impressum: 'IMPRESSUM',
-        help_move: 'Sharkie bewegen',
-        help_bubble: 'Normale Blasen werfen',
-        help_poison: 'Gift-Blasen werfen',
-        help_attack: 'Flossen-Schlag Angriff',
-        help_tip: 'Sammle Münzen • Weiche Feinden aus • Besiege den Boss!',
-        audio_music: 'Hintergrundmusik',
-        audio_sfx: 'Sound-Effekte',
-        audio_mute: '🔇 STUMM SCHALTEN',
-        audio_unmute: '🔊 TON AKTIVIEREN',
-        back: 'Zurück'
-    },
-    en: {
-        start: 'START',
-        options: 'OPTIONS',
-        menu_languages: 'LANGUAGES',
-        menu_help: 'HELP',
-        menu_audio: 'AUDIO',
-        menu_impressum: 'LEGAL NOTICE',
-        back_start: 'BACK TO START',
-        to_title: 'TO TITLE',
-        back_game: 'BACK TO GAME',
-        submenu_languages: 'LANGUAGES',
-        submenu_controls: 'CONTROLS',
-        submenu_audio: 'AUDIO',
-        submenu_impressum: 'LEGAL NOTICE',
-        help_move: 'Move Sharkie',
-        help_bubble: 'Throw normal bubbles',
-        help_poison: 'Throw poison bubbles',
-        help_attack: 'Fin-slap attack',
-        help_tip: 'Collect coins • Dodge enemies • Defeat the boss!',
-        audio_music: 'Background music',
-        audio_sfx: 'Sound effects',
-        audio_mute: '🔇 MUTE ALL',
-        audio_unmute: '🔊 UNMUTE',
-        back: 'Back'
-    }
+  de: {
+    start: "START",
+    options: "OPTIONEN",
+    menu_languages: "SPRACHEN",
+    menu_help: "HILFE",
+    menu_audio: "AUDIO",
+    menu_impressum: "IMPRESSUM",
+    back_start: "ZURÜCK ZUM START",
+    to_title: "ZUM TITEL",
+    back_game: "ZURÜCK ZUM SPIEL",
+    submenu_languages: "SPRACHEN",
+    submenu_controls: "STEUERUNG",
+    submenu_audio: "AUDIO",
+    submenu_impressum: "IMPRESSUM",
+    help_move: "Sharkie bewegen",
+    help_bubble: "Normale Blasen werfen",
+    help_poison: "Gift-Blasen werfen",
+    help_attack: "Flossen-Schlag Angriff",
+    help_tip: "Sammle Münzen • Weiche Feinden aus • Besiege den Boss!",
+    audio_music: "Hintergrundmusik",
+    audio_sfx: "Sound-Effekte",
+    audio_mute: "🔇 STUMM SCHALTEN",
+    audio_unmute: "🔊 TON AKTIVIEREN",
+    back: "Zurück",
+  },
+  en: {
+    start: "START",
+    options: "OPTIONS",
+    menu_languages: "LANGUAGES",
+    menu_help: "HELP",
+    menu_audio: "AUDIO",
+    menu_impressum: "LEGAL NOTICE",
+    back_start: "BACK TO START",
+    to_title: "TO TITLE",
+    back_game: "BACK TO GAME",
+    submenu_languages: "LANGUAGES",
+    submenu_controls: "CONTROLS",
+    submenu_audio: "AUDIO",
+    submenu_impressum: "LEGAL NOTICE",
+    help_move: "Move Sharkie",
+    help_bubble: "Throw normal bubbles",
+    help_poison: "Throw poison bubbles",
+    help_attack: "Fin-slap attack",
+    help_tip: "Collect coins • Dodge enemies • Defeat the boss!",
+    audio_music: "Background music",
+    audio_sfx: "Sound effects",
+    audio_mute: "🔇 MUTE ALL",
+    audio_unmute: "🔊 UNMUTE",
+    back: "Back",
+  },
 };
 /** @type {number} Original game width in pixels. */
 const ORIGINAL_WIDTH = 800;
@@ -152,9 +152,9 @@ const ORIGINAL_HEIGHT = 540;
  * @returns {number} ID of the created interval.
  */
 setInterval = (handler, timeout, ...args) => {
-    const intervalId = nativeSetInterval(handler, timeout, ...args);
-    trackedIntervals.add(intervalId);
-    return intervalId;
+  const intervalId = nativeSetInterval(handler, timeout, ...args);
+  trackedIntervals.add(intervalId);
+  return intervalId;
 };
 
 /**
@@ -162,8 +162,8 @@ setInterval = (handler, timeout, ...args) => {
  * @param {number} intervalId The ID of the interval to clear.
  */
 clearInterval = (intervalId) => {
-    trackedIntervals.delete(intervalId);
-    nativeClearInterval(intervalId);
+  trackedIntervals.delete(intervalId);
+  nativeClearInterval(intervalId);
 };
 
 /**
@@ -173,16 +173,16 @@ clearInterval = (intervalId) => {
  * @returns {number} ID of the created timeout.
  */
 setTimeout = (handler, timeout, ...args) => {
-    const timeoutId = nativeSetTimeout(() => {
-        trackedTimeouts.delete(timeoutId);
-        if (typeof handler === 'function') {
-            handler(...args);
-            return;
-        }
-        Function(handler)();
-    }, timeout);
-    trackedTimeouts.add(timeoutId);
-    return timeoutId;
+  const timeoutId = nativeSetTimeout(() => {
+    trackedTimeouts.delete(timeoutId);
+    if (typeof handler === "function") {
+      handler(...args);
+      return;
+    }
+    Function(handler)();
+  }, timeout);
+  trackedTimeouts.add(timeoutId);
+  return timeoutId;
 };
 
 /**
@@ -190,8 +190,8 @@ setTimeout = (handler, timeout, ...args) => {
  * @param {number} timeoutId The ID of the timeout to clear.
  */
 clearTimeout = (timeoutId) => {
-    trackedTimeouts.delete(timeoutId);
-    nativeClearTimeout(timeoutId);
+  trackedTimeouts.delete(timeoutId);
+  nativeClearTimeout(timeoutId);
 };
 
 /**
@@ -200,12 +200,12 @@ clearTimeout = (timeoutId) => {
  * @returns {number} ID of the created animation frame.
  */
 requestAnimationFrame = (callback) => {
-    const frameId = nativeRequestAnimationFrame((timestamp) => {
-        trackedAnimationFrames.delete(frameId);
-        callback(timestamp);
-    });
-    trackedAnimationFrames.add(frameId);
-    return frameId;
+  const frameId = nativeRequestAnimationFrame((timestamp) => {
+    trackedAnimationFrames.delete(frameId);
+    callback(timestamp);
+  });
+  trackedAnimationFrames.add(frameId);
+  return frameId;
 };
 
 /**
@@ -213,8 +213,8 @@ requestAnimationFrame = (callback) => {
  * @param {number} frameId The ID of the animation frame to cancel.
  */
 cancelAnimationFrame = (frameId) => {
-    trackedAnimationFrames.delete(frameId);
-    nativeCancelAnimationFrame(frameId);
+  trackedAnimationFrames.delete(frameId);
+  nativeCancelAnimationFrame(frameId);
 };
 
 /**
@@ -223,14 +223,16 @@ cancelAnimationFrame = (frameId) => {
  * @returns {void}
  */
 function clearTrackedGameLoops() {
-    trackedIntervals.forEach((intervalId) => nativeClearInterval(intervalId));
-    trackedIntervals.clear();
+  trackedIntervals.forEach((intervalId) => nativeClearInterval(intervalId));
+  trackedIntervals.clear();
 
-    trackedTimeouts.forEach((timeoutId) => nativeClearTimeout(timeoutId));
-    trackedTimeouts.clear();
+  trackedTimeouts.forEach((timeoutId) => nativeClearTimeout(timeoutId));
+  trackedTimeouts.clear();
 
-    trackedAnimationFrames.forEach((frameId) => nativeCancelAnimationFrame(frameId));
-    trackedAnimationFrames.clear();
+  trackedAnimationFrames.forEach((frameId) =>
+    nativeCancelAnimationFrame(frameId),
+  );
+  trackedAnimationFrames.clear();
 }
 
 /**
@@ -239,9 +241,9 @@ function clearTrackedGameLoops() {
  * @returns {void}
  */
 function resetCanvasState() {
-    if (!ensureCanvasElement()) return;
-    applyDefaultCanvasSize();
-    resetCanvasRenderingState();
+  if (!ensureCanvasElement()) return;
+  applyDefaultCanvasSize();
+  resetCanvasRenderingState();
 }
 
 /**
@@ -250,8 +252,8 @@ function resetCanvasState() {
  * @returns {boolean} Canvas element exists and is valid.
  */
 function ensureCanvasElement() {
-    if (!canvas) canvas = $('canvas');
-    return !!canvas;
+  if (!canvas) canvas = $("canvas");
+  return !!canvas;
 }
 
 /**
@@ -260,8 +262,8 @@ function ensureCanvasElement() {
  * @returns {void}
  */
 function applyDefaultCanvasSize() {
-    canvas.width = ORIGINAL_WIDTH;
-    canvas.height = ORIGINAL_HEIGHT;
+  canvas.width = ORIGINAL_WIDTH;
+  canvas.height = ORIGINAL_HEIGHT;
 }
 
 /**
@@ -270,11 +272,11 @@ function applyDefaultCanvasSize() {
  * @returns {void}
  */
 function resetCanvasRenderingState() {
-    const ctx = canvas.getContext('2d');
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
 }
 
 /**
@@ -283,19 +285,19 @@ function resetCanvasRenderingState() {
  * @returns {void}
  */
 function teardownCurrentGame() {
-    if (world && typeof world.pauseGame === 'function') {
-        world.pauseGame();
-    }
-    if (typeof stopAssetLoadingGate === 'function') {
-        stopAssetLoadingGate();
-    }
+  if (world && typeof world.pauseGame === "function") {
+    world.pauseGame();
+  }
+  if (typeof stopAssetLoadingGate === "function") {
+    stopAssetLoadingGate();
+  }
 
-    clearTrackedGameLoops();
-    resetKeyboardState();
-    resetCanvasState();
+  clearTrackedGameLoops();
+  resetKeyboardState();
+  resetCanvasState();
 
-    world = null;
-    isGamePaused = false;
+  world = null;
+  isGamePaused = false;
 }
 
 /**
@@ -304,13 +306,13 @@ function teardownCurrentGame() {
  * @returns {void}
  */
 function showStartScreen() {
-    canvas = $('canvas');
-    showStartUiShell();
-    syncAudioSliderValues();
-    bindUI();
-    applyLanguage(gameSettings.language || 'de');
-    updateMuteButtonLabel();
-    updateOrientationLock();
+  canvas = $("canvas");
+  showStartUiShell();
+  syncAudioSliderValues();
+  bindUI();
+  applyLanguage(gameSettings.language || "de");
+  updateMuteButtonLabel();
+  updateOrientationLock();
 }
 
 /**
@@ -319,9 +321,9 @@ function showStartScreen() {
  * @returns {void}
  */
 function showStartUiShell() {
-    showEl('start-screen');
-    hideEl('options-screen');
-    hideMobileControls();
+  showEl("start-screen");
+  hideEl("options-screen");
+  hideMobileControls();
 }
 
 /**
@@ -330,9 +332,9 @@ function showStartUiShell() {
  * @returns {void}
  */
 function syncAudioSliderValues() {
-    if (!gameSettings) return;
-    syncSingleSlider('music-slider', 'music-value', gameSettings.musicVolume);
-    syncSingleSlider('sfx-slider', 'sfx-value', gameSettings.sfxVolume);
+  if (!gameSettings) return;
+  syncSingleSlider("music-slider", "music-value", gameSettings.musicVolume);
+  syncSingleSlider("sfx-slider", "sfx-value", gameSettings.sfxVolume);
 }
 
 /**
@@ -344,9 +346,9 @@ function syncAudioSliderValues() {
  * @returns {void}
  */
 function syncSingleSlider(sliderId, labelId, value) {
-    if (value === undefined) return;
-    $(sliderId).value = value * 100;
-    $(labelId).textContent = Math.round(value * 100) + '%';
+  if (value === undefined) return;
+  $(sliderId).value = value * 100;
+  $(labelId).textContent = Math.round(value * 100) + "%";
 }
 
 /**
@@ -355,10 +357,10 @@ function syncSingleSlider(sliderId, labelId, value) {
  * @returns {void}
  */
 function init() {
-    teardownCurrentGame();
-    ensureCanvasElement();
-    world = new World(canvas);
-    applySavedAudioSettings();
+  teardownCurrentGame();
+  ensureCanvasElement();
+  world = new World(canvas);
+  applySavedAudioSettings();
 }
 
 /**
@@ -367,62 +369,66 @@ function init() {
  * @returns {void}
  */
 function applySavedAudioSettings() {
-    if (!gameSettings || !world.audioManager) return;
-    if (gameSettings.musicVolume !== undefined) {
-        world.audioManager.setMusicVolume(gameSettings.musicVolume);
-    }
-    if (gameSettings.sfxVolume !== undefined) {
-        world.audioManager.setSFXVolume(gameSettings.sfxVolume);
-    }
-    world.audioManager.setMuted(!!gameSettings.muted);
+  if (!gameSettings || !world.audioManager) return;
+  if (gameSettings.musicVolume !== undefined) {
+    world.audioManager.setMusicVolume(gameSettings.musicVolume);
+  }
+  if (gameSettings.sfxVolume !== undefined) {
+    world.audioManager.setSFXVolume(gameSettings.sfxVolume);
+  }
+  world.audioManager.setMuted(!!gameSettings.muted);
 }
 
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowLeft') keyboard.LEFT = true;
-    if (e.key === 'ArrowRight') keyboard.RIGHT = true;
-    if (e.key === 'ArrowUp') keyboard.UP = true;
-    if (e.key === 'ArrowDown') keyboard.DOWN = true;
-    if (e.key === 'd' || e.key === 'D') keyboard.D = true;
-    if (e.key === 'f' || e.key === 'F') keyboard.F = true;
-    if (e.key === ' ') keyboard.SPACE = true;
+document.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowLeft") keyboard.LEFT = true;
+  if (e.key === "ArrowRight") keyboard.RIGHT = true;
+  if (e.key === "ArrowUp") keyboard.UP = true;
+  if (e.key === "ArrowDown") keyboard.DOWN = true;
+  if (e.key === "d" || e.key === "D") keyboard.D = true;
+  if (e.key === "f" || e.key === "F") keyboard.F = true;
+  if (e.key === " ") keyboard.SPACE = true;
 });
 
-document.addEventListener('keyup', (e) => {
-    if (e.key === 'ArrowLeft') keyboard.LEFT = false;
-    if (e.key === 'ArrowRight') keyboard.RIGHT = false;
-    if (e.key === 'ArrowUp') keyboard.UP = false;
-    if (e.key === 'ArrowDown') keyboard.DOWN = false;
-    if (e.key === 'd' || e.key === 'D') keyboard.D = false;
-    if (e.key === 'f' || e.key === 'F') keyboard.F = false;
-    if (e.key === ' ') keyboard.SPACE = false;
+document.addEventListener("keyup", (e) => {
+  if (e.key === "ArrowLeft") keyboard.LEFT = false;
+  if (e.key === "ArrowRight") keyboard.RIGHT = false;
+  if (e.key === "ArrowUp") keyboard.UP = false;
+  if (e.key === "ArrowDown") keyboard.DOWN = false;
+  if (e.key === "d" || e.key === "D") keyboard.D = false;
+  if (e.key === "f" || e.key === "F") keyboard.F = false;
+  if (e.key === " ") keyboard.SPACE = false;
 });
 
-document.addEventListener('mousemove', (e) => {
-    const position = getCanvasPointerPosition(e.clientX, e.clientY);
-    if (!position) {
-        return;
-    }
+document.addEventListener("mousemove", (e) => {
+  const position = getCanvasPointerPosition(e.clientX, e.clientY);
+  if (!position) {
+    return;
+  }
 
-    mousePos.x = position.x;
-    mousePos.y = position.y;
+  mousePos.x = position.x;
+  mousePos.y = position.y;
 
-    if (world && world.restartButton) {
-        world.restartButton.updateHoverState(position.x, position.y);
-    }
+  if (world && world.restartButton) {
+    world.restartButton.updateHoverState(position.x, position.y);
+  }
 });
 
-document.addEventListener('click', (e) => {
-    if (e.target.closest('#mobile-controls')) return;
-    handleCanvasPointer(e.clientX, e.clientY);
+document.addEventListener("click", (e) => {
+  if (e.target.closest("#mobile-controls")) return;
+  handleCanvasPointer(e.clientX, e.clientY);
 });
 
-document.addEventListener('touchstart', (e) => {
+document.addEventListener(
+  "touchstart",
+  (e) => {
     if (!e.touches || e.touches.length === 0) return;
-    if (e.target.closest('#mobile-controls')) return;
+    if (e.target.closest("#mobile-controls")) return;
     const touch = e.touches[0];
     handleCanvasPointer(touch.clientX, touch.clientY);
-}, { passive: true });
-document.addEventListener('fullscreenchange', () => {
-    const isFullscreen = !!document.fullscreenElement;
-    updateCanvasResolution(isFullscreen);
+  },
+  { passive: true },
+);
+document.addEventListener("fullscreenchange", () => {
+  const isFullscreen = !!document.fullscreenElement;
+  updateCanvasResolution(isFullscreen);
 });

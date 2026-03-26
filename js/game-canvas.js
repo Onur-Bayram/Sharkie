@@ -5,7 +5,7 @@
  * @returns {Record<string, string>}
  */
 function getLanguageStrings(lang) {
-    return TRANSLATIONS[lang] || TRANSLATIONS.de;
+  return TRANSLATIONS[lang] || TRANSLATIONS.de;
 }
 
 /**
@@ -15,9 +15,9 @@ function getLanguageStrings(lang) {
  * @returns {void}
  */
 function setActiveLanguageButton(lang) {
-    document.querySelectorAll('.lang-button').forEach((btn) => {
-        btn.classList.toggle('active', btn.dataset.lang === lang);
-    });
+  document.querySelectorAll(".lang-button").forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.lang === lang);
+  });
 }
 
 /**
@@ -27,11 +27,11 @@ function setActiveLanguageButton(lang) {
  * @returns {void}
  */
 function applyLanguage(lang) {
-    const strings = getLanguageStrings(lang);
-    applyTextTranslations(strings);
-    applyTitleTranslations(strings);
-    document.documentElement.lang = lang === 'en' ? 'en' : 'de';
-    setActiveLanguageButton(lang);
+  const strings = getLanguageStrings(lang);
+  applyTextTranslations(strings);
+  applyTitleTranslations(strings);
+  document.documentElement.lang = lang === "en" ? "en" : "de";
+  setActiveLanguageButton(lang);
 }
 
 /**
@@ -41,10 +41,10 @@ function applyLanguage(lang) {
  * @returns {void}
  */
 function applyTextTranslations(strings) {
-    document.querySelectorAll('[data-i18n]').forEach((element) => {
-        const key = element.dataset.i18n;
-        if (strings[key]) element.textContent = strings[key];
-    });
+  document.querySelectorAll("[data-i18n]").forEach((element) => {
+    const key = element.dataset.i18n;
+    if (strings[key]) element.textContent = strings[key];
+  });
 }
 
 /**
@@ -54,10 +54,10 @@ function applyTextTranslations(strings) {
  * @returns {void}
  */
 function applyTitleTranslations(strings) {
-    document.querySelectorAll('[data-i18n-title]').forEach((element) => {
-        const key = element.dataset.i18nTitle;
-        if (strings[key]) element.setAttribute('title', strings[key]);
-    });
+  document.querySelectorAll("[data-i18n-title]").forEach((element) => {
+    const key = element.dataset.i18nTitle;
+    if (strings[key]) element.setAttribute("title", strings[key]);
+  });
 }
 
 /**
@@ -67,11 +67,11 @@ function applyTitleTranslations(strings) {
  * @returns {void}
  */
 function updateCanvasResolution(isFullscreen) {
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    setCanvasResolutionForMode(ctx, isFullscreen);
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  setCanvasResolutionForMode(ctx, isFullscreen);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
 }
 
 /**
@@ -82,14 +82,14 @@ function updateCanvasResolution(isFullscreen) {
  * @returns {void}
  */
 function setCanvasResolutionForMode(ctx, isFullscreen) {
-    if (!isFullscreen) {
-        canvas.width = ORIGINAL_WIDTH;
-        canvas.height = ORIGINAL_HEIGHT;
-        return;
-    }
-    const scale = devicePixelRatio || 2;
-    const multiplier = Math.min(scale, 2);
-    canvas.width = ORIGINAL_WIDTH * multiplier;
-    canvas.height = ORIGINAL_HEIGHT * multiplier;
-    ctx.scale(multiplier, multiplier);
+  if (!isFullscreen) {
+    canvas.width = ORIGINAL_WIDTH;
+    canvas.height = ORIGINAL_HEIGHT;
+    return;
+  }
+  const scale = devicePixelRatio || 2;
+  const multiplier = Math.min(scale, 2);
+  canvas.width = ORIGINAL_WIDTH * multiplier;
+  canvas.height = ORIGINAL_HEIGHT * multiplier;
+  ctx.scale(multiplier, multiplier);
 }

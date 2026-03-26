@@ -7,13 +7,13 @@
  * @returns {{x: number, y: number} | null} Canvas position or null outside the play area.
  */
 function getCanvasPointerPosition(clientX, clientY) {
-    if (!canvas) return null;
-    const rect = canvas.getBoundingClientRect();
-    const drawArea = getCanvasDrawArea(rect);
-    const relativeX = clientX - rect.left - drawArea.offsetX;
-    const relativeY = clientY - rect.top - drawArea.offsetY;
-    if (!isInsideDrawArea(relativeX, relativeY, drawArea)) return null;
-    return toCanvasCoordinates(relativeX, relativeY, drawArea);
+  if (!canvas) return null;
+  const rect = canvas.getBoundingClientRect();
+  const drawArea = getCanvasDrawArea(rect);
+  const relativeX = clientX - rect.left - drawArea.offsetX;
+  const relativeY = clientY - rect.top - drawArea.offsetY;
+  if (!isInsideDrawArea(relativeX, relativeY, drawArea)) return null;
+  return toCanvasCoordinates(relativeX, relativeY, drawArea);
 }
 
 /**
@@ -22,14 +22,24 @@ function getCanvasPointerPosition(clientX, clientY) {
  * @returns {{drawWidth: number, drawHeight: number, offsetX: number, offsetY: number}} Draw area data.
  */
 function getCanvasDrawArea(rect) {
-    const canvasRatio = ORIGINAL_WIDTH / ORIGINAL_HEIGHT;
-    const rectRatio = rect.width / rect.height;
-    if (rectRatio > canvasRatio) {
-        const drawWidth = rect.height * canvasRatio;
-        return { drawWidth, drawHeight: rect.height, offsetX: (rect.width - drawWidth) / 2, offsetY: 0 };
-    }
-    const drawHeight = rect.width / canvasRatio;
-    return { drawWidth: rect.width, drawHeight, offsetX: 0, offsetY: (rect.height - drawHeight) / 2 };
+  const canvasRatio = ORIGINAL_WIDTH / ORIGINAL_HEIGHT;
+  const rectRatio = rect.width / rect.height;
+  if (rectRatio > canvasRatio) {
+    const drawWidth = rect.height * canvasRatio;
+    return {
+      drawWidth,
+      drawHeight: rect.height,
+      offsetX: (rect.width - drawWidth) / 2,
+      offsetY: 0,
+    };
+  }
+  const drawHeight = rect.width / canvasRatio;
+  return {
+    drawWidth: rect.width,
+    drawHeight,
+    offsetX: 0,
+    offsetY: (rect.height - drawHeight) / 2,
+  };
 }
 
 /**
@@ -40,7 +50,12 @@ function getCanvasDrawArea(rect) {
  * @returns {boolean} True when inside draw area.
  */
 function isInsideDrawArea(relativeX, relativeY, drawArea) {
-    return !(relativeX < 0 || relativeY < 0 || relativeX > drawArea.drawWidth || relativeY > drawArea.drawHeight);
+  return !(
+    relativeX < 0 ||
+    relativeY < 0 ||
+    relativeX > drawArea.drawWidth ||
+    relativeY > drawArea.drawHeight
+  );
 }
 
 /**
@@ -51,10 +66,10 @@ function isInsideDrawArea(relativeX, relativeY, drawArea) {
  * @returns {{x: number, y: number}} Canvas/game coordinates.
  */
 function toCanvasCoordinates(relativeX, relativeY, drawArea) {
-    return {
-        x: (relativeX / drawArea.drawWidth) * ORIGINAL_WIDTH,
-        y: (relativeY / drawArea.drawHeight) * ORIGINAL_HEIGHT
-    };
+  return {
+    x: (relativeX / drawArea.drawWidth) * ORIGINAL_WIDTH,
+    y: (relativeY / drawArea.drawHeight) * ORIGINAL_HEIGHT,
+  };
 }
 
 /**
@@ -66,12 +81,12 @@ function toCanvasCoordinates(relativeX, relativeY, drawArea) {
  * @returns {void}
  */
 function handleCanvasPointer(clientX, clientY) {
-    if (!canvas) return;
-    const position = getCanvasPointerPosition(clientX, clientY);
-    if (!position) return;
-    if (world && world.restartButton) {
-        world.restartButton.handleClick(position.x, position.y);
-    }
+  if (!canvas) return;
+  const position = getCanvasPointerPosition(clientX, clientY);
+  if (!position) return;
+  if (world && world.restartButton) {
+    world.restartButton.handleClick(position.x, position.y);
+  }
 }
 
 /**
@@ -80,14 +95,14 @@ function handleCanvasPointer(clientX, clientY) {
  * @returns {void}
  */
 function resetKeyboardState() {
-    keyboard.LEFT = false;
-    keyboard.RIGHT = false;
-    keyboard.UP = false;
-    keyboard.DOWN = false;
-    keyboard.D = false;
-    keyboard.F = false;
-    keyboard.SPACE = false;
-    activeMobilePointers.clear();
+  keyboard.LEFT = false;
+  keyboard.RIGHT = false;
+  keyboard.UP = false;
+  keyboard.DOWN = false;
+  keyboard.D = false;
+  keyboard.F = false;
+  keyboard.SPACE = false;
+  activeMobilePointers.clear();
 }
 
 /**
@@ -97,7 +112,9 @@ function resetKeyboardState() {
  * @returns {boolean}
  */
 function isPortraitPhoneLayout() {
-    return matchMedia('(max-width: 768px) and (orientation: portrait) and (hover: none) and (pointer: coarse)').matches;
+  return matchMedia(
+    "(max-width: 768px) and (orientation: portrait) and (hover: none) and (pointer: coarse)",
+  ).matches;
 }
 
 /**
@@ -106,16 +123,16 @@ function isPortraitPhoneLayout() {
  * @returns {void}
  */
 function updateOrientationLock() {
-    const isLocked = isPortraitPhoneLayout();
-    document.body.classList.toggle('portrait-lock', isLocked);
-    if (!canvas) canvas = $('canvas');
-    if (isLocked) {
-        handleOrientationLockPause();
-        return;
-    }
-    resumeIfPausedByOrientation();
-    wasPausedByOrientation = false;
-    updateMobileControlsVisibility();
+  const isLocked = isPortraitPhoneLayout();
+  document.body.classList.toggle("portrait-lock", isLocked);
+  if (!canvas) canvas = $("canvas");
+  if (isLocked) {
+    handleOrientationLockPause();
+    return;
+  }
+  resumeIfPausedByOrientation();
+  wasPausedByOrientation = false;
+  updateMobileControlsVisibility();
 }
 
 /**
@@ -123,12 +140,17 @@ function updateOrientationLock() {
  * @returns {void}
  */
 function handleOrientationLockPause() {
-    if (world && !isGamePaused && canvas && !canvas.classList.contains('hidden')) {
-        if (typeof world.pauseGame === 'function') world.pauseGame();
-        wasPausedByOrientation = true;
-    }
-    resetKeyboardState();
-    hideMobileControls();
+  if (
+    world &&
+    !isGamePaused &&
+    canvas &&
+    !canvas.classList.contains("hidden")
+  ) {
+    if (typeof world.pauseGame === "function") world.pauseGame();
+    wasPausedByOrientation = true;
+  }
+  resetKeyboardState();
+  hideMobileControls();
 }
 
 /**
@@ -136,8 +158,8 @@ function handleOrientationLockPause() {
  * @returns {void}
  */
 function resumeIfPausedByOrientation() {
-    if (!canResumeFromOrientationLock()) return;
-    world.resumeGame();
+  if (!canResumeFromOrientationLock()) return;
+  world.resumeGame();
 }
 
 /**
@@ -145,10 +167,10 @@ function resumeIfPausedByOrientation() {
  * @returns {boolean}
  */
 function canResumeFromOrientationLock() {
-    if (!wasPausedByOrientation || !world || isGamePaused) return false;
-    if (!$('options-screen').classList.contains('is-hidden')) return false;
-    if (!canvas || canvas.classList.contains('hidden')) return false;
-    return typeof world.resumeGame === 'function';
+  if (!wasPausedByOrientation || !world || isGamePaused) return false;
+  if (!$("options-screen").classList.contains("is-hidden")) return false;
+  if (!canvas || canvas.classList.contains("hidden")) return false;
+  return typeof world.resumeGame === "function";
 }
 
 /**
@@ -157,7 +179,7 @@ function canResumeFromOrientationLock() {
  * @returns {boolean}
  */
 function isResponsiveLayout() {
-    return matchMedia('(max-width: 1024px)').matches;
+  return matchMedia("(max-width: 1024px)").matches;
 }
 
 /**
@@ -166,14 +188,14 @@ function isResponsiveLayout() {
  * @returns {void}
  */
 function updateBackIconVisibility() {
-    const optionsScreen = $('options-screen');
-    const backIconButton = optionsScreen?.querySelector('.back-icon-button');
-    if (!optionsScreen || !backIconButton) return;
-    if (optionsScreen.classList.contains('is-hidden')) {
-        backIconButton.classList.remove('is-visible');
-        return;
-    }
-    backIconButton.classList.add('is-visible');
+  const optionsScreen = $("options-screen");
+  const backIconButton = optionsScreen?.querySelector(".back-icon-button");
+  if (!optionsScreen || !backIconButton) return;
+  if (optionsScreen.classList.contains("is-hidden")) {
+    backIconButton.classList.remove("is-visible");
+    return;
+  }
+  backIconButton.classList.add("is-visible");
 }
 
 /**
@@ -182,7 +204,10 @@ function updateBackIconVisibility() {
  * @returns {boolean}
  */
 function isTouchGameplayDevice() {
-    return navigator.maxTouchPoints > 0 || matchMedia('(hover: none) and (pointer: coarse)').matches;
+  return (
+    navigator.maxTouchPoints > 0 ||
+    matchMedia("(hover: none) and (pointer: coarse)").matches
+  );
 }
 
 /**
@@ -191,12 +216,12 @@ function isTouchGameplayDevice() {
  * @returns {void}
  */
 function updateMobileControlsVisibility() {
-    const controls = $('mobile-controls');
-    const htmlFullscreenButton = $('html-fullscreen-button');
-    if (!controls || !canvas) return;
-    const baseGameplayVisible = isBaseGameplayVisible();
-    toggleMobileControls(baseGameplayVisible);
-    toggleHtmlFullscreenButton(htmlFullscreenButton, baseGameplayVisible);
+  const controls = $("mobile-controls");
+  const htmlFullscreenButton = $("html-fullscreen-button");
+  if (!controls || !canvas) return;
+  const baseGameplayVisible = isBaseGameplayVisible();
+  toggleMobileControls(baseGameplayVisible);
+  toggleHtmlFullscreenButton(htmlFullscreenButton, baseGameplayVisible);
 }
 
 /**
@@ -204,10 +229,15 @@ function updateMobileControlsVisibility() {
  * @returns {boolean}
  */
 function isBaseGameplayVisible() {
-    const isGameVisible = !canvas.classList.contains('hidden');
-    const isStartHidden = $('start-screen').classList.contains('is-hidden');
-    const isOptionsHidden = $('options-screen').classList.contains('is-hidden');
-    return !isPortraitPhoneLayout() && isGameVisible && isStartHidden && isOptionsHidden;
+  const isGameVisible = !canvas.classList.contains("hidden");
+  const isStartHidden = $("start-screen").classList.contains("is-hidden");
+  const isOptionsHidden = $("options-screen").classList.contains("is-hidden");
+  return (
+    !isPortraitPhoneLayout() &&
+    isGameVisible &&
+    isStartHidden &&
+    isOptionsHidden
+  );
 }
 
 /**
@@ -216,8 +246,8 @@ function isBaseGameplayVisible() {
  * @returns {void}
  */
 function toggleMobileControls(baseGameplayVisible) {
-    if (isTouchGameplayDevice() && baseGameplayVisible) showMobileControls();
-    else hideMobileControls();
+  if (isTouchGameplayDevice() && baseGameplayVisible) showMobileControls();
+  else hideMobileControls();
 }
 
 /**
@@ -227,12 +257,12 @@ function toggleMobileControls(baseGameplayVisible) {
  * @returns {void}
  */
 function toggleHtmlFullscreenButton(button, baseGameplayVisible) {
-    if (!button) return;
-    if (isTouchGameplayDevice()) {
-        button.classList.add('is-hidden');
-        return;
-    }
-    button.classList.toggle('is-hidden', !baseGameplayVisible);
+  if (!button) return;
+  if (isTouchGameplayDevice()) {
+    button.classList.add("is-hidden");
+    return;
+  }
+  button.classList.toggle("is-hidden", !baseGameplayVisible);
 }
 
 /**
@@ -241,10 +271,10 @@ function toggleHtmlFullscreenButton(button, baseGameplayVisible) {
  * @returns {void}
  */
 function updateHtmlFullscreenButton() {
-    const btn = $('html-fullscreen-button');
-    if (!btn) return;
-    btn.textContent = document.fullscreenElement ? '✕' : '⛶';
-    btn.title = document.fullscreenElement ? 'Vollbild verlassen' : 'Vollbild';
+  const btn = $("html-fullscreen-button");
+  if (!btn) return;
+  btn.textContent = document.fullscreenElement ? "✕" : "⛶";
+  btn.title = document.fullscreenElement ? "Vollbild verlassen" : "Vollbild";
 }
 
 /**
@@ -253,11 +283,11 @@ function updateHtmlFullscreenButton() {
  * @returns {void}
  */
 function bindMobileControls() {
-    const controls = $('mobile-controls');
-    if (!controls) return;
-    bindMobilePointerDown(controls);
-    bindMobilePointerRelease(controls);
-    bindMobileSystemResetHandlers(controls);
+  const controls = $("mobile-controls");
+  if (!controls) return;
+  bindMobilePointerDown(controls);
+  bindMobilePointerRelease(controls);
+  bindMobileSystemResetHandlers(controls);
 }
 
 /**
@@ -266,13 +296,13 @@ function bindMobileControls() {
  * @returns {void}
  */
 function bindMobilePointerDown(controls) {
-    controls.addEventListener('pointerdown', (event) => {
-        const button = event.target.closest('[data-key]');
-        if (!button) return;
-        event.preventDefault();
-        activateMobileKey(button, event.pointerId);
-        if (button.setPointerCapture) button.setPointerCapture(event.pointerId);
-    });
+  controls.addEventListener("pointerdown", (event) => {
+    const button = event.target.closest("[data-key]");
+    if (!button) return;
+    event.preventDefault();
+    activateMobileKey(button, event.pointerId);
+    if (button.setPointerCapture) button.setPointerCapture(event.pointerId);
+  });
 }
 
 /**
@@ -282,10 +312,10 @@ function bindMobilePointerDown(controls) {
  * @returns {void}
  */
 function activateMobileKey(button, pointerId) {
-    const key = button.dataset.key;
-    if (!Object.prototype.hasOwnProperty.call(keyboard, key)) return;
-    keyboard[key] = true;
-    activeMobilePointers.set(pointerId, key);
+  const key = button.dataset.key;
+  if (!Object.prototype.hasOwnProperty.call(keyboard, key)) return;
+  keyboard[key] = true;
+  activeMobilePointers.set(pointerId, key);
 }
 
 /**
@@ -294,14 +324,14 @@ function activateMobileKey(button, pointerId) {
  * @returns {void}
  */
 function bindMobilePointerRelease(controls) {
-    const releasePointerKey = (event) => {
-        const key = activeMobilePointers.get(event.pointerId);
-        if (!key) return;
-        keyboard[key] = false;
-        activeMobilePointers.delete(event.pointerId);
-    };
-    controls.addEventListener('pointerup', releasePointerKey);
-    controls.addEventListener('pointercancel', releasePointerKey);
+  const releasePointerKey = (event) => {
+    const key = activeMobilePointers.get(event.pointerId);
+    if (!key) return;
+    keyboard[key] = false;
+    activeMobilePointers.delete(event.pointerId);
+  };
+  controls.addEventListener("pointerup", releasePointerKey);
+  controls.addEventListener("pointercancel", releasePointerKey);
 }
 
 /**
@@ -310,9 +340,9 @@ function bindMobilePointerRelease(controls) {
  * @returns {void}
  */
 function bindMobileSystemResetHandlers(controls) {
-    controls.addEventListener('contextmenu', (event) => event.preventDefault());
-    addEventListener('blur', resetKeyboardState);
-    document.addEventListener('visibilitychange', () => {
-        if (document.hidden) resetKeyboardState();
-    });
+  controls.addEventListener("contextmenu", (event) => event.preventDefault());
+  addEventListener("blur", resetKeyboardState);
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) resetKeyboardState();
+  });
 }
