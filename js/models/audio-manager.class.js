@@ -25,7 +25,20 @@ class AudioManager {
    * Creates a new instance.
    */
   constructor() {
+    this.configurePreloadBehavior();
     this.loadAudio();
+  }
+
+  /**
+   * Configures preload behavior to avoid many parallel media requests
+   * on first page load (common source of HTTP/2 protocol errors).
+   * @returns {void}
+   */
+  configurePreloadBehavior() {
+    this.bgMusic.preload = "metadata";
+    this.getSfxSounds().forEach((sound) => {
+      sound.preload = "none";
+    });
   }
 
   /**
