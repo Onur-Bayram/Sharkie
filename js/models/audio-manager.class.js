@@ -60,7 +60,7 @@ class AudioManager {
    * @returns {void}
    */
   loadMusicTracks() {
-    this.bgMusic.src = "audio/Super Mario 64 Soundtrack - Dire, Dire Docks.mp3";
+    this.bgMusic.src = "audio/super-mario-dire-docks.mp3";
     this.bgMusic.loop = true;
     this.bgMusic.volume = this.musicVolume;
   }
@@ -70,15 +70,15 @@ class AudioManager {
    * @returns {void}
    */
   loadSfxTracks() {
-    this.coinSound.src = "audio/Gold.mp3";
-    this.failSound.src = "audio/Fail.mp3";
-    this.potionSound.src = "audio/Potion.mp3";
-    this.victorySound.src = "audio/8 BIT Victory sound effect.mp3";
-    this.finSlapSound.src = "audio/Punch.mp3";
-    this.electricSound.src = "audio/Electricity.mp3";
+    this.coinSound.src = "audio/gold.mp3";
+    this.failSound.src = "audio/fail.mp3";
+    this.potionSound.src = "audio/potion.mp3";
+    this.victorySound.src = "audio/victory.mp3";
+    this.finSlapSound.src = "audio/punch.mp3";
+    this.electricSound.src = "audio/electricity.mp3";
     this.hurtSound.src = "audio/confusion.mp3";
-    this.bubbleShootSound.src = "audio/Bubbleshoot.mp3";
-    this.poisonShootSound.src = "audio/Poisenshoot.mp3";
+    this.bubbleShootSound.src = "audio/bubble-shoot.mp3";
+    this.poisonShootSound.src = "audio/poison-shoot.mp3";
     this.applySfxVolumes();
   }
 
@@ -139,9 +139,9 @@ class AudioManager {
    * @returns {void}
    */
   loadVoiceTracks() {
-    this.darkZoneVoiceSound.src = "audio/DU KANNST NICHT VORBEI!!!.mp3";
+    this.darkZoneVoiceSound.src = "audio/dark-zone-voice.mp3";
     this.darkZoneVoiceSound.volume = this.sfxVolume;
-    this.bossIntroSound.src = "audio/chiiri-monster.mp3";
+    this.bossIntroSound.src = "audio/boss-intro.mp3";
     this.bossIntroSound.volume = this.sfxVolume;
   }
 
